@@ -2,324 +2,75 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABSURDUM: Malfungsi Aksara</title>
+    <title>ABSURDUM | Malfungsi Aksara</title>
     <style>
-        /* --- Gaya Dasar & Tema --- */
-        @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
-
-        :root {
-            --bg-color: #0a0a0a;
-            --text-color: #e0e0e0;
-            --accent-green: #39ff14;
-            --accent-cyan: #00ffff;
-            --accent-magenta: #ff00ff;
-            --accent-red: #ff073a;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Share Tech Mono', monospace;
-            overflow: hidden; /* Mencegah scroll */
-            cursor: crosshair;
-        }
-
-        /* --- Canvas untuk Latar Belakang Kacau --- */
-        #background-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-
-        /* --- Container Utama --- */
-        .main-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
+            background-color: #0a0a0a;
+            color: #d1d1d1;
+            font-family: 'Courier New', Courier, monospace;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            line-height: 1.2;
         }
 
-        /* --- Judul dengan Efek Glitch --- */
-        .main-title-wrapper {
-            position: absolute;
-            top: 10%;
-            text-align: center;
-            z-index: 10;
+        .container { width: 80%; max-width: 600px; }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #ff3e3e;
+            text-shadow: 2px 2px #00f0ff;
+            text-transform: uppercase;
+            letter-spacing: 5px;
         }
 
-        .main-title {
-            font-family: 'VT323', monospace;
-            font-size: 4.5rem;
-            color: var(--accent-green);
-            text-shadow: 0 0 15px var(--accent-green);
-            letter-spacing: 8px;
-            position: relative;
-            animation: flicker 5s infinite alternate;
+        .glitch-text { color: #888; font-size: 0.9rem; margin-bottom: 50px; }
+
+        .poem {
+            margin-top: 20px;
+            white-space: pre-wrap; /* Biar spasi dan enter tetap rapi/berantakan */
         }
 
-        .main-title::before,
-        .main-title::after {
-            content: 'ABSURDUM: Malfungsi Aksara';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-color);
-            overflow: hidden;
-        }
-
-        .main-title::before {
-            left: 3px;
-            text-shadow: -3px 0 var(--accent-magenta);
-            animation: glitch-anim-1 1.5s infinite linear alternate-reverse;
-        }
-
-        .main-title::after {
-            left: -3px;
-            text-shadow: -3px 0 var(--accent-cyan), 3px 3px var(--accent-magenta);
-            animation: glitch-anim-2 2.5s infinite linear alternate-reverse;
-        }
+        .footer { margin-top: 100px; font-size: 0.7rem; opacity: 0.3; }
         
-        .subtitle {
-            font-size: 1.2rem;
-            color: #777;
-            margin-top: 10px;
-            letter-spacing: 3px;
-        }
-
-        /* --- Link Puisi yang Tersebar --- */
-        .poem-links {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        .poem-link {
-            position: absolute;
-            color: var(--text-color);
-            text-decoration: none;
-            font-size: 1.2rem;
-            padding: 15px 25px;
-            background: rgba(12, 12, 12, 0.6);
-            border: 1px solid var(--accent-cyan);
-            transition: all 0.3s ease;
-            z-index: 5;
-            /* Bentuk acak dengan clip-path */
-            clip-path: polygon(0 0, 100% 5%, 100% 95%, 95% 100%, 5% 100%, 0 85%);
-        }
-
-        .poem-link:hover {
-            color: var(--bg-color);
-            background: var(--accent-cyan);
-            box-shadow: 0 0 20px var(--accent-cyan), inset 0 0 10px rgba(0,0,0,0.5);
-            transform: scale(1.1) rotate(2deg);
-        }
-
-        /* --- Fragmen Teks Melayang --- */
-        .floating-text {
-            position: absolute;
-            font-family: 'VT323', monospace;
-            color: #555;
-            font-size: 1.5rem;
-            pointer-events: none; /* Biar tidak mengganggu klik */
-            opacity: 0;
-            animation: float-up 15s linear;
-        }
-
-        /* --- Animasi --- */
-        @keyframes glitch-anim-1 {
-            0% { clip-path: inset(32% 0 63% 0); }
-            20% { clip-path: inset(75% 0 5% 0); }
-            40% { clip-path: inset(8% 0 88% 0); }
-            60% { clip-path: inset(50% 0 30% 0); }
-            80% { clip-path: inset(90% 0 2% 0); }
-            100% { clip-path: inset(25% 0 65% 0); }
-        }
-
-        @keyframes glitch-anim-2 {
-            0% { clip-path: inset(60% 0 10% 0); }
-            20% { clip-path: inset(5% 0 80% 0); }
-            40% { clip-path: inset(85% 0 5% 0); }
-            60% { clip-path: inset(20% 0 60% 0); }
-            80% { clip-path: inset(70% 0 15% 0); }
-            100% { clip-path: inset(10% 0 75% 0); }
-        }
-
-        @keyframes flicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% {
-                text-shadow: 0 0 15px var(--accent-green);
-            }
-            20%, 24%, 55% {
-                text-shadow: none; /* Matikan sebentar untuk efek flicker */
-            }
-        }
-        
-        @keyframes float-up {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.7;
-            }
-            90% {
-                opacity: 0.7;
-            }
-            100% {
-                transform: translateY(-100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        /* --- Footer --- */
-        footer {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-            font-size: 1rem;
-            color: #444;
-            z-index: 10;
-        }
+        /* Efek sederhana biar teks kelihatan "rusak" */
+        span.broken { display: inline-block; transform: rotate(-5deg) translateY(10px); color: #fff; }
     </style>
 </head>
 <body>
 
-    <canvas id="background-canvas"></canvas>
+    <div class="container">
+        <h1>ABSURDUM</h1>
+        <div class="glitch-text">> Error: System.log not found. Displaying malfungsi_aksara.txt</div>
 
-    <div class="main-container">
-        <header class="main-title-wrapper">
-            <h1 class="main-title">ABSURDUM: Malfungsi Aksara</h1>
-            <p class="subtitle">// Navigasi adalah ilusi //</p>
-        </header>
+        <div class="poem">
+            Di sini,
+            huruf-huruf <span class="broken">mati</span> muda.
+            
+            Mereka tidak sempat jadi kata,
+            apalagi menjadi doa yang dikabulkan.
+            
+            [ 404 : HATI ]
+            
+            Jendela ini terbuka,
+            tapi hanya ada gelap yang
+                                  **berteriak**.
+            
+            Apakah kau mendengar frekuensi yang patah?
+            Itu adalah aku,
+            sedang mencoba mengeja namamu 
+            dengan lidah yang sudah jadi abu.
+        </div>
 
-        <main class="poem-links">
-            <!-- 
-                GANTI LINK INI!
-                'href' adalah alamat file puisi kamu.
-                Misalnya, jika kamu punya folder 'puisi' dan file 'perjamuan.html', maka href="puisi/perjamuan.html"
-            -->
-            <a href="puisi/perjamuan.html" class="poem-link" style="top: 25%; left: 15%;">Perjamuan di Perut Paus</a>
-            <a href="puisi/debugging-jiwa.html" class="poem-link" style="top: 45%; left: 70%;">Debugging Jiwa</a>
-            <a href="puisi/arsitek-kebasahan.html" class="poem-link" style="top: 65%; left: 30%;">Arsitek Kebasahan</a>
-            <a href="puisi/eksportir-antimateri.html" class="poem-link" style="top: 35%; left: 50%;">Eksportir Antimateri</a>
-            <a href="puisi/puisi-lain.html" class="poem-link" style="top: 75%; left: 60%;">[void]</a>
-        </main>
-
-        <footer>
-            <p>// SYSTEM_ERROR: Meaning not found //</p>
-        </footer>
+        <div class="footer">
+            -- end of transmission --
+            [ Process finished with exit code 1 ]
+        </div>
     </div>
 
-    <script>
-        // --- LOGIKA UNTUK LATAR BELAKANG KACAU (PARTIKEL & GARIS) ---
-        const canvas = document.getElementById('background-canvas');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.radius = Math.random() * 1.5;
-            }
-
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-
-                if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
-                if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
-            }
-
-            draw() {
-                ctx.fillStyle = 'rgba(57, 255, 20, 0.5)'; // --accent-green
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        const particles = [];
-        const particleCount = 80;
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new Particle());
-        }
-
-        function connectParticles() {
-            const maxDistance = 120;
-            for (let a = 0; a < particles.length; a++) {
-                for (let b = a + 1; b < particles.length; b++) {
-                    const dx = particles[a].x - particles[b].x;
-                    const dy = particles[a].y - particles[b].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < maxDistance) {
-                        ctx.strokeStyle = `rgba(57, 255, 20, ${0.2 * (1 - distance / maxDistance)})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[a].x, particles[a].y);
-                        ctx.lineTo(particles[b].x, particles[b].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-        }
-
-        function animateBackground() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(particle => {
-                particle.update();
-                particle.draw();
-            });
-            connectParticles();
-            requestAnimationFrame(animateBackground);
-        }
-        animateBackground();
-
-        // --- LOGIKA UNTUK TEKS Melayang ---
-        const glitchWords = ['error', '404', 'void', 'null', 'NaN', 'undefined', '[]', '{}', '...', 'SIGSEGV'];
-        const mainContainer = document.querySelector('.main-container');
-
-        function createFloatingText() {
-            const textEl = document.createElement('div');
-            textEl.classList.add('floating-text');
-            textEl.textContent = glitchWords[Math.floor(Math.random() * glitchWords.length)];
-            textEl.style.left = Math.random() * window.innerWidth + 'px';
-            textEl.style.animationDuration = (10 + Math.random() * 10) + 's';
-            mainContainer.appendChild(textEl);
-
-            // Hapus elemen setelah animasi selesai untuk mencegah memory leak
-            setTimeout(() => {
-                textEl.remove();
-            }, 20000);
-        }
-
-        // Buat teks melayang setiap beberapa saat
-        setInterval(createFloatingText, 2000);
-    </script>
 </body>
 </html>
