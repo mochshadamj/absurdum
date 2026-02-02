@@ -3,22 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABSURDUM | Malfungsi Aksara</title>
+    <title>⊗ ABSURDUM ⊗ Malfungsi Realitas</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-
-        :root {
-            --bg-color: #0a0a0a;
-            --text-color: #d1d1d1;
-            --accent-red: #ff0040;
-            --accent-cyan: #00ffff;
-            --accent-yellow: #ffeb3b;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        
+        @keyframes colorShift {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'VT323', 'Courier New', monospace;
+            background: 
+                repeating-linear-gradient(0deg, #0a0a0a 0px, #0a0a0a 1px, transparent 1px, transparent 2px),
+                repeating-linear-gradient(90deg, #0a0a0a 0px, #0a0a0a 1px, transparent 1px, transparent 2px),
+                linear-gradient(135deg, #1a0a1a 0%, #0a0a1a 50%, #0a1a0a 100%);
+            background-size: 50px 50px, 50px 50px, 100% 100%;
+            color: #d1d1d1;
+            font-family: 'Courier New', Courier, monospace;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -26,239 +46,280 @@
             min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
-            line-height: 1.4;
             position: relative;
+            animation: colorShift 20s infinite;
         }
 
-        /* Background Animasi Kacau */
+        /* Efek noise background */
         body::before {
-            content: " ";
-            display: block;
+            content: "";
             position: fixed;
             top: 0;
             left: 0;
-            bottom: 0;
-            right: 0;
-            background: linear-gradient(217deg, rgba(255,0,64,.2), rgba(255,0,64,0) 70%),
-                        linear-gradient(127deg, rgba(0,255,255,.2), rgba(0,255,255,0) 70%),
-                        linear-gradient(336deg, rgba(255,235,59,.1), rgba(0,0,0,0) 70%);
-            background-size: 200% 200%;
-            animation: glitch-bg 15s ease infinite;
-            z-index: -1;
+            width: 100vw;
+            height: 100vh;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1;
         }
 
-        @keyframes glitch-bg {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .container { 
-            width: 80%; 
-            max-width: 700px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        /* Efek Glitch pada Judul */
-        h1 {
-            font-size: 4rem;
-            color: var(--accent-red);
-            text-transform: uppercase;
-            letter-spacing: 8px;
-            position: relative;
-            text-shadow: 2px 2px var(--accent-cyan);
-            animation: flicker 3s infinite alternate;
-        }
-
-        h1::before, h1::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        h1::before {
-            animation: glitch-1 0.3s infinite;
-            color: var(--accent-cyan);
-            z-index: -1;
-        }
-        
-        h1::after {
-            animation: glitch-2 0.3s infinite;
-            color: var(--accent-yellow);
-            z-index: -2;
-        }
-
-        @keyframes glitch-1 {
-            0% { clip-path: inset(42% 0 61% 0); transform: translate(-2px, 2px); }
-            20% { clip-path: inset(88% 0 1% 0); transform: translate(2px, -2px); }
-            40% { clip-path: inset(10% 0 85% 0); transform: translate(-2px, 2px); }
-            60% { clip-path: inset(75% 0 10% 0); transform: translate(2px, -2px); }
-            80% { clip-path: inset(55% 0 30% 0); transform: translate(-2px, 2px); }
-            100% { clip-path: inset(20% 0 60% 0); transform: translate(2px, -2px); }
-        }
-
-        @keyframes glitch-2 {
-            0% { clip-path: inset(65% 0 5% 0); transform: translate(2px, -2px); }
-            20% { clip-path: inset(15% 0 75% 0); transform: translate(-2px, 2px); }
-            40% { clip-path: inset(90% 0 2% 0); transform: translate(2px, -2px); }
-            60% { clip-path: inset(25% 0 60% 0); transform: translate(-2px, 2px); }
-            80% { clip-path: inset(70% 0 10% 0); transform: translate(2px, -2px); }
-            100% { clip-path: inset(5% 0 80% 0); transform: translate(-2px, 2px); }
-        }
-
-        @keyframes flicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% {
-                text-shadow:
-                0 0 4px var(--accent-cyan),
-                0 0 11px var(--accent-cyan),
-                0 0 19px var(--accent-cyan),
-                0 0 40px var(--accent-red),
-                0 0 80px var(--accent-red),
-                0 0 90px var(--accent-red),
-                0 0 100px var(--accent-red),
-                0 0 150px var(--accent-red);
-            }
-            20%, 24%, 55% {        
-                text-shadow: none;
-            }
-        }
-
-        .glitch-text { 
-            color: #888; 
-            font-size: 1.2rem; 
-            margin-bottom: 40px; 
-            animation: text-flicker 2s linear infinite;
-        }
-
-        @keyframes text-flicker {
-            0% { opacity: 0.8; }
-            5% { opacity: 0.5; }
-            10% { opacity: 1; }
-            15% { opacity: 0.7; }
-            20% { opacity: 1; }
-            100% { opacity: 1; }
-        }
-
-        .poem {
-            margin: 30px 0;
-            font-size: 1.3rem;
+        /* Floating symbols */
+        body::after {
+            content: "∞ ∅ ⊗ ∴ ∵ ⊕ ∇ ∆ ∫ ∮ ∑ ∏ √ ∛ ∜ ≈ ≠ ≡ ⊥ ∥ ∧ ∨ ¬ ⊃ ⊂";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8rem;
+            opacity: 0.02;
             white-space: pre-wrap;
-            text-align: left;
+            text-align: center;
+            width: 100%;
+            animation: float 15s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        /* Efek sederhana biar teks kelihatan "rusak" */
-        span.broken { 
-            display: inline-block; 
-            transform: rotate(-3deg) translateY(5px); 
-            color: #fff; 
-            padding: 0 5px;
-        }
-
-        /* Daftar Puisi / Arsip */
-        .archive {
-            margin-top: 50px;
-            border: 1px dashed #555;
+        .container {
+            width: 90%;
+            max-width: 700px;
+            position: relative;
+            z-index: 10;
             padding: 20px;
-            background: rgba(255,255,255,0.02);
         }
 
-        .archive h2 {
-            font-size: 1.8rem;
-            color: var(--accent-cyan);
-            margin-bottom: 15px;
-            animation: text-flicker 3s infinite;
+        h1 {
+            font-size: clamp(2rem, 8vw, 4rem);
+            color: #ff3e3e;
+            text-shadow: 
+                3px 3px 0 #00f0ff,
+                -2px -2px 0 #ff00ff,
+                0 0 20px rgba(255, 62, 62, 0.5);
+            text-transform: uppercase;
+            letter-spacing: clamp(3px, 1vw, 8px);
+            animation: glitch 3s infinite;
+            text-align: center;
+            margin-bottom: 10px;
+            word-break: break-word;
         }
 
-        .archive ul {
+        .subtitle {
+            color: #00f0ff;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            text-align: center;
+            margin-bottom: 40px;
+            animation: flicker 2s infinite;
+            text-shadow: 0 0 10px #00f0ff;
+        }
+
+        .poem-list {
             list-style: none;
-            padding: 0;
-            font-size: 1.2rem;
+            margin-top: 30px;
         }
 
-        .archive li {
-            margin: 10px 0;
+        .poem-item {
+            margin: 15px 0;
+            position: relative;
+            padding-left: 30px;
         }
 
-        .archive a {
-            color: var(--text-color);
+        .poem-item::before {
+            content: "⊗";
+            position: absolute;
+            left: 0;
+            color: #ff3e3e;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        .poem-item:nth-child(2)::before { content: "∅"; animation-delay: 0.5s; }
+        .poem-item:nth-child(3)::before { content: "∞"; animation-delay: 1s; }
+        .poem-item:nth-child(4)::before { content: "∇"; animation-delay: 1.5s; }
+
+        .poem-link {
+            color: #d1d1d1;
             text-decoration: none;
-            transition: all 0.2s ease;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            transition: all 0.3s;
             display: inline-block;
+            position: relative;
         }
 
-        .archive a:hover {
-            color: var(--accent-yellow);
-            transform: translate(5px, -2px);
-            text-shadow: 0 0 5px var(--accent-yellow);
+        .poem-link:hover {
+            color: #ff3e3e;
+            text-shadow: 0 0 10px #ff3e3e;
+            transform: translateX(10px);
+            animation: glitch 0.3s infinite;
         }
 
-        .archive a::before {
-            content: '> ';
-            color: #555;
-        }
-        
-        .footer { 
-            margin-top: 80px; 
-            font-size: 1rem; 
-            opacity: 0.4; 
-            animation: text-flicker 5s infinite;
+        .poem-link::after {
+            content: " [KORUP]";
+            font-size: 0.7em;
+            color: #00f0ff;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            body { font-size: 16px; }
-            .container { width: 90%; }
-            h1 { font-size: 2.5rem; letter-spacing: 4px; }
-            .glitch-text { font-size: 1rem; }
-            .poem { font-size: 1.1rem; }
-            .archive h2 { font-size: 1.5rem; }
-            .archive ul { font-size: 1rem; }
+        .poem-link:hover::after {
+            opacity: 1;
+        }
+
+        .error-box {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid #ff3e3e;
+            border-style: dashed;
+            padding: 15px;
+            margin: 30px 0;
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
+            animation: flicker 5s infinite;
+            line-height: 1.6;
+        }
+
+        .glitch-box {
+            background: rgba(0, 240, 255, 0.05);
+            border-left: 3px solid #00f0ff;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
+            white-space: pre-wrap;
+            line-height: 1.8;
+        }
+
+        .broken {
+            display: inline-block;
+            transform: rotate(-5deg) translateY(3px);
+            color: #fff;
+            text-shadow: 0 0 5px #fff;
+        }
+
+        .corrupted {
+            color: #ff00ff;
+            animation: glitch 1s infinite;
+        }
+
+        .footer {
+            margin-top: 80px;
+            font-size: clamp(0.6rem, 1.5vw, 0.75rem);
+            opacity: 0.3;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .container { width: 95%; padding: 15px; }
+            h1 { letter-spacing: 3px; }
+            .poem-item { padding-left: 25px; }
+        }
+
+        /* Random floating particles */
+        .particle {
+            position: fixed;
+            color: #ff3e3e;
+            font-size: 1.5rem;
+            opacity: 0.1;
+            pointer-events: none;
+            animation: float 10s infinite ease-in-out;
+            z-index: 0;
         }
     </style>
 </head>
 <body>
 
+    <!-- Floating particles -->
+    <div class="particle" style="top: 10%; left: 10%;">∞</div>
+    <div class="particle" style="top: 20%; right: 15%; animation-delay: 2s;">⊗</div>
+    <div class="particle" style="bottom: 30%; left: 20%; animation-delay: 4s;">∅</div>
+    <div class="particle" style="bottom: 10%; right: 25%; animation-delay: 6s;">∇</div>
+
     <div class="container">
-        <h1 data-text="ABSURDUM">ABSURDUM</h1>
-        <div class="glitch-text">> Error: System.log not found. Displaying malfungsi_aksara.txt</div>
-
-        <div class="poem">
-            Di sini,
-            huruf-huruf <span class="broken">mati</span> muda.
-            
-            Mereka tidak sempat jadi kata,
-            apalagi menjadi doa yang dikabulkan.
-            
-            [ 404 : HATI ]
-            
-            Jendela ini terbuka,
-            tapi hanya ada gelap yang
-                                  **berteriak**.
-            
-            Apakah kau mendengar frekuensi yang patah?
-            Itu adalah aku,
-            sedang mencoba mengeja namamu 
-            dengan lidah yang sudah jadi abu.
+        <h1>⊗ ABSURDUM ⊗</h1>
+        <div class="subtitle">
+            >> ERROR_404: Logika.exe telah berhenti bekerja
         </div>
 
-        <div class="archive">
-            <h2>ARSIP KERUSAKAN</h2>
-            <ul>
-                <li><a href="puisi/perjamuan.html">perjamuan di perut paus plastik</a></li>
-                <!-- Tambahkan link puisi lainnya di sini -->
-                <li><a href="#">[CORRUPTED_FILE].txt</a></li>
-            </ul>
+        <div class="error-box">
+            <strong>[!] PERINGATAN SISTEM [!]</strong><br>
+            Puisi-puisi berikut mengandung <span class="corrupted">malfungsi aksara</span>.<br>
+            Konsumsi berlebihan dapat menyebabkan:<br>
+            • Kerusakan sirkuit logika<br>
+            • Halusinasi eksistensial<br>
+            • <span class="broken">Ketidakmampuan membedakan mimpi dan kenyataan</span><br>
+            <br>
+            <em>[ Anda telah diperingatkan. ]</em>
         </div>
+
+        <div class="glitch-box">
+Di sini,
+huruf-huruf <span class="broken">mati</span> muda.
+
+Mereka tidak sempat jadi kata,
+apalagi menjadi doa yang dikabulkan.
+
+<span class="corrupted">[ 404 : HATI ]</span>
+
+Jendela ini terbuka,
+tapi hanya ada gelap yang
+                      **berteriak**.
+
+Apakah kau mendengar frekuensi yang patah?
+Itu adalah aku,
+sedang mencoba mengeja namamu 
+dengan lidah yang sudah jadi abu.
+        </div>
+
+        <h2 style="color: #00f0ff; font-size: clamp(1.2rem, 3vw, 1.5rem); margin-top: 40px; margin-bottom: 20px; text-shadow: 0 0 10px #00f0ff;">
+            ≡ DAFTAR KORUPSI AKSARA ≡
+        </h2>
+
+        <ul class="poem-list">
+            <li class="poem-item">
+                <a href="puisi/perjamuan.html" class="poem-link">Perjamuan di Perut Paus Plastik</a>
+            </li>
+            <li class="poem-item">
+                <a href="puisi/sirkuit.html" class="poem-link">Sirkuit Sunyi yang Berteriak di Jam 3 Pagi</a>
+            </li>
+            <li class="poem-item">
+                <a href="puisi/gravitasi.html" class="poem-link">Surat Untuk Gravitasi yang Tidak Pernah Dibalas</a>
+            </li>
+            <li class="poem-item">
+                <a href="puisi/void.html" class="poem-link">Dialog dengan Kekosongan di Pojok Kamar</a>
+            </li>
+        </ul>
 
         <div class="footer">
-            -- end of transmission --
-            [ Process finished with exit code 1 ]
+            <span class="corrupted">∴</span> end of transmission <span class="corrupted">∴</span><br>
+            [ Process finished with exit code: <span class="broken">∞</span> ]<br>
+            Last modified: <span class="corrupted">ERROR::TIME_NOT_FOUND</span><br>
+            <br>
+            <em>"Jangan percaya apapun yang kau baca di sini.<br>
+            Termasuk kalimat ini."</em>
         </div>
     </div>
+
+    <script>
+        // Random glitch effect pada hover
+        document.querySelectorAll('.poem-link').forEach(link => {
+            link.addEventListener('mouseenter', function() {
+                if(Math.random() > 0.5) {
+                    this.textContent = this.textContent.split('').sort(() => Math.random() - 0.5).join('');
+                    setTimeout(() => {
+                        location.reload(); // Refresh untuk reset text
+                    }, 300);
+                }
+            });
+        });
+
+        // Random background color shift
+        setInterval(() => {
+            if(Math.random() > 0.95) {
+                document.body.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
+                setTimeout(() => {
+                    document.body.style.filter = '';
+                }, 100);
+            }
+        }, 3000);
+    </script>
 
 </body>
 </html>
