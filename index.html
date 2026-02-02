@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABSURDUM: Malfungsi Aksara</title>
+    <style>
+        /* --- Gaya Dasar & Tema --- */
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+        :root {
+            --bg-color: #0c0c0c;
+            --text-color: #e0e0e0;
+            --accent-color: #39ff14; /* Hijau neon */
+            --accent-color-2: #00ffff; /* Cyan */
+            --border-color: #333;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem; /* 22px */
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* --- Container & Layout --- */
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px 40px;
+            border-left: 2px solid var(--border-color);
+            border-right: 2px solid var(--border-color);
+        }
+
+        /* --- Judul Utama dengan Efek Glitch --- */
+        .main-title {
+            text-align: center;
+            font-size: 3.5rem;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-color);
+            letter-spacing: 5px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .main-title::before,
+        .main-title::after {
+            content: 'ABSURDUM: Malfungsi Aksara';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            overflow: hidden;
+        }
+
+        .main-title::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff; /* Magenta */
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+
+        .main-title::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--accent-color-2), 2px 2px #ff00ff;
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% { clip-path: inset(42% 0 61% 0); }
+            20% { clip-path: inset(91% 0 2% 0); }
+            40% { clip-path: inset(43% 0 1% 0); }
+            60% { clip-path: inset(25% 0 58% 0); }
+            80% { clip-path: inset(54% 0 7% 0); }
+            100% { clip-path: inset(78% 0 11% 0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip-path: inset(65% 0 8% 0); }
+            20% { clip-path: inset(12% 0 75% 0); }
+            40% { clip-path: inset(50% 0 30% 0); }
+            60% { clip-path: inset(88% 0 5% 0); }
+            80% { clip-path: inset(33% 0 45% 0); }
+            100% { clip-path: inset(5% 0 83% 0); }
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #888;
+            margin-bottom: 50px;
+        }
+
+        /* --- Gaya Puisi --- */
+        .puisi {
+            margin-bottom: 60px;
+        }
+
+        .puisi h2 {
+            font-size: 2rem;
+            color: var(--accent-color-2);
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+        }
+
+        .puisi p {
+            margin: 20px 0;
+            white-space: pre-wrap; /* Memastikan spasi dan enter tetap */
+        }
+
+        .math-line {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1rem;
+            color: #555;
+            border-top: 1px dashed var(--border-color);
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+            text-shadow: 0 0 5px var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1 class="main-title">ABSURDUM: Malfungsi Aksara</h1>
+            <p class="subtitle">[Koleksi Puisi dari Ruang Antara]</p>
+        </header>
+
+        <main>
+            <article class="puisi">
+                <h2>Debugging Jiwa</h2>
+                <p>
+System.out.println("Kau adalah variabel tak terdefinisi di dalam fungsi kehidupanku.");
+Kompiler keberatan, ia melempar `NullPointerException` setiap kali aku mencoba memanggil namamu.
+Aku mencoba `try { mencintaimu(); } catch (HatiPatahException e) { System.out.println("Gagal."); }`
+Hasilnya? Stack overflow di pelipis.
+                </p>
+                <p>
+Di memori ram, sisa-sisa senyummu masih tercache.
+Tapi aku lupa passwordnya.
+Aku menghapus folder `Kenangan.exe`, tapi ternyata itu adalah file sistem.
+Sekarang, OS-ku bluescreen.
+Layar mati. Hanya ada kursor yang berkedip, menertawakanku.
+                </p>
+                <p class="math-line">
+ $if (cinta == true) \{ \text{world.meltdown()} \}$                 </p>
+            </article>
+
+            <article class="puisi">
+                <h2>Supermarket Mimpi Basah</h2>
+                <p>
+Aku berbelanja di supermarket yang buka jam 3 pagi.
+Di rak kaleng, bukan sarden, tapi "Kekecewaan Kedaluwarsa".
+Promo: Beli 2 botol "Air Mata Setan", gratis 1 sachet "Luka Bekas Kuku".
+Kasirnya adalah boneka kayu tanpa mata, dengan barcode yang tertempel di kening.
+                </p>
+                <p>
+"Apa yang kau cari?" bisiknya suara mesin EDC yang error.
+"Aku mencari diskon untuk hari esok," jawabku.
+Boneka itu tertawa, suaranya seperti kertas yang disobek.
+"Maaf, stok habis. Hari esok kami recall karena mengandung racun ketidakpastian."
+                </p>
+                <p>
+Di depan pintu keluar, alarm berbunyi nyaring.
+Tidak ada yang mencuri.
+Hanya saja, realitas ini lupa membayar di kasir.
+                </p>
+            </article>
+
+            <article class="puisi">
+                <h2>Kalkulator Hati</h2>
+                <p>
+ $\sqrt{\text{kebohongan}^2 + \text{rahasia}^2} = \text{trauma}$  $\int_{0}^{\text{mati}} \text{penyesalan}(t) \, dt = \infty$                 </p>
+                <p>
+Aku menekan tombol `AC` (All Clear).
+Tapi angka-angka di layar hatiku hanya berkedip, tidak mau hilang.
+`5318008` — aku balik kalkulatornya, itu berarti `BOOBIES`.
+Aku tidak tahu apa artinya, tapi itu membuatku tertawa.
+Tawa yang pahit, seperti baterai kemasam.
+                </p>
+                <p>
+ $\frac{d}{dx}(\text{cinta}) = 0$ Turunan dari cinta terhadap waktu adalah nol.
+Ia tidak berubah, hanya membusuk.
+                </p>
+            </article>
+        </main>
+
+        <footer>
+            <p>© 2024, Kebisingan Kosong. Hak cipta sengaja dilupakan.</p>
+            <p>// <a href="#">ERROR_404: Makna tidak ditemukan</a> //</p>
+        </footer>
+    </div>
+
+</body>
+</html>
