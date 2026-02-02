@@ -7,321 +7,388 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-3px, 3px); text-shadow: 2px 2px #ff00ff, -2px -2px #00f0ff; }
-            40% { transform: translate(-3px, -3px); text-shadow: -2px -2px #ff00ff, 2px 2px #00f0ff; }
-            60% { transform: translate(3px, 3px); text-shadow: 2px -2px #ff00ff, -2px 2px #00f0ff; }
-            80% { transform: translate(3px, -3px); text-shadow: -2px 2px #ff00ff, 2px -2px #00f0ff; }
-            100% { transform: translate(0); }
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-30px) rotate(10deg); }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
         body {
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 0, 100, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 50%, rgba(0, 240, 255, 0.1) 0%, transparent 50%),
-                linear-gradient(125deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%);
-            background-size: 100% 100%, 100% 100%, 100% 100%;
+            background-color: #0a0a0a;
             color: #d1d1d1;
             font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
             min-height: 100vh;
-            position: relative;
             overflow-x: hidden;
+            position: relative;
+            line-height: 1.8;
         }
 
-        /* Noise effect */
-        body::before {
-            content: "";
+        /* Animated Abstract Background */
+        #chaos-canvas {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.04;
-            pointer-events: none;
-            z-index: 1;
-            animation: pulse 4s infinite;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.25;
         }
 
         .container {
+            position: relative;
+            z-index: 1;
+            width: 90%;
             max-width: 800px;
             margin: 0 auto;
-            position: relative;
-            z-index: 10;
+            padding: 40px 20px;
         }
 
-        .back-link {
+        /* Back button */
+        .back-button {
             display: inline-block;
-            color: #00f0ff;
-            text-decoration: none;
+            padding: 10px 20px;
             margin-bottom: 30px;
-            font-size: clamp(0.8rem, 2vw, 0.9rem);
-            transition: all 0.3s;
-        }
-
-        .back-link:hover {
+            background: rgba(255, 62, 62, 0.1);
+            border: 1px dashed #ff3e3e;
             color: #ff3e3e;
-            animation: shake 0.5s infinite;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
         }
 
-        h1 {
-            font-size: clamp(1.8rem, 6vw, 3rem);
+        .back-button:hover {
+            background: rgba(255, 62, 62, 0.2);
+            transform: translateX(-5px);
+            border-color: #00f0ff;
+            color: #00f0ff;
+        }
+
+        .poem-title {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
             color: #ff3e3e;
-            text-shadow: 
-                3px 3px 0 #00f0ff,
-                -2px -2px 0 #ff00ff,
-                0 0 30px rgba(255, 62, 62, 0.6);
-            margin-bottom: 40px;
-            line-height: 1.3;
-            animation: glitch 5s infinite;
-            word-wrap: break-word;
+            text-shadow: 2px 2px #00f0ff;
+            margin-bottom: 10px;
+            animation: pulse 3s infinite;
         }
 
-        .poem {
-            font-size: clamp(0.9rem, 2.2vw, 1.1rem);
-            line-height: 1.9;
-            white-space: pre-wrap;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .poem-meta {
+            font-size: 0.75rem;
+            color: #666;
             margin-bottom: 50px;
-            text-shadow: 0 0 1px rgba(255, 255, 255, 0.3);
+            font-style: italic;
         }
 
-        .line {
-            margin: 15px 0;
-            position: relative;
+        .poem-content {
+            white-space: pre-wrap;
+            font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+            line-height: 2;
+            margin-bottom: 60px;
         }
 
-        .indent { padding-left: clamp(20px, 5vw, 40px); }
-        .indent-2 { padding-left: clamp(40px, 10vw, 80px); }
-        .indent-3 { padding-left: clamp(60px, 15vw, 120px); }
-
+        /* Styling untuk elemen khusus */
         .highlight {
             color: #00f0ff;
-            text-shadow: 0 0 10px #00f0ff;
-            animation: pulse 2s infinite;
+            font-weight: bold;
+        }
+
+        .void {
+            color: #ff00ff;
+            font-style: italic;
         }
 
         .broken {
             display: inline-block;
-            transform: rotate(-8deg) translateY(5px);
-            color: #ff3e3e;
-            text-shadow: 0 0 8px #ff3e3e;
-        }
-
-        .glitch {
-            animation: glitch 2s infinite;
-            color: #ff00ff;
-        }
-
-        .formula {
-            background: rgba(255, 62, 62, 0.1);
-            border: 1px dashed #ff3e3e;
-            padding: 15px;
-            margin: 25px 0;
-            font-size: clamp(1rem, 2.5vw, 1.3rem);
-            text-align: center;
-            animation: pulse 3s infinite;
+            transform: rotate(-5deg);
+            color: #ffff00;
         }
 
         .whisper {
-            font-size: clamp(0.75rem, 1.8vw, 0.85rem);
+            font-size: 0.85em;
             color: #888;
             font-style: italic;
         }
 
         .scream {
             font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 15px #fff;
-            letter-spacing: 3px;
+            color: #ff3e3e;
+            letter-spacing: 2px;
         }
 
-        .void {
-            color: #333;
-            text-shadow: 0 0 5px #666;
-        }
-
-        .symbol {
-            font-size: clamp(1.2rem, 3vw, 1.8rem);
-            color: #ff00ff;
-            display: inline-block;
-            animation: rotate 10s infinite linear;
-        }
-
-        .error-box {
-            background: rgba(0, 240, 255, 0.05);
-            border: 2px solid #00f0ff;
-            border-style: double;
+        .formula {
+            display: block;
+            text-align: center;
             padding: 20px;
             margin: 30px 0;
-            font-size: clamp(0.75rem, 2vw, 0.9rem);
+            background: rgba(255, 62, 62, 0.05);
+            border-left: 3px solid #ff3e3e;
+            font-size: 1.2em;
+            color: #00f0ff;
         }
 
-        .footer {
-            margin-top: 60px;
-            padding-top: 30px;
-            border-top: 1px dashed #333;
-            font-size: clamp(0.7rem, 1.8vw, 0.8rem);
-            opacity: 0.4;
-            text-align: center;
+        /* Glitch text effect */
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+            animation: glitch-1 0.3s infinite;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: 2px 0 #00f0ff;
+            animation: glitch-2 0.3s infinite;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { clip-path: inset(40% 0 45% 0); }
+            50% { clip-path: inset(54% 0 15% 0); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { clip-path: inset(65% 0 10% 0); }
+            50% { clip-path: inset(12% 0 70% 0); }
         }
 
         /* Floating symbols */
         .float-symbol {
             position: fixed;
-            font-size: clamp(2rem, 5vw, 4rem);
-            opacity: 0.05;
-            animation: float 20s infinite ease-in-out;
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            opacity: 0.08;
             pointer-events: none;
             z-index: 0;
+            animation: drift 15s infinite ease-in-out;
+        }
+
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(100px, -80px) rotate(120deg); }
+            66% { transform: translate(-80px, 100px) rotate(240deg); }
+        }
+
+        .end-mark {
+            text-align: center;
+            margin-top: 80px;
+            padding: 30px;
+            border-top: 1px dashed #333;
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        /* Corrupted text effect */
+        .corrupt {
+            background: linear-gradient(90deg, #ff3e3e, #00f0ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: corrupt-shift 2s infinite;
+        }
+
+        @keyframes corrupt-shift {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(180deg); }
         }
 
         @media (max-width: 600px) {
-            body { padding: 15px; }
-            .poem { font-size: 1rem; }
-            h1 { margin-bottom: 30px; }
+            .container { padding: 30px 15px; }
+            .formula { padding: 15px; font-size: 1em; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Floating symbols background -->
-    <div class="float-symbol" style="top: 10%; left: 5%;">∞</div>
-    <div class="float-symbol" style="top: 60%; right: 10%; animation-delay: 3s;">⊗</div>
-    <div class="float-symbol" style="bottom: 20%; left: 15%; animation-delay: 6s;">∅</div>
-    <div class="float-symbol" style="top: 40%; right: 5%; animation-delay: 9s;">∇</div>
+    <!-- Chaos Canvas -->
+    <canvas id="chaos-canvas"></canvas>
+
+    <!-- Floating symbols -->
+    <div class="float-symbol" style="top: 5%; left: 75%; animation-delay: 0s;">∞</div>
+    <div class="float-symbol" style="top: 30%; left: 5%; animation-delay: 3s;">∅</div>
+    <div class="float-symbol" style="top: 60%; left: 90%; animation-delay: 6s;">∫</div>
+    <div class="float-symbol" style="top: 80%; left: 10%; animation-delay: 9s;">≠</div>
+    <div class="float-symbol" style="top: 45%; left: 85%; animation-delay: 12s;">Σ</div>
 
     <div class="container">
-        <a href="../index.html" class="back-link">← Kembali ke Void</a>
+        <a href="../index.html" class="back-button">← kembali ke void</a>
 
-        <h1>Perjamuan di Perut Paus Plastik</h1>
-
-        <div class="poem">
-<div class="line">Di sini, di dalam tenggorokan hari Minggu,</div>
-<div class="line">Oksigen adalah barang antik yang dipajang di etalase toko <span class="broken">tutup</span>.</div>
-
-<div class="line" style="margin-top: 25px;">Aku memotong-motong bayanganku sendiri,</div>
-<div class="line">menyajikannya dengan saus penyesalan yang terlalu banyak <span class="highlight">garam</span>.</div>
-
-<div class="formula">
-<span class="symbol">ƒ</span>(x) = sunyi × <span class="symbol">∞</span>
-</div>
-
-<div class="line"><span class="scream">Lihat!</span></div>
-<div class="line">Ada kereta api yang melaju di urat nadiku,</div>
-<div class="line">masinisnya adalah seekor burung gagak yang <span class="glitch">lupa cara terbang</span>.</div>
-
-<div class="line" style="margin-top: 20px;">Stasiunnya?</div>
-<div class="line indent"><span class="void">Tidak ada.</span></div>
-
-<div class="line" style="margin-top: 20px;">Hanya ada papan pengumuman yang menuliskan:</div>
-<div class="line indent"><span class="highlight">"Harap antre untuk menjadi tidak ada."</span></div>
-
-<div class="line" style="margin-top: 30px;"><span class="whisper">(Ssst... dengar tidak?)</span></div>
-<div class="line">Suara keramik retak di dalam kepalamu itu?</div>
-<div class="line">Itu adalah cita-cita yang terlalu lama disimpan di dalam <span class="broken">kulkas</span>.</div>
-
-<div class="line indent">Membeku.</div>
-<div class="line indent-2">Membiru.</div>
-<div class="line indent-3">Menjadi <span class="glitch">fosil</span> yang ditertawakan oleh kecoak-kecoak penyair.</div>
-
-<div class="line" style="margin-top: 30px;">Aku menulis surat pada gravitasi:</div>
-<div class="line indent"><span class="highlight">"Tolong lepaskan aku sekali saja."</span></div>
-
-<div class="line" style="margin-top: 20px;">Tapi gravitasi sedang sibuk menghitung jumlah rambut</div>
-<div class="line">yang jatuh dari kepala orang-orang yang sedang <span class="broken">jatuh cinta</span>.</div>
-
-<div class="line indent">Satu.</div>
-<div class="line indent-2">Dua.</div>
-<div class="line indent-3"><span class="void">Nol.</span></div>
-
-<div class="line" style="margin-top: 30px;">Di pojok ruangan, masa lalu sedang mencuci piring.</div>
-<div class="line"><span class="scream">Prang!</span></div>
-<div class="line">Satu piring pecah, satu memori <span class="glitch">hilang</span>.</div>
-
-<div class="line" style="margin-top: 30px;">Apakah kau mencium bau kabel terbakar?</div>
-<div class="line">Itu adalah sirkuit logika kita yang hangus</div>
-<div class="line">karena mencoba memahami mengapa pagi selalu datang</div>
-<div class="line indent"><span class="broken">tanpa permisi</span>.</div>
-
-<div class="line" style="margin-top: 30px;">Jangan cari aku di dalam kamus.</div>
-<div class="line">Aku terselip di antara <span class="void">spasi</span> dua kata</div>
-<div class="line">yang tidak pernah berani kau ucapkan.</div>
-
-<div class="line" style="margin-top: 25px;">Aku adalah titik yang ingin menjadi lingkaran,</div>
-<div class="line">tapi selalu berakhir sebagai tanda tanya yang</div>
-<div class="line indent"><span class="broken">patah</span>.</div>
-
-<div class="formula">
-1 + 1 = <span class="glitch">Luka</span>
-</div>
-
-<div class="line"><span class="whisper">(Matematika ini valid di planet yang tidak punya matahari).</span></div>
+        <h1 class="poem-title">Perjamuan di Perut Paus Plastik</h1>
+        <div class="poem-meta">
+            file_corruption: 78% | sanity_check: FAILED | timestamp: ∞
         </div>
 
-        <div class="error-box">
-            <strong>[⊗] STATUS TRANSMISI [⊗]</strong><br><br>
-            Puisi berhasil ter-<span class="glitch">korup</span>si.<br>
-            Efek samping: kehilangan kemampuan membedakan metafora dan realitas.<br>
-            Gejala: melihat warna yang tidak ada namanya.<br><br>
-            <em>Jika Anda merasa kosong setelah membaca ini,<br>
-            berarti puisi ini bekerja dengan <span class="broken">sempurna</span>.</em>
+        <div class="poem-content">Di sini, di dalam tenggorokan hari Minggu,
+Oksigen adalah barang antik yang dipajang di etalase toko tutup.
+Aku memotong-motong bayanganku sendiri,
+menyajikannya dengan <span class="highlight">saus penyesalan</span> yang terlalu banyak garam.
+
+<span class="formula">f(x) = sunyi × ∞</span>
+
+Lihat!
+Ada kereta api yang melaju di urat nadiku,
+masinisnya adalah seekor burung gagak yang lupa cara terbang.
+Stasiunnya?
+<span class="void">Tidak ada.</span>
+Hanya ada papan pengumuman yang menuliskan:
+<span class="scream">"Harap antre untuk menjadi tidak ada."</span>
+
+<span class="whisper">(Ssst... dengar tidak?)</span>
+Suara keramik retak di dalam kepalamu itu?
+Itu adalah cita-cita yang terlalu lama disimpan di dalam kulkas.
+<span class="broken">Membeku.</span>
+<span class="broken">Membiru.</span>
+<span class="broken">Menjadi fosil</span> yang ditertawakan oleh kecoak-kecoak penyair.
+
+Aku menulis surat pada gravitasi:
+<span class="highlight">"Tolong lepaskan aku sekali saja."</span>
+Tapi gravitasi sedang sibuk menghitung jumlah rambut yang jatuh
+dari kepala orang-orang yang sedang jatuh cinta.
+
+Satu.
+Dua.
+<span class="void">Nol.</span>
+
+Di pojok ruangan, masa lalu sedang mencuci piring.
+<span class="scream">Prang!</span>
+Satu piring pecah, satu memori hilang.
+
+Apakah kau mencium bau kabel terbakar?
+Itu adalah sirkuit logika kita yang hangus
+karena mencoba memahami mengapa pagi selalu datang
+<span class="highlight">tanpa permisi.</span>
+
+Jangan cari aku di dalam kamus.
+Aku terselip di antara spasi dua kata
+yang tidak pernah berani kau ucapkan.
+
+Aku adalah titik yang ingin menjadi lingkaran,
+tapi selalu berakhir sebagai tanda tanya yang
+<span class="corrupt">patah.</span>
+
+<span class="formula">1 + 1 = Luka</span>
+
+<span class="whisper">(Matematika ini valid di planet yang tidak punya matahari).</span>
         </div>
 
-        <div class="footer">
-            <span class="symbol">∴</span> end of poem <span class="symbol">∴</span><br>
-            [ Memory leak detected at line: <span class="glitch">∞</span> ]<br>
-            <br>
-            <a href="../index.html" style="color: #666; text-decoration: none;">← Kembali ke INDEX ERROR</a>
+        <div class="end-mark">
+            <pre>
+-- transmission corrupted --
+[ Process terminated unexpectedly ]
+
+next_poem.exe: file not found
+reality_check(): returned NULL
+existence_status: <span class="corrupt">UNDEFINED</span>
+
+"Terima kasih sudah membaca yang tidak bisa dibaca."
+            </pre>
         </div>
     </div>
 
     <script>
-        // Random glitch effect
-        setInterval(() => {
-            if(Math.random() > 0.97) {
-                document.body.style.filter = `hue-rotate(${Math.random() * 360}deg) brightness(${0.8 + Math.random() * 0.4})`;
-                setTimeout(() => {
-                    document.body.style.filter = '';
-                }, 100);
+        // Chaos Canvas Background
+        const canvas = document.getElementById('chaos-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        class Particle {
+            constructor() {
+                this.reset();
             }
-        }, 2000);
-
-        // Random text corruption on some words
-        const glitchElements = document.querySelectorAll('.glitch');
-        setInterval(() => {
-            glitchElements.forEach(el => {
-                if(Math.random() > 0.9) {
-                    const original = el.textContent;
-                    el.textContent = original.split('').sort(() => Math.random() - 0.5).join('');
-                    setTimeout(() => {
-                        el.textContent = original;
-                    }, 200);
+            
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2 + 1;
+                const colors = ['#ff3e3e', '#00f0ff', '#ff00ff', '#ffff00'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.alpha = Math.random() * 0.3 + 0.1;
+                this.life = Math.random() * 200 + 100;
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life--;
+                
+                if (this.life <= 0 || this.x < 0 || this.x > canvas.width || 
+                    this.y < 0 || this.y > canvas.height) {
+                    this.reset();
                 }
+            }
+            
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
+        
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle());
+            }
+        }
+        
+        function drawChaos() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw abstract lines
+            ctx.globalAlpha = 0.1;
+            for (let i = 0; i < 20; i++) {
+                ctx.beginPath();
+                ctx.strokeStyle = i % 2 === 0 ? '#ff3e3e' : '#00f0ff';
+                ctx.lineWidth = Math.random() * 2;
+                
+                const x1 = Math.random() * canvas.width;
+                const y1 = Math.random() * canvas.height;
+                const x2 = Math.random() * canvas.width;
+                const y2 = Math.random() * canvas.height;
+                
+                ctx.moveTo(x1, y1);
+                ctx.quadraticCurveTo(
+                    (x1 + x2) / 2 + Math.random() * 100 - 50,
+                    (y1 + y2) / 2 + Math.random() * 100 - 50,
+                    x2, y2
+                );
+                ctx.stroke();
+            }
+            
+            // Update and draw particles
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
             });
-        }, 3000);
+            
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(drawChaos);
+        }
+        
+        resizeCanvas();
+        initParticles();
+        drawChaos();
+        
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initParticles();
+        });
     </script>
 
 </body>
