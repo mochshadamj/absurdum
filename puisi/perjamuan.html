@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perjamuan di Perut Paus Plastik - ABSURDUM</title>
+    <style>
+        /* --- Gaya Dasar & Tema --- */
+        @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --bg-color: #0d0d0d;
+            --text-color: #dcdcdc;
+            --accent-green: #39ff14;
+            --accent-cyan: #00ffff;
+            --accent-magenta: #ff00ff;
+            --border-color: #2a2a2a;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            /* Efek scanline halus */
+            background-image: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+        }
+
+        /* --- Container & Layout --- */
+        .container {
+            max-width: 750px;
+            margin: 40px auto;
+            padding: 40px 60px;
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        /* Efek noise di background */
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdmFsdWVzPSIwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwLjA1IDAiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjYSkiIG9wYWNpdHk9Ii4wNSIvPjwvc3ZnPg==');
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        /* --- Judul Puisi --- */
+        .poem-title {
+            font-family: 'VT323', monospace;
+            font-size: 3rem;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 8px var(--accent-cyan);
+            margin-bottom: 40px;
+            text-align: center;
+            animation: title-flicker 6s infinite;
+        }
+
+        @keyframes title-flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                opacity: 1;
+            }
+            20%, 22%, 24%, 55% {
+                opacity: 0.7;
+            }
+        }
+
+        /* --- Isi Puisi --- */
+        .poem-content p {
+            margin: 30px 0;
+            white-space: pre-wrap; /* Menjaga format puisi */
+            text-indent: 2em; /* Indentasi di awal paragraf */
+        }
+
+        .poem-content .no-indent {
+            text-indent: 0;
+        }
+
+        /* --- Garis Matematika --- */
+        .math-line {
+            color: var(--accent-green);
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            display: block;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        /* --- Navigasi Kembali --- */
+        .back-button {
+            display: inline-block;
+            margin-top: 50px;
+            padding: 10px 20px;
+            color: var(--accent-magenta);
+            border: 1px solid var(--accent-magenta);
+            text-decoration: none;
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            color: var(--bg-color);
+            background-color: var(--accent-magenta);
+            box-shadow: 0 0 15px var(--accent-magenta);
+            text-shadow: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1 class="poem-title">Perjamuan di Perut Paus Plastik</h1>
+        </header>
+
+        <main class="poem-content">
+            <p>Di sini, di dalam tenggorokan hari Minggu,
+Oksigen adalah barang antik yang dipajang di etalase toko tutup.
+Aku memotong-motong bayanganku sendiri,
+menyajikannya dengan saus penyesalan yang terlalu banyak garam.</p>
+
+            <span class="math-line">$f(x) = \text{sunyi} \times \infty$</span>
+
+            <p class="no-indent">Lihat!</p>
+            <p>Ada kereta api yang melaju di urat nadiku,
+masinisnya adalah seekor burung gagak yang lupa cara terbang.
+Stasiunnya?
+Tidak ada.
+Hanya ada papan pengumuman yang menuliskan:
+"Harap antre untuk menjadi tidak ada."</p>
+            
+            <p class="no-indent">(Ssst... dengar tidak?)</p>
+            <p>Suara keramik retak di dalam kepalamu itu?
+Itu adalah cita-cita yang terlalu lama disimpan di dalam kulkas.
+Membeku.
+Membiru.
+Menjadi fosil yang ditertawakan oleh kecoak-kecoak penyair.</p>
+
+            <p>Aku menulis surat pada gravitasi:
+"Tolong lepaskan aku sekali saja."
+Tapi gravitasi sedang sibuk menghitung jumlah rambut yang jatuh dari kepala orang-orang yang sedang jatuh cinta.
+Satu.
+Dua.
+Nol.</p>
+
+            <p>Di pojok ruangan, masa lalu sedang mencuci piring.
+Prang!
+Satu piring pecah, satu memori hilang.</p>
+
+            <p>Apakah kau mencium bau kabel terbakar?
+Itu adalah sirkuit logika kita yang hangus karena mencoba memahami mengapa pagi selalu datang
+tanpa permisi.</p>
+
+            <p>Jangan cari aku di dalam kamus.
+Aku terselip di antara spasi dua kata yang tidak pernah berani kau ucapkan.</p>
+
+            <p>Aku adalah titik yang ingin menjadi lingkaran,
+tapi selalu berakhir sebagai tanda tanya yang
+patah.</p>
+
+            <span class="math-line">$1 + 1 = \text{Luka}$</span>
+            
+            <p class="no-indent">(Matematika ini valid di planet yang tidak punya matahari).</p>
+        </main>
+
+        <footer>
+            <a href="/" class="back-button">&gt; KEMBALI</a>
+        </footer>
+    </div>
+
+</body>
+</html>
