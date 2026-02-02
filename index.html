@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABSURDUM | Malfungsi Aksara</title>
+    <title>ABSURDUM: MALFUNGSI AKSARA</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            background-color: #0a0a0a;
-            color: #d1d1d1;
-            font-family: 'Courier New', Courier, monospace;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* Background Abstrak Canvas */
-        #abstract-canvas {
+        body {
+            background: linear-gradient(135deg, #1a0a2e 0%, #0f0520 50%, #1a0a2e 100%);
+            color: #d1d1d1;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Background Canvas untuk Coretan */
+        #scribbleCanvas {
             position: fixed;
             top: 0;
             left: 0;
@@ -25,323 +29,335 @@
             height: 100%;
             z-index: 0;
             opacity: 0.3;
+            pointer-events: none;
         }
 
         .container {
             position: relative;
-            z-index: 1;
+            z-index: 10;
             width: 90%;
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 50px 20px;
+            padding: 40px 20px;
+        }
+
+        /* Header Absurd */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
         }
 
         h1 {
-            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-size: clamp(2rem, 8vw, 4rem);
             color: #ff3e3e;
-            text-shadow: 3px 3px #00f0ff, -2px -2px #ff00ff;
+            text-shadow: 3px 3px #00f0ff, -2px -2px #ff00ff, 5px -5px #ffff00;
             text-transform: uppercase;
-            letter-spacing: clamp(3px, 1vw, 8px);
-            animation: glitch 3s infinite;
-            margin-bottom: 10px;
+            letter-spacing: 8px;
+            animation: glitchTitle 3s infinite alternate;
+            position: relative;
+            display: inline-block;
         }
 
-        @keyframes glitch {
-            0%, 100% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(2px, -2px); }
-            60% { transform: translate(-1px, -1px); }
-            80% { transform: translate(1px, 1px); }
+        @keyframes glitchTitle {
+            0% { transform: skewX(0deg); }
+            20% { transform: skewX(-5deg) translateX(2px); }
+            40% { transform: skewX(5deg) translateX(-2px); }
+            60% { transform: skewX(-3deg) translateY(1px); }
+            80% { transform: skewX(3deg) translateY(-1px); }
+            100% { transform: skewX(0deg); }
         }
 
         .subtitle {
             color: #888;
-            font-size: clamp(0.7rem, 2vw, 0.9rem);
-            margin-bottom: 60px;
-            animation: flicker 4s infinite;
+            font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+            margin-top: 20px;
+            letter-spacing: 3px;
+            animation: flicker 2s infinite;
         }
 
         @keyframes flicker {
-            0%, 100% { opacity: 0.7; }
+            0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
         }
 
-        .poem-fragment {
-            margin: 40px 0;
-            padding: 20px;
-            border-left: 2px solid #ff3e3e;
-            white-space: pre-wrap;
-            line-height: 1.8;
-            font-size: clamp(0.85rem, 2vw, 1rem);
-        }
-
-        .broken {
-            display: inline-block;
-            transform: rotate(-8deg) translateY(5px);
-            color: #00f0ff;
-            font-weight: bold;
-        }
-
-        .void {
-            color: #ff00ff;
-            font-style: italic;
-        }
-
-        /* Link Puisi - Absurd Style */
-        .poem-links {
-            margin-top: 80px;
+        /* Daftar Puisi - Langsung Terlihat */
+        .poem-list {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 25px;
+            margin-top: 40px;
         }
 
         .poem-link {
-            position: relative;
-            padding: 15px 20px;
-            background: rgba(255, 62, 62, 0.05);
-            border: 1px dashed #ff3e3e;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid transparent;
+            border-image: linear-gradient(45deg, #ff3e3e, #00f0ff, #ff00ff, #ffff00) 1;
+            padding: 20px;
             text-decoration: none;
             color: #d1d1d1;
+            display: block;
+            position: relative;
             transition: all 0.3s ease;
-            font-size: clamp(0.85rem, 2vw, 1rem);
             overflow: hidden;
         }
 
         .poem-link::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.2), transparent);
-            transition: left 0.5s;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 62, 62, 0.1),
+                transparent
+            );
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
         }
 
         .poem-link:hover::before {
-            left: 100%;
+            animation: shimmer 1s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
         }
 
         .poem-link:hover {
-            background: rgba(255, 62, 62, 0.1);
-            border-color: #00f0ff;
             transform: translateX(10px) rotate(-1deg);
+            background: rgba(255, 255, 255, 0.08);
+            border-image: linear-gradient(45deg, #ffff00, #ff00ff, #00f0ff, #ff3e3e) 1;
         }
 
-        .poem-link-title {
-            display: block;
+        .poem-title {
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
             color: #ff3e3e;
-            font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .poem-link-status {
-            font-size: 0.75rem;
+        .poem-snippet {
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
             color: #888;
             font-style: italic;
+            line-height: 1.6;
         }
 
-        .static-noise {
-            display: inline-block;
-            animation: noise 0.3s infinite;
-        }
-
-        @keyframes noise {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
-
-        .error-box {
-            margin: 60px 0;
-            padding: 15px;
-            background: rgba(255, 0, 0, 0.05);
-            border: 1px solid rgba(255, 62, 62, 0.3);
-            font-size: 0.8rem;
-            color: #ff6b6b;
-        }
-
-        .footer {
-            margin-top: 120px;
-            padding: 20px;
-            font-size: clamp(0.6rem, 1.5vw, 0.75rem);
-            opacity: 0.3;
-            text-align: center;
-            border-top: 1px dashed #333;
-        }
-
-        /* Floating elements */
-        .float-symbol {
+        /* Elemen Absurd yang Melayang */
+        .floating-chaos {
             position: fixed;
             font-size: 2rem;
-            opacity: 0.1;
-            pointer-events: none;
+            opacity: 0.2;
+            z-index: 5;
             animation: float 10s infinite ease-in-out;
-            z-index: 0;
+            pointer-events: none;
         }
 
         @keyframes float {
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(50px, -50px) rotate(90deg); }
-            50% { transform: translate(0, -100px) rotate(180deg); }
-            75% { transform: translate(-50px, -50px) rotate(270deg); }
+            25% { transform: translate(100px, -100px) rotate(90deg); }
+            50% { transform: translate(-50px, 100px) rotate(180deg); }
+            75% { transform: translate(150px, 50px) rotate(270deg); }
         }
 
-        @media (max-width: 600px) {
-            .container { padding: 30px 15px; }
-            .poem-fragment { padding: 15px; margin: 30px 0; }
+        .chaos-1 { top: 10%; left: 10%; color: #ff3e3e; animation-delay: 0s; }
+        .chaos-2 { top: 30%; right: 15%; color: #00f0ff; animation-delay: 2s; }
+        .chaos-3 { bottom: 20%; left: 20%; color: #ff00ff; animation-delay: 4s; }
+        .chaos-4 { top: 60%; right: 10%; color: #ffff00; animation-delay: 6s; }
+
+        /* Broken text effect */
+        .broken {
+            display: inline-block;
+            color: #ff3e3e;
+            transform: rotate(-5deg) translateY(5px);
+            animation: shiver 2s infinite;
+        }
+
+        @keyframes shiver {
+            0%, 100% { transform: rotate(-5deg) translateY(5px); }
+            50% { transform: rotate(5deg) translateY(-5px); }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 100px;
+            font-size: clamp(0.6rem, 2vw, 0.7rem);
+            opacity: 0.3;
+            padding-bottom: 40px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                letter-spacing: 4px;
+            }
+            .poem-link {
+                padding: 15px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Canvas untuk background abstrak -->
-    <canvas id="abstract-canvas"></canvas>
+    <!-- Canvas untuk Coretan Abstrak -->
+    <canvas id="scribbleCanvas"></canvas>
 
-    <!-- Floating symbols -->
-    <div class="float-symbol" style="top: 10%; left: 80%; animation-delay: 0s;">∞</div>
-    <div class="float-symbol" style="top: 40%; left: 10%; animation-delay: 2s;">∅</div>
-    <div class="float-symbol" style="top: 70%; left: 85%; animation-delay: 4s;">∫</div>
-    <div class="float-symbol" style="top: 25%; left: 15%; animation-delay: 6s;">≠</div>
+    <!-- Elemen Melayang Absurd -->
+    <div class="floating-chaos chaos-1">∞</div>
+    <div class="floating-chaos chaos-2">?</div>
+    <div class="floating-chaos chaos-3">◊</div>
+    <div class="floating-chaos chaos-4">⊗</div>
 
     <div class="container">
-        <h1>ABSURDUM: <br>MALFUNGSI AKSARA</h1>
-        <div class="subtitle">> Error: System.log not found. Displaying malfungsi_aksara.txt</div>
+        <!-- Header -->
+        <div class="header">
+            <h1>ABSURDUM:<br>MALFUNGSI AKSARA</h1>
+            <div class="subtitle">&gt;&gt; Error: Reality.dll not found | Sistem sedang berhalusinasi...</div>
+        </div>
 
-        <div class="poem-fragment">
-Di sini,
+        <!-- Puisi Pembuka -->
+        <div class="poem" style="margin-bottom: 80px; padding: 30px; background: rgba(255,62,62,0.05); border-left: 4px solid #ff3e3e;">
+            <div style="white-space: pre-wrap; line-height: 2;">Di sini,
 huruf-huruf <span class="broken">mati</span> muda.
 
 Mereka tidak sempat jadi kata,
 apalagi menjadi doa yang dikabulkan.
 
-<span class="void">[ 404 : HATI ]</span>
+<span style="color: #ff00ff; font-weight: bold;">[ 404 : HATI ]</span>
 
 Jendela ini terbuka,
 tapi hanya ada gelap yang
-                      <span class="broken">**berteriak**</span>.
+                          <span style="color: #ffff00; font-weight: bold;">**berteriak**</span>.
 
-Apakah kau mendengar frekuensi yang patah?
+<span style="color: #666; font-style: italic;">Apakah kau mendengar frekuensi yang patah?</span>
 Itu adalah aku,
 sedang mencoba mengeja namamu 
-dengan lidah yang sudah jadi abu.
-        </div>
-
-        <div class="error-box">
-            <span class="static-noise">█</span> WARNING: Memory corruption detected at address 0x<span class="broken">void</span>
-            <br>Attempting to read: <span class="void">meaning_of_life.dll</span>
-            <br>Status: <span style="color: #00f0ff;">ABSURD_NOT_FOUND</span>
+dengan lidah yang sudah jadi <span class="broken">abu</span>.</div>
         </div>
 
         <!-- Daftar Puisi -->
-        <div class="poem-links">
+        <div class="poem-list">
             <a href="puisi/perjamuan.html" class="poem-link">
-                <span class="poem-link-title">01. Perjamuan di Perut Paus Plastik</span>
-                <span class="poem-link-status">status: tersedia | corrupted: 78% | sanity: null</span>
+                <div class="poem-title">⊕ Perjamuan di Perut Paus Plastik</div>
+                <div class="poem-snippet">
+                    "Oksigen adalah barang antik..." | f(x) = sunyi × ∞ | Gravitasi sedang menghitung rambut orang jatuh cinta
+                </div>
             </a>
 
-            <a href="#" class="poem-link" onclick="return false;" style="opacity: 0.5;">
-                <span class="poem-link-title">02. [REDACTED]</span>
-                <span class="poem-link-status">status: belum ada | reality.exe stopped working</span>
-            </a>
-
-            <a href="#" class="poem-link" onclick="return false;" style="opacity: 0.5;">
-                <span class="poem-link-title">03. ???</span>
-                <span class="poem-link-status">status: NULL | ERROR: Cannot divide by existence</span>
+            <!-- Tambahkan puisi lain di sini dengan format yang sama -->
+            <a href="puisi/coming-soon.html" class="poem-link" style="opacity: 0.5; pointer-events: none;">
+                <div class="poem-title">⊗ [LOADING_CHAOS.txt]</div>
+                <div class="poem-snippet">
+                    Segera: Kalimat yang menolak jadi kalimat...
+                </div>
             </a>
         </div>
 
+        <!-- Footer -->
         <div class="footer">
-            <pre>
--- end of transmission --
-[ Process finished with exit code <span class="broken">∞</span> ]
-last_coherent_thought.log: 0 bytes
-void_percentage: 99.7%
-
-"Jika kau membaca ini, maka kau sudah terlambat."
-            </pre>
+            -- end of transmission --<br>
+            [ Process finished with exit code ∞ ]<br>
+            <span style="color: #ff3e3e;">※ Semua teks adalah fiksi yang tidak paham dirinya fiksi ※</span>
         </div>
     </div>
 
     <script>
-        // Abstract Canvas Background
-        const canvas = document.getElementById('abstract-canvas');
+        // Membuat Coretan Abstrak di Canvas
+        const canvas = document.getElementById('scribbleCanvas');
         const ctx = canvas.getContext('2d');
-        
+
+        // Set ukuran canvas
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            drawAbstract();
+            drawScribbles();
         }
-        
-        function drawAbstract() {
+
+        function drawScribbles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Random abstract shapes
-            for (let i = 0; i < 30; i++) {
-                ctx.beginPath();
-                
-                // Random colors
-                const colors = ['#ff3e3e', '#00f0ff', '#ff00ff', '#ffff00', '#00ff00'];
+            // Warna-warna absurd
+            const colors = ['#ff3e3e', '#00f0ff', '#ff00ff', '#ffff00', '#00ff00'];
+            
+            // Gambar 50 coretan acak
+            for (let i = 0; i < 50; i++) {
                 ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
                 ctx.lineWidth = Math.random() * 3 + 1;
-                ctx.globalAlpha = 0.1 + Math.random() * 0.2;
+                ctx.globalAlpha = Math.random() * 0.3 + 0.1;
                 
-                // Random shapes
-                const shapeType = Math.floor(Math.random() * 4);
-                const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height;
-                
-                if (shapeType === 0) {
-                    // Lines
-                    ctx.moveTo(x, y);
-                    ctx.lineTo(x + Math.random() * 200 - 100, y + Math.random() * 200 - 100);
-                } else if (shapeType === 1) {
-                    // Circles
-                    ctx.arc(x, y, Math.random() * 100, 0, Math.PI * 2);
-                } else if (shapeType === 2) {
-                    // Rectangles
-                    ctx.rect(x, y, Math.random() * 150, Math.random() * 150);
-                } else {
-                    // Curves
-                    ctx.moveTo(x, y);
-                    ctx.quadraticCurveTo(
-                        x + Math.random() * 200 - 100,
-                        y + Math.random() * 200 - 100,
-                        x + Math.random() * 300 - 150,
-                        y + Math.random() * 300 - 150
-                    );
-                }
-                
-                ctx.stroke();
-            }
-            
-            // Random scribbles
-            for (let i = 0; i < 15; i++) {
                 ctx.beginPath();
-                ctx.strokeStyle = '#ff3e3e';
-                ctx.lineWidth = 1;
-                ctx.globalAlpha = 0.05;
                 
+                // Starting point acak
                 let x = Math.random() * canvas.width;
                 let y = Math.random() * canvas.height;
                 ctx.moveTo(x, y);
                 
-                for (let j = 0; j < 10; j++) {
-                    x += Math.random() * 40 - 20;
-                    y += Math.random() * 40 - 20;
+                // Buat garis acak dengan 5-15 titik
+                const points = Math.floor(Math.random() * 10) + 5;
+                for (let j = 0; j < points; j++) {
+                    x += (Math.random() - 0.5) * 200;
+                    y += (Math.random() - 0.5) * 200;
                     ctx.lineTo(x, y);
                 }
+                
                 ctx.stroke();
             }
+            
+            // Gambar beberapa lingkaran acak
+            for (let i = 0; i < 20; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 2 + 1;
+                ctx.globalAlpha = Math.random() * 0.2 + 0.1;
+                
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const radius = Math.random() * 100 + 20;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Gambar beberapa bentuk geometri absurd
+            for (let i = 0; i < 15; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 3 + 1;
+                ctx.globalAlpha = Math.random() * 0.25 + 0.1;
+                
+                ctx.beginPath();
+                const sides = Math.floor(Math.random() * 5) + 3;
+                const centerX = Math.random() * canvas.width;
+                const centerY = Math.random() * canvas.height;
+                const size = Math.random() * 80 + 30;
+                
+                for (let j = 0; j <= sides; j++) {
+                    const angle = (j / sides) * Math.PI * 2;
+                    const x = centerX + Math.cos(angle) * size;
+                    const y = centerY + Math.sin(angle) * size;
+                    if (j === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+            
+            ctx.globalAlpha = 1;
         }
-        
+
+        // Initial draw dan resize listener
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
-        
-        // Redraw periodically for subtle animation
+
+        // Redraw coretan setiap 10 detik untuk efek berubah-ubah
         setInterval(() => {
-            drawAbstract();
+            drawScribbles();
         }, 10000);
     </script>
 
