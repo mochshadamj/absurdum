@@ -2,12 +2,23 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ABSURDUM | Malfungsi Aksara</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+        :root {
+            --bg-color: #0a0a0a;
+            --text-color: #d1d1d1;
+            --accent-red: #ff0040;
+            --accent-cyan: #00ffff;
+            --accent-yellow: #ffeb3b;
+        }
+
         body {
-            background-color: #0a0a0a;
-            color: #d1d1d1;
-            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'VT323', 'Courier New', monospace;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -15,36 +26,204 @@
             min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
-            line-height: 1.2;
+            line-height: 1.4;
+            position: relative;
         }
 
-        .container { width: 80%; max-width: 600px; }
+        /* Background Animasi Kacau */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(217deg, rgba(255,0,64,.2), rgba(255,0,64,0) 70%),
+                        linear-gradient(127deg, rgba(0,255,255,.2), rgba(0,255,255,0) 70%),
+                        linear-gradient(336deg, rgba(255,235,59,.1), rgba(0,0,0,0) 70%);
+            background-size: 200% 200%;
+            animation: glitch-bg 15s ease infinite;
+            z-index: -1;
+        }
 
+        @keyframes glitch-bg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container { 
+            width: 80%; 
+            max-width: 700px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Efek Glitch pada Judul */
         h1 {
-            font-size: 2.5rem;
-            color: #ff3e3e;
-            text-shadow: 2px 2px #00f0ff;
+            font-size: 4rem;
+            color: var(--accent-red);
             text-transform: uppercase;
-            letter-spacing: 5px;
+            letter-spacing: 8px;
+            position: relative;
+            text-shadow: 2px 2px var(--accent-cyan);
+            animation: flicker 3s infinite alternate;
         }
 
-        .glitch-text { color: #888; font-size: 0.9rem; margin-bottom: 50px; }
+        h1::before, h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        h1::before {
+            animation: glitch-1 0.3s infinite;
+            color: var(--accent-cyan);
+            z-index: -1;
+        }
+        
+        h1::after {
+            animation: glitch-2 0.3s infinite;
+            color: var(--accent-yellow);
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0% { clip-path: inset(42% 0 61% 0); transform: translate(-2px, 2px); }
+            20% { clip-path: inset(88% 0 1% 0); transform: translate(2px, -2px); }
+            40% { clip-path: inset(10% 0 85% 0); transform: translate(-2px, 2px); }
+            60% { clip-path: inset(75% 0 10% 0); transform: translate(2px, -2px); }
+            80% { clip-path: inset(55% 0 30% 0); transform: translate(-2px, 2px); }
+            100% { clip-path: inset(20% 0 60% 0); transform: translate(2px, -2px); }
+        }
+
+        @keyframes glitch-2 {
+            0% { clip-path: inset(65% 0 5% 0); transform: translate(2px, -2px); }
+            20% { clip-path: inset(15% 0 75% 0); transform: translate(-2px, 2px); }
+            40% { clip-path: inset(90% 0 2% 0); transform: translate(2px, -2px); }
+            60% { clip-path: inset(25% 0 60% 0); transform: translate(-2px, 2px); }
+            80% { clip-path: inset(70% 0 10% 0); transform: translate(2px, -2px); }
+            100% { clip-path: inset(5% 0 80% 0); transform: translate(-2px, 2px); }
+        }
+
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
+                text-shadow:
+                0 0 4px var(--accent-cyan),
+                0 0 11px var(--accent-cyan),
+                0 0 19px var(--accent-cyan),
+                0 0 40px var(--accent-red),
+                0 0 80px var(--accent-red),
+                0 0 90px var(--accent-red),
+                0 0 100px var(--accent-red),
+                0 0 150px var(--accent-red);
+            }
+            20%, 24%, 55% {        
+                text-shadow: none;
+            }
+        }
+
+        .glitch-text { 
+            color: #888; 
+            font-size: 1.2rem; 
+            margin-bottom: 40px; 
+            animation: text-flicker 2s linear infinite;
+        }
+
+        @keyframes text-flicker {
+            0% { opacity: 0.8; }
+            5% { opacity: 0.5; }
+            10% { opacity: 1; }
+            15% { opacity: 0.7; }
+            20% { opacity: 1; }
+            100% { opacity: 1; }
+        }
 
         .poem {
-            margin-top: 20px;
-            white-space: pre-wrap; /* Biar spasi dan enter tetap rapi/berantakan */
+            margin: 30px 0;
+            font-size: 1.3rem;
+            white-space: pre-wrap;
+            text-align: left;
         }
 
-        .footer { margin-top: 100px; font-size: 0.7rem; opacity: 0.3; }
-        
         /* Efek sederhana biar teks kelihatan "rusak" */
-        span.broken { display: inline-block; transform: rotate(-5deg) translateY(10px); color: #fff; }
+        span.broken { 
+            display: inline-block; 
+            transform: rotate(-3deg) translateY(5px); 
+            color: #fff; 
+            padding: 0 5px;
+        }
+
+        /* Daftar Puisi / Arsip */
+        .archive {
+            margin-top: 50px;
+            border: 1px dashed #555;
+            padding: 20px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .archive h2 {
+            font-size: 1.8rem;
+            color: var(--accent-cyan);
+            margin-bottom: 15px;
+            animation: text-flicker 3s infinite;
+        }
+
+        .archive ul {
+            list-style: none;
+            padding: 0;
+            font-size: 1.2rem;
+        }
+
+        .archive li {
+            margin: 10px 0;
+        }
+
+        .archive a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .archive a:hover {
+            color: var(--accent-yellow);
+            transform: translate(5px, -2px);
+            text-shadow: 0 0 5px var(--accent-yellow);
+        }
+
+        .archive a::before {
+            content: '> ';
+            color: #555;
+        }
+        
+        .footer { 
+            margin-top: 80px; 
+            font-size: 1rem; 
+            opacity: 0.4; 
+            animation: text-flicker 5s infinite;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            body { font-size: 16px; }
+            .container { width: 90%; }
+            h1 { font-size: 2.5rem; letter-spacing: 4px; }
+            .glitch-text { font-size: 1rem; }
+            .poem { font-size: 1.1rem; }
+            .archive h2 { font-size: 1.5rem; }
+            .archive ul { font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>ABSURDUM</h1>
+        <h1 data-text="ABSURDUM">ABSURDUM</h1>
         <div class="glitch-text">> Error: System.log not found. Displaying malfungsi_aksara.txt</div>
 
         <div class="poem">
@@ -64,6 +243,15 @@
             Itu adalah aku,
             sedang mencoba mengeja namamu 
             dengan lidah yang sudah jadi abu.
+        </div>
+
+        <div class="archive">
+            <h2>ARSIP KERUSAKAN</h2>
+            <ul>
+                <li><a href="puisi/perjamuan.html">perjamuan di perut paus plastik</a></li>
+                <!-- Tambahkan link puisi lainnya di sini -->
+                <li><a href="#">[CORRUPTED_FILE].txt</a></li>
+            </ul>
         </div>
 
         <div class="footer">
