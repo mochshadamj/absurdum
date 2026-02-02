@@ -3,264 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⊗ ABSURDUM ⊗ Malfungsi Realitas</title>
+    <title>ABSURDUM | Malfungsi Aksara</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
-        }
-        
-        @keyframes colorShift {
-            0% { filter: hue-rotate(0deg); }
-            100% { filter: hue-rotate(360deg); }
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-        }
-        
-        @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
         body {
-            background: 
-                repeating-linear-gradient(0deg, #0a0a0a 0px, #0a0a0a 1px, transparent 1px, transparent 2px),
-                repeating-linear-gradient(90deg, #0a0a0a 0px, #0a0a0a 1px, transparent 1px, transparent 2px),
-                linear-gradient(135deg, #1a0a1a 0%, #0a0a1a 50%, #0a1a0a 100%);
-            background-size: 50px 50px, 50px 50px, 100% 100%;
+            background-color: #0a0a0a;
             color: #d1d1d1;
             font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             min-height: 100vh;
-            margin: 0;
             overflow-x: hidden;
             position: relative;
-            animation: colorShift 20s infinite;
         }
 
-        /* Efek noise background */
-        body::before {
-            content: "";
+        /* Background Abstrak Canvas */
+        #abstract-canvas {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.03;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* Floating symbols */
-        body::after {
-            content: "∞ ∅ ⊗ ∴ ∵ ⊕ ∇ ∆ ∫ ∮ ∑ ∏ √ ∛ ∜ ≈ ≠ ≡ ⊥ ∥ ∧ ∨ ¬ ⊃ ⊂";
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 8rem;
-            opacity: 0.02;
-            white-space: pre-wrap;
-            text-align: center;
             width: 100%;
-            animation: float 15s infinite ease-in-out;
-            pointer-events: none;
+            height: 100%;
             z-index: 0;
+            opacity: 0.3;
         }
 
         .container {
+            position: relative;
+            z-index: 1;
             width: 90%;
             max-width: 700px;
-            position: relative;
-            z-index: 10;
-            padding: 20px;
+            margin: 0 auto;
+            padding: 50px 20px;
         }
 
         h1 {
-            font-size: clamp(2rem, 8vw, 4rem);
+            font-size: clamp(2rem, 8vw, 3.5rem);
             color: #ff3e3e;
-            text-shadow: 
-                3px 3px 0 #00f0ff,
-                -2px -2px 0 #ff00ff,
-                0 0 20px rgba(255, 62, 62, 0.5);
+            text-shadow: 3px 3px #00f0ff, -2px -2px #ff00ff;
             text-transform: uppercase;
             letter-spacing: clamp(3px, 1vw, 8px);
             animation: glitch 3s infinite;
-            text-align: center;
             margin-bottom: 10px;
-            word-break: break-word;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-1px, -1px); }
+            80% { transform: translate(1px, 1px); }
         }
 
         .subtitle {
-            color: #00f0ff;
+            color: #888;
             font-size: clamp(0.7rem, 2vw, 0.9rem);
-            text-align: center;
-            margin-bottom: 40px;
-            animation: flicker 2s infinite;
-            text-shadow: 0 0 10px #00f0ff;
+            margin-bottom: 60px;
+            animation: flicker 4s infinite;
         }
 
-        .poem-list {
-            list-style: none;
-            margin-top: 30px;
+        @keyframes flicker {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 0.3; }
         }
 
-        .poem-item {
-            margin: 15px 0;
-            position: relative;
-            padding-left: 30px;
-        }
-
-        .poem-item::before {
-            content: "⊗";
-            position: absolute;
-            left: 0;
-            color: #ff3e3e;
-            animation: float 3s infinite ease-in-out;
-        }
-
-        .poem-item:nth-child(2)::before { content: "∅"; animation-delay: 0.5s; }
-        .poem-item:nth-child(3)::before { content: "∞"; animation-delay: 1s; }
-        .poem-item:nth-child(4)::before { content: "∇"; animation-delay: 1.5s; }
-
-        .poem-link {
-            color: #d1d1d1;
-            text-decoration: none;
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-            transition: all 0.3s;
-            display: inline-block;
-            position: relative;
-        }
-
-        .poem-link:hover {
-            color: #ff3e3e;
-            text-shadow: 0 0 10px #ff3e3e;
-            transform: translateX(10px);
-            animation: glitch 0.3s infinite;
-        }
-
-        .poem-link::after {
-            content: " [KORUP]";
-            font-size: 0.7em;
-            color: #00f0ff;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .poem-link:hover::after {
-            opacity: 1;
-        }
-
-        .error-box {
-            background: rgba(255, 0, 0, 0.1);
-            border: 2px solid #ff3e3e;
-            border-style: dashed;
-            padding: 15px;
-            margin: 30px 0;
-            font-size: clamp(0.7rem, 2vw, 0.85rem);
-            animation: flicker 5s infinite;
-            line-height: 1.6;
-        }
-
-        .glitch-box {
-            background: rgba(0, 240, 255, 0.05);
-            border-left: 3px solid #00f0ff;
-            padding: 15px;
-            margin: 20px 0;
-            font-size: clamp(0.75rem, 2vw, 0.9rem);
+        .poem-fragment {
+            margin: 40px 0;
+            padding: 20px;
+            border-left: 2px solid #ff3e3e;
             white-space: pre-wrap;
             line-height: 1.8;
+            font-size: clamp(0.85rem, 2vw, 1rem);
         }
 
         .broken {
             display: inline-block;
-            transform: rotate(-5deg) translateY(3px);
-            color: #fff;
-            text-shadow: 0 0 5px #fff;
+            transform: rotate(-8deg) translateY(5px);
+            color: #00f0ff;
+            font-weight: bold;
         }
 
-        .corrupted {
+        .void {
             color: #ff00ff;
-            animation: glitch 1s infinite;
+            font-style: italic;
+        }
+
+        /* Link Puisi - Absurd Style */
+        .poem-links {
+            margin-top: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .poem-link {
+            position: relative;
+            padding: 15px 20px;
+            background: rgba(255, 62, 62, 0.05);
+            border: 1px dashed #ff3e3e;
+            text-decoration: none;
+            color: #d1d1d1;
+            transition: all 0.3s ease;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            overflow: hidden;
+        }
+
+        .poem-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .poem-link:hover::before {
+            left: 100%;
+        }
+
+        .poem-link:hover {
+            background: rgba(255, 62, 62, 0.1);
+            border-color: #00f0ff;
+            transform: translateX(10px) rotate(-1deg);
+        }
+
+        .poem-link-title {
+            display: block;
+            color: #ff3e3e;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .poem-link-status {
+            font-size: 0.75rem;
+            color: #888;
+            font-style: italic;
+        }
+
+        .static-noise {
+            display: inline-block;
+            animation: noise 0.3s infinite;
+        }
+
+        @keyframes noise {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .error-box {
+            margin: 60px 0;
+            padding: 15px;
+            background: rgba(255, 0, 0, 0.05);
+            border: 1px solid rgba(255, 62, 62, 0.3);
+            font-size: 0.8rem;
+            color: #ff6b6b;
         }
 
         .footer {
-            margin-top: 80px;
+            margin-top: 120px;
+            padding: 20px;
             font-size: clamp(0.6rem, 1.5vw, 0.75rem);
             opacity: 0.3;
             text-align: center;
-            line-height: 1.8;
+            border-top: 1px dashed #333;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 600px) {
-            .container { width: 95%; padding: 15px; }
-            h1 { letter-spacing: 3px; }
-            .poem-item { padding-left: 25px; }
-        }
-
-        /* Random floating particles */
-        .particle {
+        /* Floating elements */
+        .float-symbol {
             position: fixed;
-            color: #ff3e3e;
-            font-size: 1.5rem;
+            font-size: 2rem;
             opacity: 0.1;
             pointer-events: none;
             animation: float 10s infinite ease-in-out;
             z-index: 0;
         }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(50px, -50px) rotate(90deg); }
+            50% { transform: translate(0, -100px) rotate(180deg); }
+            75% { transform: translate(-50px, -50px) rotate(270deg); }
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 30px 15px; }
+            .poem-fragment { padding: 15px; margin: 30px 0; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Floating particles -->
-    <div class="particle" style="top: 10%; left: 10%;">∞</div>
-    <div class="particle" style="top: 20%; right: 15%; animation-delay: 2s;">⊗</div>
-    <div class="particle" style="bottom: 30%; left: 20%; animation-delay: 4s;">∅</div>
-    <div class="particle" style="bottom: 10%; right: 25%; animation-delay: 6s;">∇</div>
+    <!-- Canvas untuk background abstrak -->
+    <canvas id="abstract-canvas"></canvas>
+
+    <!-- Floating symbols -->
+    <div class="float-symbol" style="top: 10%; left: 80%; animation-delay: 0s;">∞</div>
+    <div class="float-symbol" style="top: 40%; left: 10%; animation-delay: 2s;">∅</div>
+    <div class="float-symbol" style="top: 70%; left: 85%; animation-delay: 4s;">∫</div>
+    <div class="float-symbol" style="top: 25%; left: 15%; animation-delay: 6s;">≠</div>
 
     <div class="container">
-        <h1>⊗ ABSURDUM ⊗</h1>
-        <div class="subtitle">
-            >> ERROR_404: Logika.exe telah berhenti bekerja
-        </div>
+        <h1>ABSURDUM</h1>
+        <div class="subtitle">> Error: System.log not found. Displaying malfungsi_aksara.txt</div>
 
-        <div class="error-box">
-            <strong>[!] PERINGATAN SISTEM [!]</strong><br>
-            Puisi-puisi berikut mengandung <span class="corrupted">malfungsi aksara</span>.<br>
-            Konsumsi berlebihan dapat menyebabkan:<br>
-            • Kerusakan sirkuit logika<br>
-            • Halusinasi eksistensial<br>
-            • <span class="broken">Ketidakmampuan membedakan mimpi dan kenyataan</span><br>
-            <br>
-            <em>[ Anda telah diperingatkan. ]</em>
-        </div>
-
-        <div class="glitch-box">
+        <div class="poem-fragment">
 Di sini,
 huruf-huruf <span class="broken">mati</span> muda.
 
 Mereka tidak sempat jadi kata,
 apalagi menjadi doa yang dikabulkan.
 
-<span class="corrupted">[ 404 : HATI ]</span>
+<span class="void">[ 404 : HATI ]</span>
 
 Jendela ini terbuka,
 tapi hanya ada gelap yang
-                      **berteriak**.
+                      <span class="broken">**berteriak**</span>.
 
 Apakah kau mendengar frekuensi yang patah?
 Itu adalah aku,
@@ -268,57 +227,122 @@ sedang mencoba mengeja namamu
 dengan lidah yang sudah jadi abu.
         </div>
 
-        <h2 style="color: #00f0ff; font-size: clamp(1.2rem, 3vw, 1.5rem); margin-top: 40px; margin-bottom: 20px; text-shadow: 0 0 10px #00f0ff;">
-            ≡ DAFTAR KORUPSI AKSARA ≡
-        </h2>
+        <div class="error-box">
+            <span class="static-noise">█</span> WARNING: Memory corruption detected at address 0x<span class="broken">void</span>
+            <br>Attempting to read: <span class="void">meaning_of_life.dll</span>
+            <br>Status: <span style="color: #00f0ff;">ABSURD_NOT_FOUND</span>
+        </div>
 
-        <ul class="poem-list">
-            <li class="poem-item">
-                <a href="puisi/perjamuan.html" class="poem-link">Perjamuan di Perut Paus Plastik</a>
-            </li>
-            <li class="poem-item">
-                <a href="puisi/sirkuit.html" class="poem-link">Sirkuit Sunyi yang Berteriak di Jam 3 Pagi</a>
-            </li>
-            <li class="poem-item">
-                <a href="puisi/gravitasi.html" class="poem-link">Surat Untuk Gravitasi yang Tidak Pernah Dibalas</a>
-            </li>
-            <li class="poem-item">
-                <a href="puisi/void.html" class="poem-link">Dialog dengan Kekosongan di Pojok Kamar</a>
-            </li>
-        </ul>
+        <!-- Daftar Puisi -->
+        <div class="poem-links">
+            <a href="puisi/perjamuan.html" class="poem-link">
+                <span class="poem-link-title">01. Perjamuan di Perut Paus Plastik</span>
+                <span class="poem-link-status">status: tersedia | corrupted: 78% | sanity: null</span>
+            </a>
+
+            <a href="#" class="poem-link" onclick="return false;" style="opacity: 0.5;">
+                <span class="poem-link-title">02. [REDACTED]</span>
+                <span class="poem-link-status">status: belum ada | reality.exe stopped working</span>
+            </a>
+
+            <a href="#" class="poem-link" onclick="return false;" style="opacity: 0.5;">
+                <span class="poem-link-title">03. ???</span>
+                <span class="poem-link-status">status: NULL | ERROR: Cannot divide by existence</span>
+            </a>
+        </div>
 
         <div class="footer">
-            <span class="corrupted">∴</span> end of transmission <span class="corrupted">∴</span><br>
-            [ Process finished with exit code: <span class="broken">∞</span> ]<br>
-            Last modified: <span class="corrupted">ERROR::TIME_NOT_FOUND</span><br>
-            <br>
-            <em>"Jangan percaya apapun yang kau baca di sini.<br>
-            Termasuk kalimat ini."</em>
+            <pre>
+-- end of transmission --
+[ Process finished with exit code <span class="broken">∞</span> ]
+last_coherent_thought.log: 0 bytes
+void_percentage: 99.7%
+
+"Jika kau membaca ini, maka kau sudah terlambat."
+            </pre>
         </div>
     </div>
 
     <script>
-        // Random glitch effect pada hover
-        document.querySelectorAll('.poem-link').forEach(link => {
-            link.addEventListener('mouseenter', function() {
-                if(Math.random() > 0.5) {
-                    this.textContent = this.textContent.split('').sort(() => Math.random() - 0.5).join('');
-                    setTimeout(() => {
-                        location.reload(); // Refresh untuk reset text
-                    }, 300);
+        // Abstract Canvas Background
+        const canvas = document.getElementById('abstract-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawAbstract();
+        }
+        
+        function drawAbstract() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Random abstract shapes
+            for (let i = 0; i < 30; i++) {
+                ctx.beginPath();
+                
+                // Random colors
+                const colors = ['#ff3e3e', '#00f0ff', '#ff00ff', '#ffff00', '#00ff00'];
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 3 + 1;
+                ctx.globalAlpha = 0.1 + Math.random() * 0.2;
+                
+                // Random shapes
+                const shapeType = Math.floor(Math.random() * 4);
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                
+                if (shapeType === 0) {
+                    // Lines
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x + Math.random() * 200 - 100, y + Math.random() * 200 - 100);
+                } else if (shapeType === 1) {
+                    // Circles
+                    ctx.arc(x, y, Math.random() * 100, 0, Math.PI * 2);
+                } else if (shapeType === 2) {
+                    // Rectangles
+                    ctx.rect(x, y, Math.random() * 150, Math.random() * 150);
+                } else {
+                    // Curves
+                    ctx.moveTo(x, y);
+                    ctx.quadraticCurveTo(
+                        x + Math.random() * 200 - 100,
+                        y + Math.random() * 200 - 100,
+                        x + Math.random() * 300 - 150,
+                        y + Math.random() * 300 - 150
+                    );
                 }
-            });
-        });
-
-        // Random background color shift
-        setInterval(() => {
-            if(Math.random() > 0.95) {
-                document.body.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
-                setTimeout(() => {
-                    document.body.style.filter = '';
-                }, 100);
+                
+                ctx.stroke();
             }
-        }, 3000);
+            
+            // Random scribbles
+            for (let i = 0; i < 15; i++) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#ff3e3e';
+                ctx.lineWidth = 1;
+                ctx.globalAlpha = 0.05;
+                
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height;
+                ctx.moveTo(x, y);
+                
+                for (let j = 0; j < 10; j++) {
+                    x += Math.random() * 40 - 20;
+                    y += Math.random() * 40 - 20;
+                    ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Redraw periodically for subtle animation
+        setInterval(() => {
+            drawAbstract();
+        }, 10000);
     </script>
 
 </body>
