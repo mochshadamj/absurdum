@@ -5,20 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perjamuan di Perut Paus Plastik | ABSURDUM</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
+            background: linear-gradient(217deg, rgba(10,10,30,.8), rgba(10,10,30,0) 70.71%),
+                        linear-gradient(127deg, rgba(30,10,40,.8), rgba(30,10,40,0) 70.71%),
+                        linear-gradient(336deg, rgba(10,30,50,.8), rgba(10,30,50,0) 70.71%);
             background-color: #0a0a0a;
             color: #d1d1d1;
             font-family: 'Courier New', Courier, monospace;
-            min-height: 100vh;
             overflow-x: hidden;
             position: relative;
-            line-height: 1.8;
+            min-height: 100vh;
+            padding: 40px 20px;
         }
 
-        /* Animated Abstract Background */
-        #chaos-canvas {
+        /* Canvas Background */
+        #chaosCanvas {
             position: fixed;
             top: 0;
             left: 0;
@@ -26,369 +33,373 @@
             height: 100%;
             z-index: 0;
             opacity: 0.25;
+            pointer-events: none;
         }
 
         .container {
             position: relative;
-            z-index: 1;
-            width: 90%;
+            z-index: 10;
             max-width: 800px;
             margin: 0 auto;
-            padding: 40px 20px;
         }
 
-        /* Back button */
-        .back-button {
-            display: inline-block;
-            padding: 10px 20px;
-            margin-bottom: 30px;
-            background: rgba(255, 62, 62, 0.1);
-            border: 1px dashed #ff3e3e;
-            color: #ff3e3e;
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-        }
-
-        .back-button:hover {
+        /* Back Button */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
             background: rgba(255, 62, 62, 0.2);
-            transform: translateX(-5px);
-            border-color: #00f0ff;
-            color: #00f0ff;
-        }
-
-        .poem-title {
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            border: 2px solid #ff3e3e;
             color: #ff3e3e;
-            text-shadow: 2px 2px #00f0ff;
-            margin-bottom: 10px;
-            animation: pulse 3s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .poem-meta {
-            font-size: 0.75rem;
-            color: #666;
-            margin-bottom: 50px;
-            font-style: italic;
-        }
-
-        .poem-content {
-            white-space: pre-wrap;
-            font-size: clamp(0.9rem, 2.2vw, 1.1rem);
-            line-height: 2;
-            margin-bottom: 60px;
-        }
-
-        /* Styling untuk elemen khusus */
-        .highlight {
-            color: #00f0ff;
-            font-weight: bold;
-        }
-
-        .void {
-            color: #ff00ff;
-            font-style: italic;
-        }
-
-        .broken {
-            display: inline-block;
-            transform: rotate(-5deg);
-            color: #ffff00;
-        }
-
-        .whisper {
-            font-size: 0.85em;
-            color: #888;
-            font-style: italic;
-        }
-
-        .scream {
-            font-weight: bold;
-            color: #ff3e3e;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 100;
+            text-transform: uppercase;
             letter-spacing: 2px;
         }
 
-        .formula {
-            display: block;
+        .back-btn:hover {
+            background: rgba(255, 62, 62, 0.4);
+            transform: translateX(-5px);
+        }
+
+        /* Title */
+        h1 {
+            font-size: clamp(1.8rem, 6vw, 3rem);
+            color: #ff3e3e;
+            text-shadow: 2px 2px #00f0ff, -2px -2px #ff00ff;
             text-align: center;
-            padding: 20px;
-            margin: 30px 0;
-            background: rgba(255, 62, 62, 0.05);
-            border-left: 3px solid #ff3e3e;
-            font-size: 1.2em;
-            color: #00f0ff;
+            margin-bottom: 40px;
+            animation: titleGlitch 4s infinite;
+            letter-spacing: 3px;
+            line-height: 1.3;
         }
 
-        /* Glitch text effect */
-        .glitch {
+        @keyframes titleGlitch {
+            0%, 90%, 100% { transform: skewX(0deg); }
+            92% { transform: skewX(-3deg) translateX(-5px); }
+            94% { transform: skewX(3deg) translateX(5px); }
+            96% { transform: skewX(-2deg); }
+        }
+
+        /* Poem Content */
+        .poem {
+            line-height: 2;
+            white-space: pre-wrap;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            text-align: left;
             position: relative;
+        }
+
+        /* Styling untuk elemen-elemen khusus */
+        .broken {
             display: inline-block;
+            color: #ff3e3e;
+            transform: rotate(var(--rotate, -5deg)) translateY(var(--translateY, 5px));
+            animation: shiver 2s infinite;
         }
 
-        .glitch::before,
-        .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        @keyframes shiver {
+            0%, 100% { transform: rotate(-5deg) translateY(5px); }
+            50% { transform: rotate(5deg) translateY(-5px); }
         }
 
-        .glitch::before {
-            left: 2px;
-            text-shadow: -2px 0 #ff00ff;
-            animation: glitch-1 0.3s infinite;
+        .math {
+            display: inline-block;
+            background: rgba(0, 240, 255, 0.1);
+            padding: 5px 15px;
+            border-left: 3px solid #00f0ff;
+            color: #00f0ff;
+            font-weight: bold;
+            margin: 20px 0;
+            letter-spacing: 2px;
         }
 
-        .glitch::after {
-            left: -2px;
-            text-shadow: 2px 0 #00f0ff;
-            animation: glitch-2 0.3s infinite;
+        .whisper {
+            color: #666;
+            font-style: italic;
+            font-size: 0.85em;
         }
 
-        @keyframes glitch-1 {
-            0%, 100% { clip-path: inset(40% 0 45% 0); }
-            50% { clip-path: inset(54% 0 15% 0); }
+        .emphasis {
+            color: #ffff00;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
         }
 
-        @keyframes glitch-2 {
-            0%, 100% { clip-path: inset(65% 0 10% 0); }
-            50% { clip-path: inset(12% 0 70% 0); }
+        .error {
+            color: #ff00ff;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .space-line {
+            height: 40px;
         }
 
         /* Floating symbols */
         .float-symbol {
             position: fixed;
-            font-size: clamp(1.5rem, 4vw, 3rem);
-            opacity: 0.08;
+            font-size: 3rem;
+            opacity: 0.15;
+            z-index: 5;
             pointer-events: none;
-            z-index: 0;
-            animation: drift 15s infinite ease-in-out;
+            animation: floatAround 15s infinite ease-in-out;
         }
 
-        @keyframes drift {
+        @keyframes floatAround {
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(100px, -80px) rotate(120deg); }
-            66% { transform: translate(-80px, 100px) rotate(240deg); }
+            25% { transform: translate(-50px, 100px) rotate(90deg); }
+            50% { transform: translate(100px, -50px) rotate(180deg); }
+            75% { transform: translate(-100px, -100px) rotate(270deg); }
         }
 
-        .end-mark {
+        .symbol-1 { top: 15%; left: 80%; color: #ff3e3e; animation-delay: 0s; }
+        .symbol-2 { top: 40%; left: 10%; color: #00f0ff; animation-delay: 3s; }
+        .symbol-3 { top: 70%; right: 15%; color: #ff00ff; animation-delay: 6s; }
+        .symbol-4 { bottom: 20%; left: 70%; color: #ffff00; animation-delay: 9s; }
+
+        /* Footer */
+        .footer {
+            margin-top: 100px;
             text-align: center;
-            margin-top: 80px;
-            padding: 30px;
-            border-top: 1px dashed #333;
-            font-size: 0.75rem;
-            color: #666;
+            font-size: 0.7rem;
+            opacity: 0.4;
+            padding-bottom: 40px;
         }
 
-        /* Corrupted text effect */
-        .corrupt {
-            background: linear-gradient(90deg, #ff3e3e, #00f0ff, #ff00ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: corrupt-shift 2s infinite;
-        }
-
-        @keyframes corrupt-shift {
-            0%, 100% { filter: hue-rotate(0deg); }
-            50% { filter: hue-rotate(180deg); }
-        }
-
-        @media (max-width: 600px) {
-            .container { padding: 30px 15px; }
-            .formula { padding: 15px; font-size: 1em; }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .back-btn {
+                position: relative;
+                display: inline-block;
+                margin-bottom: 30px;
+            }
+            
+            .poem {
+                font-size: 0.95rem;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Chaos Canvas -->
-    <canvas id="chaos-canvas"></canvas>
+    <!-- Canvas Chaos Background -->
+    <canvas id="chaosCanvas"></canvas>
 
-    <!-- Floating symbols -->
-    <div class="float-symbol" style="top: 5%; left: 75%; animation-delay: 0s;">∞</div>
-    <div class="float-symbol" style="top: 30%; left: 5%; animation-delay: 3s;">∅</div>
-    <div class="float-symbol" style="top: 60%; left: 90%; animation-delay: 6s;">∫</div>
-    <div class="float-symbol" style="top: 80%; left: 10%; animation-delay: 9s;">≠</div>
-    <div class="float-symbol" style="top: 45%; left: 85%; animation-delay: 12s;">Σ</div>
+    <!-- Floating Symbols -->
+    <div class="float-symbol symbol-1">∞</div>
+    <div class="float-symbol symbol-2">⊗</div>
+    <div class="float-symbol symbol-3">◊</div>
+    <div class="float-symbol symbol-4">⊕</div>
+
+    <a href="../index.html" class="back-btn">← kembali</a>
 
     <div class="container">
-        <a href="../index.html" class="back-button">← kembali ke void</a>
+        <h1>Perjamuan di Perut<br>Paus Plastik</h1>
 
-        <h1 class="poem-title">Perjamuan di Perut Paus Plastik</h1>
-        <div class="poem-meta">
-            file_corruption: 78% | sanity_check: FAILED | timestamp: ∞
-        </div>
+        <div class="poem">Di sini, di dalam tenggorokan hari Minggu,
+Oksigen adalah barang antik yang dipajang di etalase toko <span class="broken">tutup</span>.
 
-        <div class="poem-content">Di sini, di dalam tenggorokan hari Minggu,
-Oksigen adalah barang antik yang dipajang di etalase toko tutup.
 Aku memotong-motong bayanganku sendiri,
-menyajikannya dengan <span class="highlight">saus penyesalan</span> yang terlalu banyak garam.
+menyajikannya dengan saus penyesalan yang terlalu banyak garam.
 
-<span class="formula">f(x) = sunyi × ∞</span>
+<span class="math">f(x) = sunyi × ∞</span>
 
-Lihat!
+<span class="emphasis">Lihat!</span>
 Ada kereta api yang melaju di urat nadiku,
 masinisnya adalah seekor burung gagak yang lupa cara terbang.
+
 Stasiunnya?
-<span class="void">Tidak ada.</span>
+<span class="error">Tidak ada</span>.
+
 Hanya ada papan pengumuman yang menuliskan:
-<span class="scream">"Harap antre untuk menjadi tidak ada."</span>
+<span class="whisper">"Harap antre untuk menjadi tidak ada."</span>
+
+<div class="space-line"></div>
 
 <span class="whisper">(Ssst... dengar tidak?)</span>
+
 Suara keramik retak di dalam kepalamu itu?
 Itu adalah cita-cita yang terlalu lama disimpan di dalam kulkas.
-<span class="broken">Membeku.</span>
-<span class="broken">Membiru.</span>
-<span class="broken">Menjadi fosil</span> yang ditertawakan oleh kecoak-kecoak penyair.
+
+<span class="broken">Membeku</span>.
+<span class="broken" style="--rotate: 3deg; --translateY: -3px;">Membiru</span>.
+<span class="broken" style="--rotate: -7deg; --translateY: 8px;">Menjadi fosil yang ditertawakan oleh kecoak-kecoak penyair</span>.
+
+<div class="space-line"></div>
 
 Aku menulis surat pada gravitasi:
-<span class="highlight">"Tolong lepaskan aku sekali saja."</span>
-Tapi gravitasi sedang sibuk menghitung jumlah rambut yang jatuh
-dari kepala orang-orang yang sedang jatuh cinta.
+<span class="whisper">"Tolong lepaskan aku sekali saja."</span>
+
+Tapi gravitasi sedang sibuk menghitung 
+jumlah rambut yang jatuh dari kepala 
+orang-orang yang sedang jatuh cinta.
 
 Satu.
 Dua.
-<span class="void">Nol.</span>
+<span class="error">Nol</span>.
+
+<div class="space-line"></div>
 
 Di pojok ruangan, masa lalu sedang mencuci piring.
-<span class="scream">Prang!</span>
+
+<span class="emphasis">Prang!</span>
+
 Satu piring pecah, satu memori hilang.
 
-Apakah kau mencium bau kabel terbakar?
-Itu adalah sirkuit logika kita yang hangus
+<div class="space-line"></div>
+
+Apakah kau mencium bau kabel <span class="broken">terbakar</span>?
+
+Itu adalah sirkuit logika kita yang hangus 
 karena mencoba memahami mengapa pagi selalu datang
-<span class="highlight">tanpa permisi.</span>
+<span class="whisper">tanpa permisi</span>.
+
+<div class="space-line"></div>
 
 Jangan cari aku di dalam kamus.
-Aku terselip di antara spasi dua kata
+
+Aku terselip di antara spasi dua kata 
 yang tidak pernah berani kau ucapkan.
 
 Aku adalah titik yang ingin menjadi lingkaran,
 tapi selalu berakhir sebagai tanda tanya yang
-<span class="corrupt">patah.</span>
+<span class="broken">patah</span>.
 
-<span class="formula">1 + 1 = Luka</span>
+<span class="math">1 + 1 = Luka</span>
 
-<span class="whisper">(Matematika ini valid di planet yang tidak punya matahari).</span>
+<span class="whisper">(Matematika ini valid di planet yang tidak punya matahari)</span>.
         </div>
 
-        <div class="end-mark">
-            <pre>
--- transmission corrupted --
-[ Process terminated unexpectedly ]
-
-next_poem.exe: file not found
-reality_check(): returned NULL
-existence_status: <span class="corrupt">UNDEFINED</span>
-
-"Terima kasih sudah membaca yang tidak bisa dibaca."
-            </pre>
+        <div class="footer">
+            -- transmisi selesai --<br>
+            [ syntax_error: meaning.not_found ]<br>
+            <span style="color: #ff3e3e;">※ puisi ini tidak bertanggung jawab atas kebingunganmu ※</span>
         </div>
     </div>
 
     <script>
         // Chaos Canvas Background
-        const canvas = document.getElementById('chaos-canvas');
+        const canvas = document.getElementById('chaosCanvas');
         const ctx = canvas.getContext('2d');
-        let particles = [];
-        
+
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            drawChaos();
         }
-        
-        class Particle {
-            constructor() {
-                this.reset();
-            }
-            
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.size = Math.random() * 2 + 1;
-                const colors = ['#ff3e3e', '#00f0ff', '#ff00ff', '#ffff00'];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-                this.alpha = Math.random() * 0.3 + 0.1;
-                this.life = Math.random() * 200 + 100;
-            }
-            
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.life--;
-                
-                if (this.life <= 0 || this.x < 0 || this.x > canvas.width || 
-                    this.y < 0 || this.y > canvas.height) {
-                    this.reset();
-                }
-            }
-            
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = this.alpha;
-                ctx.fillRect(this.x, this.y, this.size, this.size);
-            }
-        }
-        
-        function initParticles() {
-            particles = [];
-            for (let i = 0; i < 50; i++) {
-                particles.push(new Particle());
-            }
-        }
-        
+
         function drawChaos() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Draw abstract lines
-            ctx.globalAlpha = 0.1;
-            for (let i = 0; i < 20; i++) {
+            const colors = ['#ff3e3e', '#00f0ff', '#ff00ff', '#ffff00', '#00ff00', '#ff6600'];
+            
+            // Coretan acak
+            for (let i = 0; i < 60; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 2.5 + 0.5;
+                ctx.globalAlpha = Math.random() * 0.4 + 0.05;
+                
                 ctx.beginPath();
-                ctx.strokeStyle = i % 2 === 0 ? '#ff3e3e' : '#00f0ff';
-                ctx.lineWidth = Math.random() * 2;
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height;
+                ctx.moveTo(x, y);
                 
-                const x1 = Math.random() * canvas.width;
-                const y1 = Math.random() * canvas.height;
-                const x2 = Math.random() * canvas.width;
-                const y2 = Math.random() * canvas.height;
-                
-                ctx.moveTo(x1, y1);
-                ctx.quadraticCurveTo(
-                    (x1 + x2) / 2 + Math.random() * 100 - 50,
-                    (y1 + y2) / 2 + Math.random() * 100 - 50,
-                    x2, y2
-                );
+                const points = Math.floor(Math.random() * 12) + 4;
+                for (let j = 0; j < points; j++) {
+                    x += (Math.random() - 0.5) * 180;
+                    y += (Math.random() - 0.5) * 180;
+                    
+                    if (Math.random() > 0.5) {
+                        ctx.lineTo(x, y);
+                    } else {
+                        const cpx = x + (Math.random() - 0.5) * 100;
+                        const cpy = y + (Math.random() - 0.5) * 100;
+                        ctx.quadraticCurveTo(cpx, cpy, x, y);
+                    }
+                }
                 ctx.stroke();
             }
             
-            // Update and draw particles
-            particles.forEach(particle => {
-                particle.update();
-                particle.draw();
-            });
+            // Spiral dan lingkaran absurd
+            for (let i = 0; i < 25; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 2 + 0.5;
+                ctx.globalAlpha = Math.random() * 0.3 + 0.05;
+                
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const radius = Math.random() * 120 + 20;
+                
+                ctx.beginPath();
+                
+                if (Math.random() > 0.5) {
+                    // Lingkaran
+                    ctx.arc(x, y, radius, 0, Math.PI * 2);
+                } else {
+                    // Spiral
+                    const loops = Math.random() * 3 + 1;
+                    for (let angle = 0; angle < Math.PI * 2 * loops; angle += 0.1) {
+                        const r = radius * (angle / (Math.PI * 2 * loops));
+                        const px = x + Math.cos(angle) * r;
+                        const py = y + Math.sin(angle) * r;
+                        if (angle === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                }
+                ctx.stroke();
+            }
+            
+            // Garis-garis patah
+            for (let i = 0; i < 30; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 3 + 0.5;
+                ctx.globalAlpha = Math.random() * 0.25 + 0.05;
+                
+                ctx.beginPath();
+                const startX = Math.random() * canvas.width;
+                const startY = Math.random() * canvas.height;
+                ctx.moveTo(startX, startY);
+                
+                const segments = Math.floor(Math.random() * 8) + 3;
+                let currentX = startX;
+                let currentY = startY;
+                
+                for (let j = 0; j < segments; j++) {
+                    currentX += (Math.random() - 0.5) * 150;
+                    currentY += (Math.random() - 0.5) * 150;
+                    ctx.lineTo(currentX, currentY);
+                }
+                ctx.stroke();
+            }
+            
+            // Dots acak
+            for (let i = 0; i < 100; i++) {
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.globalAlpha = Math.random() * 0.4 + 0.1;
+                
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 4 + 1;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
             
             ctx.globalAlpha = 1;
-            requestAnimationFrame(drawChaos);
         }
-        
+
         resizeCanvas();
-        initParticles();
-        drawChaos();
+        window.addEventListener('resize', resizeCanvas);
         
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            initParticles();
-        });
+        // Refresh background setiap 12 detik
+        setInterval(() => {
+            drawChaos();
+        }, 12000);
     </script>
 
 </body>
