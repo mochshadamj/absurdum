@@ -3,212 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perjamuan di Perut Paus Plastik - ABSURDUM</title>
+    <title>Perjamuan di Perut Paus Plastik | ABSURDUM</title>
     <style>
-        /* --- Gaya Dasar & Tema --- */
-        @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
         :root {
-            --bg-color: #0d0d0d;
-            --text-color: #dcdcdc;
-            --accent-green: #39ff14;
+            --bg-color: #0a0a0a;
+            --text-color: #d1d1d1;
+            --accent-red: #ff0040;
             --accent-cyan: #00ffff;
-            --accent-magenta: #ff00ff;
-            --border-color: #2a2a2a;
+            --accent-yellow: #ffeb3b;
         }
 
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100vh;
+        body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 1.2rem;
-            line-height: 1.8;
-            /* Efek scanline halus */
-            background-image: repeating-linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.15),
-                rgba(0, 0, 0, 0.15) 1px,
-                transparent 1px,
-                transparent 2px
-            );
-        }
-
-        /* --- Container & Layout --- */
-        .container {
-            max-width: 750px;
-            margin: 40px auto;
-            padding: 40px 60px;
-            border-left: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
+            font-family: 'VT323', 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+            line-height: 1.6;
             position: relative;
         }
-        
-        /* Efek noise di background */
-        .container::before {
-            content: "";
-            position: absolute;
+
+        /* Background Animasi Kacau */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdmFsdWVzPSIwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwLjA1IDAiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjYSkiIG9wYWNpdHk9Ii4wNSIvPjwvc3ZnPg==');
-            opacity: 0.1;
-            pointer-events: none;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(217deg, rgba(255,0,64,.1), rgba(255,0,64,0) 70%),
+                        linear-gradient(127deg, rgba(0,255,255,.1), rgba(0,255,255,0) 70%),
+                        linear-gradient(336deg, rgba(255,235,59,.05), rgba(0,0,0,0) 70%);
+            background-size: 200% 200%;
+            animation: glitch-bg 20s ease infinite;
+            z-index: -1;
         }
 
-        /* --- Judul Puisi --- */
-        .poem-title {
-            font-family: 'VT323', monospace;
-            font-size: 3rem;
-            color: var(--accent-cyan);
-            text-shadow: 0 0 8px var(--accent-cyan);
-            margin-bottom: 40px;
+        @keyframes glitch-bg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .poem-container {
+            width: 85%;
+            max-width: 650px;
+            text-align: left;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--accent-red);
+            text-transform: uppercase;
+            letter-spacing: 5px;
             text-align: center;
-            animation: title-flicker 6s infinite;
-        }
-
-        @keyframes title-flicker {
-            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-                opacity: 1;
-            }
-            20%, 22%, 24%, 55% {
-                opacity: 0.7;
-            }
-        }
-
-        /* --- Isi Puisi --- */
-        .poem-content p {
-            margin: 30px 0;
-            white-space: pre-wrap; /* Menjaga format puisi */
-            text-indent: 2em; /* Indentasi di awal paragraf */
-        }
-
-        .poem-content .no-indent {
-            text-indent: 0;
-        }
-
-        /* --- Container untuk Simbol SVG --- */
-        .math-symbol {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 40px 0;
-            filter: drop-shadow(0 0 5px rgba(57, 255, 20, 0.3)); /* Efek glow */
-        }
-
-        /* --- Navigasi Kembali --- */
-        .back-button {
-            display: inline-block;
-            margin-top: 50px;
-            padding: 10px 20px;
-            color: var(--accent-magenta);
-            border: 1px solid var(--accent-magenta);
-            text-decoration: none;
-            font-family: 'VT323', monospace;
-            font-size: 1.5rem;
-            transition: all 0.3s ease;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px var(--accent-cyan);
+            animation: flicker 4s infinite alternate;
         }
         
-        .back-button:hover {
-            color: var(--bg-color);
-            background-color: var(--accent-magenta);
-            box-shadow: 0 0 15px var(--accent-magenta);
-            text-shadow: none;
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
+                text-shadow:
+                0 0 4px var(--accent-cyan),
+                0 0 11px var(--accent-cyan),
+                0 0 19px var(--accent-cyan),
+                0 0 40px var(--accent-red),
+                0 0 80px var(--accent-red);
+            }
+            20%, 24%, 55% {        
+                text-shadow: none;
+            }
         }
 
+        .poem-content {
+            font-size: 1.4rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Styling untuk bagian 'matematika' atau simbol */
+        .math-chaos {
+            color: var(--accent-yellow);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            display: block;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.6rem;
+            text-shadow: 0 0 10px var(--accent-yellow);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .back-link a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            border: 1px solid var(--accent-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .back-link a:hover {
+            background-color: var(--accent-cyan);
+            color: var(--bg-color);
+            box-shadow: 0 0 15px var(--accent-cyan);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            body { font-size: 16px; }
+            .poem-container { width: 90%; }
+            h1 { font-size: 2rem; }
+            .poem-content { font-size: 1.2rem; }
+            .math-chaos { font-size: 1.4rem; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <h1 class="poem-title">Perjamuan di Perut Paus Plastik</h1>
-        </header>
+    <div class="poem-container">
+        <h1>Perjamuan di Perut Paus Plastik</h1>
 
-        <main class="poem-content">
-            <p>Di sini, di dalam tenggorokan hari Minggu,
+        <div class="poem-content">
+Di sini, di dalam tenggorokan hari Minggu,
 Oksigen adalah barang antik yang dipajang di etalase toko tutup.
 Aku memotong-motong bayanganku sendiri,
-menyajikannya dengan saus penyesalan yang terlalu banyak garam.</p>
+menyajikannya dengan saus penyesalan yang terlalu banyak garam.
 
-            <!-- SIMBOL PERTAMA -->
-            <div class="math-symbol">
-                <svg width="320" height="60" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="100%" height="100%" fill="#0d0d0d" stroke="#39ff14" stroke-width="1" rx="5"/>
-                    <text x="15" y="40" font-family="monospace" font-size="20" fill="#00ffff">f(x)</text>
-                    <text x="65" y="40" font-family="monospace" font-size="20" fill="#e0e0e0">=</text>
-                    <text x="95" y="40" font-family="monospace" font-size="20" fill="#ff00ff">sunyi</text>
-                    <text x="165" y="40" font-family="monospace" font-size="20" fill="#e0e0e0">×</text>
-                    <text x="195" y="40" font-family="monospace" font-size="24" fill="#39ff14">∞</text>
-                    <!-- Dekorasi titik-tik -->
-                    <circle cx="250" cy="20" r="2" fill="#39ff14"/>
-                    <circle cx="260" cy="25" r="2" fill="#00ffff"/>
-                    <circle cx="265" cy="35" r="2" fill="#ff00ff"/>
-                </svg>
-            </div>
+<span class="math-chaos">f(x) = sunyi × ∞</span>
 
-            <p class="no-indent">Lihat!</p>
-            <p>Ada kereta api yang melaju di urat nadiku,
+Lihat!
+Ada kereta api yang melaju di urat nadiku,
 masinisnya adalah seekor burung gagak yang lupa cara terbang.
 Stasiunnya?
 Tidak ada.
 Hanya ada papan pengumuman yang menuliskan:
-"Harap antre untuk menjadi tidak ada."</p>
-            
-            <p class="no-indent">(Ssst... dengar tidak?)</p>
-            <p>Suara keramik retak di dalam kepalamu itu?
+"Harap antre untuk menjadi tidak ada."
+
+(Ssst... dengar tidak?)
+Suara keramik retak di dalam kepalamu itu?
 Itu adalah cita-cita yang terlalu lama disimpan di dalam kulkas.
 Membeku.
 Membiru.
-Menjadi fosil yang ditertawakan oleh kecoak-kecoak penyair.</p>
+Menjadi fosil yang ditertawakan oleh kecoak-kecoak penyair.
 
-            <p>Aku menulis surat pada gravitasi:
+Aku menulis surat pada gravitasi:
 "Tolong lepaskan aku sekali saja."
 Tapi gravitasi sedang sibuk menghitung jumlah rambut yang jatuh dari kepala orang-orang yang sedang jatuh cinta.
 Satu.
 Dua.
-Nol.</p>
+Nol.
 
-            <p>Di pojok ruangan, masa lalu sedang mencuci piring.
+Di pojok ruangan, masa lalu sedang mencuci piring.
 Prang!
-Satu piring pecah, satu memori hilang.</p>
+Satu piring pecah, satu memori hilang.
 
-            <p>Apakah kau mencium bau kabel terbakar?
+Apakah kau mencium bau kabel terbakar?
 Itu adalah sirkuit logika kita yang hangus karena mencoba memahami mengapa pagi selalu datang
-tanpa permisi.</p>
+tanpa permisi.
 
-            <p>Jangan cari aku di dalam kamus.
-Aku terselip di antara spasi dua kata yang tidak pernah berani kau ucapkan.</p>
-
-            <p>Aku adalah titik yang ingin menjadi lingkaran,
+Jangan cari aku di dalam kamus.
+Aku terselip di antara spasi dua kata yang tidak pernah berani kau ucapkan.
+Aku adalah titik yang ingin menjadi lingkaran,
 tapi selalu berakhir sebagai tanda tanya yang
-patah.</p>
+patah.
 
-            <!-- SIMBOL KEDUA -->
-            <div class="math-symbol">
-                <svg width="280" height="60" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="100%" height="100%" fill="#0d0d0d" stroke="#ff00ff" stroke-width="1" rx="5"/>
-                    <text x="15" y="40" font-family="monospace" font-size="24" fill="#e0e0e0">1</text>
-                    <text x="40" y="40" font-family="monospace" font-size="20" fill="#e0e0e0">+</text>
-                    <text x="65" y="40" font-family="monospace" font-size="24" fill="#e0e0e0">1</text>
-                    <text x="90" y="40" font-family="monospace" font-size="20" fill="#e0e0e0">=</text>
-                    <text x="120" y="40" font-family="monospace" font-size="20" fill="#39ff14">Luka</text>
-                    <!-- Dekorasi garis glitch -->
-                    <line x1="220" y1="15" x2="230" y2="45" stroke="#00ffff" stroke-width="1"/>
-                    <line x1="235" y1="10" x2="245" y2="50" stroke="#ff00ff" stroke-width="1"/>
-                </svg>
-            </div>
-            
-            <p class="no-indent">(Matematika ini valid di planet yang tidak punya matahari).</p>
-        </main>
+<span class="math-chaos">1 + 1 = Luka</span>
+(Matematika ini valid di planet yang tidak punya matahari)
+        </div>
 
-        <footer>
-            <a href="/" class="back-button">&gt; KEMBALI</a>
-        </footer>
+        <div class="back-link">
+            <a href="../index.html">[ KEMBALI KE KEKACAUAN UTAMA ]</a>
+        </div>
     </div>
 
 </body>
