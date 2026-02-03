@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROTOKOL 00:00 | ABSURDUM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            color: #d1d1d1;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        /* Glitch Background */
+        #glitchCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        /* Digital Noise Overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(255, 62, 62, 0.03) 0px,
+                transparent 1px,
+                transparent 2px,
+                rgba(0, 240, 255, 0.03) 3px
+            );
+            z-index: 1;
+            pointer-events: none;
+            animation: scanline 8s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Back Button */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 0, 255, 0.2);
+            border: 2px solid #ff00ff;
+            color: #ff00ff;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 100;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 0, 255, 0.4);
+            transform: translateX(-5px) rotate(-2deg);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+        }
+
+        /* Title with extreme glitch */
+        h1 {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            color: #00f0ff;
+            text-shadow: 3px 3px #ff00ff, -3px -3px #ff3e3e, 0 0 20px #00f0ff;
+            text-align: center;
+            margin-bottom: 15px;
+            animation: crazyGlitch 5s infinite;
+            letter-spacing: 4px;
+            line-height: 1.4;
+            text-transform: uppercase;
+        }
+
+        @keyframes crazyGlitch {
+            0%, 80%, 100% { transform: skewX(0deg) translateX(0); }
+            81% { transform: skewX(-8deg) translateX(-10px); }
+            83% { transform: skewX(8deg) translateX(10px); }
+            85% { transform: skewX(-5deg) translateX(-5px); }
+            87% { transform: skewX(5deg) translateX(5px); }
+            89% { transform: skewX(0deg) translateX(0); }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #ff3e3e;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            margin-bottom: 50px;
+            letter-spacing: 2px;
+            opacity: 0.8;
+        }
+
+        /* Poem Content */
+        .poem {
+            line-height: 2.2;
+            white-space: pre-wrap;
+            font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+            text-align: left;
+            position: relative;
+        }
+
+        /* Warning box */
+        .warning {
+            display: inline-block;
+            background: rgba(255, 62, 62, 0.2);
+            border: 2px dashed #ff3e3e;
+            padding: 8px 15px;
+            color: #ff3e3e;
+            font-weight: bold;
+            margin: 15px 0;
+            letter-spacing: 1px;
+            animation: blinkWarning 1.5s infinite;
+        }
+
+        @keyframes blinkWarning {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Math formula */
+        .math {
+            display: inline-block;
+            background: rgba(255, 0, 255, 0.15);
+            padding: 8px 20px;
+            border: 2px solid #ff00ff;
+            color: #ff00ff;
+            font-weight: bold;
+            margin: 20px 0;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+        }
+
+        /* Broken/glitching text */
+        .broken {
+            display: inline-block;
+            color: #ff3e3e;
+            animation: textShiver 1.5s infinite;
+        }
+
+        @keyframes textShiver {
+            0%, 100% { transform: rotate(-3deg) translateY(3px) translateX(-1px); }
+            25% { transform: rotate(3deg) translateY(-3px) translateX(1px); }
+            50% { transform: rotate(-2deg) translateY(2px) translateX(-2px); }
+            75% { transform: rotate(2deg) translateY(-2px) translateX(2px); }
+        }
+
+        /* Whisper/parentheses text */
+        .whisper {
+            color: #666;
+            font-style: italic;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        /* Emphasis/shouting */
+        .shout {
+            color: #ffff00;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(255, 255, 0, 0.6);
+            letter-spacing: 3px;
+        }
+
+        /* Cyan emphasis */
+        .cyan {
+            color: #00f0ff;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+        }
+
+        /* Corrupted/strikethrough */
+        .corrupt {
+            color: #ff00ff;
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        /* Italic quotes */
+        .quote {
+            font-style: italic;
+            color: #aaa;
+        }
+
+        /* Space lines */
+        .space {
+            height: 30px;
+        }
+
+        /* Digital clock display */
+        .clock {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: #00f0ff;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+            z-index: 100;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Floating digital artifacts */
+        .artifact {
+            position: fixed;
+            font-size: 2rem;
+            opacity: 0.1;
+            z-index: 5;
+            pointer-events: none;
+            animation: digitalFloat 20s infinite ease-in-out;
+            font-weight: bold;
+        }
+
+        @keyframes digitalFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.1; }
+            25% { transform: translate(-100px, 150px) rotate(90deg) scale(1.5); opacity: 0.2; }
+            50% { transform: translate(150px, -100px) rotate(180deg) scale(0.8); opacity: 0.05; }
+            75% { transform: translate(-150px, -150px) rotate(270deg) scale(1.3); opacity: 0.15; }
+        }
+
+        .art-1 { top: 10%; left: 15%; color: #ff3e3e; animation-delay: 0s; }
+        .art-2 { top: 50%; right: 10%; color: #00f0ff; animation-delay: 5s; }
+        .art-3 { bottom: 20%; left: 25%; color: #ff00ff; animation-delay: 10s; }
+        .art-4 { top: 70%; right: 30%; color: #ffff00; animation-delay: 15s; }
+
+        /* Footer */
+        .footer {
+            margin-top: 100px;
+            text-align: center;
+            font-size: 0.7rem;
+            opacity: 0.4;
+            padding-bottom: 40px;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .back-btn {
+                position: relative;
+                display: inline-block;
+                margin-bottom: 30px;
+            }
+            
+            .clock {
+                font-size: 1rem;
+                top: 15px;
+                right: 15px;
+            }
+            
+            .poem {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Glitch Canvas Background -->
+    <canvas id="glitchCanvas"></canvas>
+
+    <!-- Digital Clock -->
+    <div class="clock" id="digitalClock">00:00:00</div>
+
+    <!-- Floating Digital Artifacts -->
+    <div class="artifact art-1">01010011</div>
+    <div class="artifact art-2">ERROR</div>
+    <div class="artifact art-3">√-1</div>
+    <div class="artifact art-4">NULL</div>
+
+    <a href="../index.html" class="back-btn">← kembali</a>
+
+    <div class="container">
+        <h1>PROTOKOL 00:00</h1>
+        <div class="subtitle">(Pesta Pora di Antara Detik)</div>
+
+        <div class="poem">Satu jam lagi adalah seekor <span class="broken">ubur-ubur</span>
+yang tersangkut di kabel telepon.
+
+Ia menyengat ingatanmu
+sampai kau lupa warna ibumu.
+
+<span class="warning">[WARNING: DATA CORRUPTION]</span>
+
+Di atas meja, ada sepiring <span class="cyan">matahari goreng</span>.
+<span class="broken">Setengah matang</span>.
+
+Kuningnya meleleh ke lantai,
+menjadi sungai kecil yang mengalirkan
+semua janji manis yang kedaluwarsa tahun lalu.
+
+<div class="space"></div>
+
+Kenapa pintu ini menghadap ke dalam diri sendiri?
+
+<span class="cyan">Ketuklah</span>.
+
+Tidak ada siapa-siapa,
+kecuali suara radio yang menyiarkan
+detak jantung seekor semut yang sedang <span class="broken">depresi</span>.
+
+<span class="math">√Rindu = Angka Nol yang Berdarah</span>
+
+<span class="cyan">Lihat ke bawah</span>.
+
+Kakimu tidak ada.
+Mereka sudah pergi ke pasar,
+membeli satu liter udara
+untuk mengisi paru-paru yang bocor karena
+terlalu banyak menghirup abu dari
+pembakaran <span class="shout">SURAT CINTA UNTUK TUHAN</span>.
+
+<div class="space"></div>
+
+<span class="whisper">(Jangan berkedip)</span>
+
+Jika kau berkedip, dunia akan bergeser
+dua milimeter ke arah kiri.
+
+Dan kau akan bangun sebagai sebuah
+lubang kunci yang kehilangan
+<span class="broken">pintunya</span>.
+
+<div class="space"></div>
+
+Klakson mobil di luar sana berbunyi...
+
+<span class="quote">"Aku lapar," katanya.</span>
+<span class="quote">"Aku lapar," katanya.</span>
+
+Tapi bensinnya hanyalah air mata dari
+mesin ATM yang sedang patah hati.
+
+<div class="space"></div>
+
+<span class="corrupt">Mati</span>.
+Hidup.
+<span class="corrupt">Mati</span>.
+<span class="cyan">Restart</span>.
+
+<div class="space"></div>
+
+Apakah kau sudah cukup gila?
+
+Atau kau butuh sedikit lagi bumbu
+dari tumpahan tinta
+yang tidak sengaja menggambar
+peta menuju
+
+<span class="shout">TEMPAT DI MANA SEMUA HAL BERHENTI BERNAMA</span>.
+        </div>
+
+        <div class="footer">
+            -- sistem error --<br>
+            [ memory leak detected | reality.exe has stopped working ]<br>
+            <span style="color: #ff00ff;">※ protokol ini tidak menjamin kewarasan pembacanya ※</span>
+        </div>
+    </div>
+
+    <script>
+        // Digital Clock that glitches
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours().toString().padStart(2, '0');
+            let minutes = now.getMinutes().toString().padStart(2, '0');
+            let seconds = now.getSeconds().toString().padStart(2, '0');
+            
+            // Random glitch effect
+            if (Math.random() > 0.95) {
+                hours = '??';
+            }
+            if (Math.random() > 0.97) {
+                minutes = 'XX';
+            }
+            if (Math.random() > 0.98) {
+                seconds = '00';
+            }
+            
+            document.getElementById('digitalClock').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+        
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Glitch Canvas Background
+        const canvas = document.getElementById('glitchCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawGlitch();
+        }
+
+        function drawGlitch() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const colors = ['#ff3e3e', '#00f0ff', '#ff00ff', '#ffff00'];
+            
+            // Grid lines (digital/matrix style)
+            ctx.globalAlpha = 0.15;
+            for (let i = 0; i < 30; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = 1;
+                
+                // Horizontal lines
+                const y = Math.random() * canvas.height;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+                
+                // Vertical lines
+                const x = Math.random() * canvas.width;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            // Random digital blocks/pixels
+            for (let i = 0; i < 100; i++) {
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.globalAlpha = Math.random() * 0.2 + 0.05;
+                
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 30 + 5;
+                
+                ctx.fillRect(x, y, size, size);
+            }
+            
+            // Glitch rectangles
+            for (let i = 0; i < 25; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 3 + 1;
+                ctx.globalAlpha = Math.random() * 0.25 + 0.05;
+                
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const w = Math.random() * 150 + 50;
+                const h = Math.random() * 100 + 30;
+                
+                ctx.strokeRect(x, y, w, h);
+            }
+            
+            // Random scribbles/corrupted lines
+            for (let i = 0; i < 40; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 2 + 0.5;
+                ctx.globalAlpha = Math.random() * 0.3 + 0.05;
+                
+                ctx.beginPath();
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height;
+                ctx.moveTo(x, y);
+                
+                const segments = Math.floor(Math.random() * 8) + 3;
+                for (let j = 0; j < segments; j++) {
+                    x += (Math.random() - 0.5) * 200;
+                    y += (Math.random() - 0.5) * 200;
+                    ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+            
+            // Digital noise dots
+            for (let i = 0; i < 150; i++) {
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.globalAlpha = Math.random() * 0.4 + 0.1;
+                
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 3 + 1;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.globalAlpha = 1;
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Redraw with glitch effect every 8 seconds
+        setInterval(() => {
+            drawGlitch();
+        }, 8000);
+    </script>
+
+</body>
+</html>
