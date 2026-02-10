@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catatan dari Saku Celana Tuan Kosong | ABSURDUM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0000;
+            color: #8a8a8a;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        /* Chaotic animated background */
+        #chaosCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+
+        /* Dark bloody vignette */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(80, 0, 0, 0.3) 100%);
+        }
+
+        /* Static noise overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03\'/%3E%3C/svg%3E");
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.03;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        /* Back Button - Dark bloody style */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(60, 0, 0, 0.4);
+            border: 1px solid #5a0000;
+            color: #8a3a3a;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 100;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .back-btn:hover {
+            background: rgba(80, 0, 0, 0.6);
+            transform: translateX(-5px);
+            border-color: #8a0000;
+            color: #aa4a4a;
+        }
+
+        /* Title - Dark bloody minimal glitch */
+        h1 {
+            font-size: clamp(1.5rem, 5vw, 2.8rem);
+            color: #8a3a3a;
+            text-shadow: 
+                2px 2px #4a0000, 
+                -1px -1px #2a0000;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            line-height: 1.5;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #4a4a4a;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            margin-bottom: 60px;
+            letter-spacing: 3px;
+        }
+
+        /* Poem Content */
+        .poem {
+            line-height: 2.3;
+            white-space: pre-wrap;
+            font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+            text-align: left;
+            position: relative;
+            text-shadow: 0 0 1px rgba(192, 192, 192, 0.5);
+        }
+
+        /* Broken scissors/torn effect - subtle */
+        .torn {
+            display: inline-block;
+            color: #aa4a4a;
+            text-decoration: line-through;
+            text-decoration-color: #5a0000;
+        }
+
+        /* Math formula - dark gore style */
+        .equation {
+            display: inline-block;
+            background: rgba(60, 0, 0, 0.3);
+            padding: 10px 25px;
+            border: 1px solid #5a0000;
+            color: #8a4a4a;
+            font-weight: bold;
+            margin: 25px 0;
+            letter-spacing: 2px;
+        }
+
+        /* Status box - dark corrupted */
+        .status {
+            display: inline-block;
+            background: rgba(80, 0, 0, 0.2);
+            border: 1px solid #6a0000;
+            padding: 8px 18px;
+            color: #aa4a4a;
+            font-weight: bold;
+            margin: 15px 0;
+            letter-spacing: 1px;
+            font-family: monospace;
+        }
+
+        /* Whisper text */
+        .whisper {
+            color: #555;
+            font-style: italic;
+            font-size: 0.88em;
+            opacity: 0.7;
+        }
+
+        /* Shout/scream text */
+        .scream {
+            color: #aa5a5a;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        /* Blue emphasis */
+        .blue {
+            color: #6a5a7a;
+            font-weight: bold;
+        }
+
+        /* Purple/magenta emphasis */
+        .purple {
+            color: #7a5a6a;
+            font-weight: bold;
+        }
+
+        /* Green/toxic emphasis */
+        .toxic {
+            color: #5a6a5a;
+            font-weight: bold;
+        }
+
+        /* Sound effects */
+        .sound {
+            display: inline-block;
+            color: #8a4a4a;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* Spacing */
+        .space {
+            height: 35px;
+        }
+
+        /* Floating chaos symbols - very subtle */
+        .chaos-symbol {
+            position: fixed;
+            font-size: clamp(2rem, 5vw, 4rem);
+            opacity: 0.03;
+            z-index: 5;
+            pointer-events: none;
+            font-weight: bold;
+            color: #4a2a2a;
+        }
+
+        .sym-1 { top: 8%; left: 12%; }
+        .sym-2 { top: 35%; right: 8%; }
+        .sym-3 { bottom: 15%; left: 18%; }
+        .sym-4 { top: 65%; right: 22%; }
+        .sym-5 { top: 50%; left: 50%; }
+
+        /* Floating scissors images */
+        .scissors-float {
+            position: fixed;
+            width: clamp(80px, 12vw, 150px);
+            opacity: 0.15;
+            z-index: 5;
+            pointer-events: none;
+            filter: grayscale(100%) brightness(0.3) contrast(1.5);
+            animation: scissorsDrift 30s infinite ease-in-out;
+        }
+
+        @keyframes scissorsDrift {
+            0%, 100% { 
+                transform: translate(0, 0) rotate(0deg); 
+                opacity: 0.15;
+            }
+            25% { 
+                transform: translate(-80px, 100px) rotate(45deg); 
+                opacity: 0.25;
+            }
+            50% { 
+                transform: translate(100px, -80px) rotate(-45deg); 
+                opacity: 0.1;
+            }
+            75% { 
+                transform: translate(-60px, -60px) rotate(90deg); 
+                opacity: 0.2;
+            }
+        }
+
+        .scissors-1 { 
+            top: 20%; 
+            right: 15%; 
+            animation-delay: 0s;
+            animation-duration: 35s;
+        }
+        .scissors-2 { 
+            bottom: 30%; 
+            left: 10%; 
+            animation-delay: 8s;
+            animation-duration: 40s;
+        }
+        .scissors-3 { 
+            top: 60%; 
+            right: 25%; 
+            animation-delay: 15s;
+            animation-duration: 38s;
+        }
+
+        /* Bloody scream font for specific text */
+        .bloody-font {
+            font-family: 'Nosifer', cursive;
+            color: #9a4a4a;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px #4a0000, 1px 1px #3a0000;
+        }
+
+        .creepy-font {
+            font-family: 'Creepster', cursive;
+            color: #aa5555;
+            letter-spacing: 2px;
+        }
+
+        /* Distorted container effect */
+        .distort-box {
+            display: inline-block;
+            padding: 3px 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: skew(-2deg);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 120px;
+            text-align: center;
+            font-size: 0.7rem;
+            opacity: 0.25;
+            padding-bottom: 50px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .back-btn {
+                position: relative;
+                display: inline-block;
+                margin-bottom: 30px;
+            }
+            
+            .poem {
+                font-size: 0.92rem;
+                line-height: 2.1;
+            }
+            
+            h1 {
+                letter-spacing: 1px;
+            }
+        }
+
+        /* Modal Peringatan Konten */
+        .content-warning-modal {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .content-warning-modal.hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(20, 0, 0, 0.95), rgba(40, 0, 20, 0.95));
+            border: 3px solid #ff3e3e;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(255, 62, 62, 0.5);
+            animation: modalSlide 0.5s ease;
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: 2px solid #ff3e3e;
+            color: #ff3e3e;
+            width: 35px;
+            height: 35px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            background: #ff3e3e;
+            color: #000;
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            color: #ff3e3e;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 62, 62, 0.5);
+        }
+
+        .modal-text {
+            color: #d1d1d1;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: 2px solid;
+            background: transparent;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .modal-btn-continue {
+            border-color: #ff3e3e;
+            color: #ff3e3e;
+        }
+
+        .modal-btn-continue:hover {
+            background: #ff3e3e;
+            color: #000;
+        }
+
+        .modal-btn-back {
+            border-color: #666;
+            color: #666;
+        }
+
+        .modal-btn-back:hover {
+            background: #666;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Modal Peringatan Konten -->
+    <div class="content-warning-modal" id="contentWarning">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2 class="modal-title">⚠️ Peringatan Konten</h2>
+            <p class="modal-text">
+                Puisi ini mengandung konten absurd dan surealisme ekstrem yang dapat menyebabkan kebingungan, disorientasi, atau interpretasi yang sangat personal. 
+                <br><br>
+                Penafsiran dan makna dari karya ini sepenuhnya merupakan tanggung jawab pembaca. Penulis tidak bertanggung jawab atas efek halusinasi mental, eksistensial crisis, atau pemahaman yang muncul dari pembacaan.
+                <br><br>
+                <strong>Lanjutkan dengan risiko sendiri.</strong>
+            </p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-back" onclick="goBack()">Kembali</button>
+                <button class="modal-btn modal-btn-continue" onclick="continueReading()">Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chaos Canvas Background -->
+    <canvas id="chaosCanvas"></canvas>
+
+    <!-- Floating Chaos Symbols -->
+    <div class="chaos-symbol sym-1">✂</div>
+    <div class="chaos-symbol sym-2">◐</div>
+    <div class="chaos-symbol sym-3">⌘</div>
+    <div class="chaos-symbol sym-4">◬</div>
+    <div class="chaos-symbol sym-5">⊙</div>
+
+    <!-- Floating Scissors Image -->
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLn5mTMyLZd43i4RDkQ1d0j8hSvg80EsCt5g&s" class="scissors-float scissors-1" alt="">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLn5mTMyLZd43i4RDkQ1d0j8hSvg80EsCt5g&s" class="scissors-float scissors-2" alt="">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLn5mTMyLZd43i4RDkQ1d0j8hSvg80EsCt5g&s" class="scissors-float scissors-3" alt="">
+
+    <a href="../index.html" class="back-btn">← kembali</a>
+
+    <div class="container">
+        <h1>✂ Catatan dari Saku<br>Celana Tuan Kosong</h1>
+        <div class="subtitle">[ sistem_kehilangan_identitas.exe ]</div>
+
+        <div class="poem">Aku terbangun sebagai sepasang <span class="torn bloody-font">gunting yang tumpul</span>,
+mencoba memotong arah mata angin yang sedang <span class="blue">mabuk</span>.
+
+Di kepalaku, ada sebuah pesta pernikahan antara
+seekor telepon umum dan sebuah <span class="torn">lubang sumur</span>.
+
+<div class="space"></div>
+
+Kenapa jari-jariku berubah menjadi 
+barisan korek api yang <span class="whisper">basah</span>?
+
+Aku mencoba mengetik pesan di atas permukaan air tenang,
+tapi yang keluar justru suara <span class="purple creepy-font">mesin jahit</span> 
+yang sedang <span class="torn">patah hati</span>.
+
+<div class="space"></div>
+
+Seseorang datang membawa nampan berisi 
+potongan <span class="toxic">langit sore</span>,
+ia memaksaku memakannya dengan <span class="distort-box">sendok yang terbuat dari suara klakson</span>.
+
+<div class="space"></div>
+
+<span class="whisper">"Permisi,"</span> kataku pada sebuah bayangan di tembok.
+
+Tapi bayangan itu justru sibuk <span class="blue bloody-font">mengupas kulitnya sendiri</span>,
+menunjukkan bahwa di dalamnya hanya ada 
+tumpukan kartu remi yang hilang <span class="torn">angka tujuhnya</span>.
+
+<div class="space"></div>
+
+Aku tidak punya wajah.
+
+Wajahku sedang dipinjam oleh sebuah jam dinding 
+untuk menunjukkan pukul <span class="purple">tiga belas lewat sepuluh kancing baju</span>.
+
+<span class="equation">Gravitasi = Sepasang Sepatu yang Berisi Nasi Uduk</span>
+
+<span class="toxic">Lihatlah</span> ke dalam lemari es itu.
+
+Di sana, ada sebuah rahasia yang sedang <span class="blue">kedinginan</span>.
+Bukan cinta, bukan benci.
+
+Hanya sebuah remote TV yang mencoba belajar terbang
+menggunakan sayap yang ditenun dari 
+<span class="whisper creepy-font">rambut nenek sihir</span>.
+
+<div class="space"></div>
+
+Aku ingin lari,
+tapi lantai ini berubah menjadi deretan <span class="torn bloody-font">gigi</span> 
+yang sedang sikat gigi.
+
+Aku ingin diam,
+tapi udara di sekitarku mulai berteriak 
+dalam bahasa <span class="scream bloody-font">Lampu Neon yang Berkedip</span>.
+
+<div class="space"></div>
+
+Kenapa kemejaku terasa seperti sedang memeluk sebuah <span class="torn">kegagalan</span>?
+
+Kenapa napasku berbau seperti buku matematika 
+yang tenggelam di <span class="blue">laut mati</span>?
+
+<span class="status">[!] STATUS: TIDAK ADA SIAPA-SIAPA DI DALAM SAYA</span>
+
+Jika kau bertemu dengan diriku yang lain,
+tolong berikan dia sebuah kantong plastik berisi 
+<span class="purple creepy-font">suara tawa bayi</span>.
+
+Karena aku sedang sibuk menjadi sebuah titik 
+yang menolak untuk mengakhiri kalimat ini.
+
+<div class="space"></div>
+
+<span class="sound bloody-font">(Gubrak)</span>
+<span class="sound bloody-font">(Krasak)</span>
+<span class="sound bloody-font">(Cis)</span>
+
+<div class="space"></div>
+
+Ternyata, dunia ini hanyalah sebuah <span class="toxic">kelereng</span> 
+yang sedang dimainkan oleh
+seekor kucing yang matanya adalah 
+dua buah <span class="torn bloody-font">lubang kunci</span> 
+yang tidak punya <span class="torn">pintu</span>.
+        </div>
+
+        <div class="footer">
+            -- catatan berakhir di sini (atau mungkin tidak) --<br>
+            [ identitas_tercecer.dat | lokasi: ??? | waktu: N/A ]<br>
+            <span style="color: #6a3a3a;">※ Tuan Kosong tidak bertanggung jawab atas isi sakunya ※</span>
+        </div>
+    </div>
+
+    <script>
+        // Ultra Chaotic Canvas Background
+        const canvas = document.getElementById('chaosCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawChaos();
+        }
+
+        function drawChaos() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const colors = ['#5a0000', '#4a0000', '#6a1a1a', '#3a0000', '#7a2a2a', '#2a0000'];
+            
+            // Wild scribbles
+            for (let i = 0; i < 80; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 3 + 0.3;
+                ctx.globalAlpha = Math.random() * 0.4 + 0.05;
+                
+                ctx.beginPath();
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height;
+                ctx.moveTo(x, y);
+                
+                const points = Math.floor(Math.random() * 15) + 5;
+                for (let j = 0; j < points; j++) {
+                    x += (Math.random() - 0.5) * 220;
+                    y += (Math.random() - 0.5) * 220;
+                    
+                    if (Math.random() > 0.6) {
+                        ctx.lineTo(x, y);
+                    } else {
+                        const cpx1 = x + (Math.random() - 0.5) * 150;
+                        const cpy1 = y + (Math.random() - 0.5) * 150;
+                        const cpx2 = x + (Math.random() - 0.5) * 150;
+                        const cpy2 = y + (Math.random() - 0.5) * 150;
+                        ctx.bezierCurveTo(cpx1, cpy1, cpx2, cpy2, x, y);
+                    }
+                }
+                ctx.stroke();
+            }
+            
+            // Scissors shapes (abstract)
+            for (let i = 0; i < 15; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 2.5 + 1;
+                ctx.globalAlpha = Math.random() * 0.3 + 0.05;
+                
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 60 + 30;
+                
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + size, y - size);
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + size, y + size);
+                ctx.moveTo(x + size * 0.7, y);
+                ctx.arc(x + size * 0.7, y, size * 0.3, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Chaotic circles and spirals
+            for (let i = 0; i < 35; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 2.5 + 0.5;
+                ctx.globalAlpha = Math.random() * 0.35 + 0.05;
+                
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const radius = Math.random() * 100 + 25;
+                
+                if (Math.random() > 0.5) {
+                    // Circle
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                } else {
+                    // Spiral
+                    ctx.beginPath();
+                    const loops = Math.random() * 4 + 1.5;
+                    for (let angle = 0; angle < Math.PI * 2 * loops; angle += 0.08) {
+                        const r = radius * (angle / (Math.PI * 2 * loops));
+                        const px = x + Math.cos(angle) * r;
+                        const py = y + Math.sin(angle) * r;
+                        if (angle === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.stroke();
+                }
+            }
+            
+            // Abstract geometric chaos
+            for (let i = 0; i < 25; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 3.5 + 0.5;
+                ctx.globalAlpha = Math.random() * 0.3 + 0.05;
+                
+                ctx.beginPath();
+                const sides = Math.floor(Math.random() * 6) + 3;
+                const centerX = Math.random() * canvas.width;
+                const centerY = Math.random() * canvas.height;
+                const size = Math.random() * 90 + 35;
+                const rotation = Math.random() * Math.PI * 2;
+                
+                for (let j = 0; j <= sides; j++) {
+                    const angle = (j / sides) * Math.PI * 2 + rotation;
+                    const x = centerX + Math.cos(angle) * size;
+                    const y = centerY + Math.sin(angle) * size;
+                    if (j === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+            
+            // Broken lines (scissors cutting effect)
+            for (let i = 0; i < 40; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 2.5 + 0.5;
+                ctx.globalAlpha = Math.random() * 0.35 + 0.05;
+                
+                ctx.setLineDash([Math.random() * 20 + 5, Math.random() * 15 + 5]);
+                
+                ctx.beginPath();
+                const startX = Math.random() * canvas.width;
+                const startY = Math.random() * canvas.height;
+                ctx.moveTo(startX, startY);
+                
+                const segments = Math.floor(Math.random() * 10) + 3;
+                let currentX = startX;
+                let currentY = startY;
+                
+                for (let j = 0; j < segments; j++) {
+                    currentX += (Math.random() - 0.5) * 180;
+                    currentY += (Math.random() - 0.5) * 180;
+                    ctx.lineTo(currentX, currentY);
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+            
+            // Random dots/particles
+            for (let i = 0; i < 200; i++) {
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.globalAlpha = Math.random() * 0.5 + 0.1;
+                
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 4 + 0.5;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Zigzag chaos lines
+            for (let i = 0; i < 20; i++) {
+                ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
+                ctx.lineWidth = Math.random() * 2 + 1;
+                ctx.globalAlpha = Math.random() * 0.25 + 0.05;
+                
+                ctx.beginPath();
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height;
+                ctx.moveTo(x, y);
+                
+                const zigs = Math.floor(Math.random() * 12) + 5;
+                for (let j = 0; j < zigs; j++) {
+                    x += (Math.random() - 0.5) * 100;
+                    y += (j % 2 === 0 ? 1 : -1) * (Math.random() * 50 + 20);
+                    ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+            
+            ctx.globalAlpha = 1;
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Refresh background every 10 seconds with different chaos
+        setInterval(() => {
+            drawChaos();
+        }, 10000);
+
+        // Modal Peringatan Konten
+        function closeModal() {
+            document.getElementById('contentWarning').classList.add('hidden');
+        }
+
+        function continueReading() {
+            closeModal();
+        }
+
+        function goBack() {
+            window.location.href = '../index.html'; // Sesuaikan dengan path halaman index Anda
+        }
+
+        // Tampilkan modal saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('contentWarning').classList.remove('hidden');
+        });
+    </script>
+
+</body>
+</html>

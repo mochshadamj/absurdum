@@ -278,9 +278,147 @@
                 font-size: 0.95rem;
             }
         }
+
+        /* Modal Peringatan Konten */
+        .content-warning-modal {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .content-warning-modal.hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(20, 0, 0, 0.95), rgba(40, 0, 20, 0.95));
+            border: 3px solid #ff3e3e;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(255, 62, 62, 0.5);
+            animation: modalSlide 0.5s ease;
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: 2px solid #ff3e3e;
+            color: #ff3e3e;
+            width: 35px;
+            height: 35px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            background: #ff3e3e;
+            color: #000;
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            color: #ff3e3e;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 62, 62, 0.5);
+        }
+
+        .modal-text {
+            color: #d1d1d1;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: 2px solid;
+            background: transparent;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .modal-btn-continue {
+            border-color: #ff3e3e;
+            color: #ff3e3e;
+        }
+
+        .modal-btn-continue:hover {
+            background: #ff3e3e;
+            color: #000;
+        }
+
+        .modal-btn-back {
+            border-color: #666;
+            color: #666;
+        }
+
+        .modal-btn-back:hover {
+            background: #666;
+            color: #000;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Modal Peringatan Konten -->
+    <div class="content-warning-modal" id="contentWarning">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2 class="modal-title">⚠️ Peringatan Konten</h2>
+            <p class="modal-text">
+                Puisi ini mengandung konten absurd dan surealisme ekstrem yang dapat menyebabkan kebingungan, disorientasi, atau interpretasi yang sangat personal. 
+                <br><br>
+                Penafsiran dan makna dari karya ini sepenuhnya merupakan tanggung jawab pembaca. Penulis tidak bertanggung jawab atas efek halusinasi mental, eksistensial crisis, atau pemahaman yang muncul dari pembacaan.
+                <br><br>
+                <strong>Lanjutkan dengan risiko sendiri.</strong>
+            </p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-back" onclick="goBack()">Kembali</button>
+                <button class="modal-btn modal-btn-continue" onclick="continueReading()">Lanjutkan</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Glitch Canvas Background -->
     <canvas id="glitchCanvas"></canvas>
@@ -514,6 +652,24 @@ peta menuju
         setInterval(() => {
             drawGlitch();
         }, 8000);
+
+        // Modal Peringatan Konten
+        function closeModal() {
+            document.getElementById('contentWarning').classList.add('hidden');
+        }
+
+        function continueReading() {
+            closeModal();
+        }
+
+        function goBack() {
+            window.location.href = '../index.html'; // Sesuaikan dengan path halaman index Anda
+        }
+
+        // Tampilkan modal saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('contentWarning').classList.remove('hidden');
+        });
     </script>
 
 </body>
