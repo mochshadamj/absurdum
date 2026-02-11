@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anatomi Titik yang Saling Memunggungi | ABSURDUM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            color: #d1d1d1;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        /* Galaxy Canvas Background */
+        #galaxyCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        /* Vignette overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Back Button */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(100, 50, 150, 0.2);
+            border: 2px solid #8a5ac7;
+            color: #b8a0d8;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 100;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .back-btn:hover {
+            background: rgba(100, 50, 150, 0.4);
+            transform: translateX(-5px);
+            box-shadow: 0 0 20px rgba(138, 90, 199, 0.4);
+        }
+
+        /* Title */
+        h1 {
+            font-size: clamp(1.8rem, 6vw, 3rem);
+            color: #b8a0d8;
+            text-shadow: 2px 2px #6a4a9a, -2px -2px #4a2a6a, 0 0 20px rgba(184, 160, 216, 0.5);
+            text-align: center;
+            margin-bottom: 20px;
+            animation: titleGlow 4s infinite alternate;
+            letter-spacing: 3px;
+            line-height: 1.4;
+            text-transform: uppercase;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { 
+                text-shadow: 2px 2px #6a4a9a, -2px -2px #4a2a6a, 0 0 20px rgba(184, 160, 216, 0.5);
+            }
+            50% { 
+                text-shadow: 2px 2px #6a4a9a, -2px -2px #4a2a6a, 0 0 40px rgba(184, 160, 216, 0.8);
+            }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7a7a7a;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            margin-bottom: 60px;
+            letter-spacing: 3px;
+            opacity: 0.6;
+        }
+
+        /* Poem Content */
+        .poem {
+            line-height: 2.2;
+            white-space: pre-wrap;
+            font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+            text-align: left;
+            position: relative;
+            text-shadow: 0 0 2px rgba(184, 160, 216, 0.3);
+        }
+
+        /* Styling elements */
+        .broken {
+            display: inline-block;
+            color: #b8a0d8;
+            transform: rotate(var(--rotate, -3deg)) translateY(var(--translateY, 3px));
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { 
+                opacity: 1;
+                text-shadow: 0 0 5px rgba(184, 160, 216, 0.5);
+            }
+            50% { 
+                opacity: 0.7;
+                text-shadow: 0 0 15px rgba(184, 160, 216, 0.8);
+            }
+        }
+
+        .emphasis {
+            color: #d8c0f8;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(216, 192, 248, 0.6);
+        }
+
+        .whisper {
+            color: #666;
+            font-style: italic;
+            font-size: 0.88em;
+            opacity: 0.8;
+        }
+
+        .cosmic {
+            color: #9a7ac7;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(154, 122, 199, 0.5);
+        }
+
+        .void {
+            color: #8a8a8a;
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .glow {
+            color: #c8b0e8;
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(200, 176, 232, 0.7);
+        }
+
+        .space {
+            height: 35px;
+        }
+
+        /* Floating cosmic symbols */
+        .cosmic-symbol {
+            position: fixed;
+            font-size: clamp(2rem, 5vw, 4rem);
+            opacity: 0.1;
+            z-index: 5;
+            pointer-events: none;
+            font-weight: bold;
+            color: #b8a0d8;
+            animation: cosmicFloat 20s infinite ease-in-out;
+        }
+
+        @keyframes cosmicFloat {
+            0%, 100% { 
+                transform: translate(0, 0) rotate(0deg); 
+                opacity: 0.1;
+            }
+            25% { 
+                transform: translate(-60px, 80px) rotate(90deg); 
+                opacity: 0.15;
+            }
+            50% { 
+                transform: translate(80px, -60px) rotate(180deg); 
+                opacity: 0.08;
+            }
+            75% { 
+                transform: translate(-80px, -80px) rotate(270deg); 
+                opacity: 0.12;
+            }
+        }
+
+        .sym-1 { top: 15%; left: 10%; animation-delay: 0s; }
+        .sym-2 { top: 40%; right: 15%; animation-delay: 5s; }
+        .sym-3 { bottom: 25%; left: 20%; animation-delay: 10s; }
+        .sym-4 { top: 65%; right: 10%; animation-delay: 15s; }
+        .sym-5 { top: 30%; left: 50%; animation-delay: 7s; }
+
+        /* Footer */
+        .footer {
+            margin-top: 100px;
+            text-align: center;
+            font-size: 0.7rem;
+            opacity: 0.4;
+            padding-bottom: 40px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .back-btn {
+                position: relative;
+                display: inline-block;
+                margin-bottom: 30px;
+            }
+            
+            .poem {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Modal Peringatan Konten */
+        .content-warning-modal {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .content-warning-modal.hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(30, 0, 50, 0.95), rgba(50, 20, 70, 0.95));
+            border: 3px solid #8a5ac7;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(138, 90, 199, 0.5);
+            animation: modalSlide 0.5s ease;
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: 2px solid #8a5ac7;
+            color: #8a5ac7;
+            width: 35px;
+            height: 35px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            background: #8a5ac7;
+            color: #000;
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            color: #b8a0d8;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(184, 160, 216, 0.5);
+        }
+
+        .modal-text {
+            color: #d1d1d1;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: 2px solid;
+            background: transparent;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .modal-btn-continue {
+            border-color: #8a5ac7;
+            color: #8a5ac7;
+        }
+
+        .modal-btn-continue:hover {
+            background: #8a5ac7;
+            color: #000;
+        }
+
+        .modal-btn-back {
+            border-color: #666;
+            color: #666;
+        }
+
+        .modal-btn-back:hover {
+            background: #666;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Modal Peringatan Konten -->
+    <div class="content-warning-modal" id="contentWarning">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2 class="modal-title">⚠️ Peringatan Konten</h2>
+            <p class="modal-text">
+                Puisi ini mengandung konten absurd dan surealisme ekstrem yang dapat menyebabkan kebingungan, disorientasi, atau interpretasi yang sangat personal. 
+                <br><br>
+                Penafsiran dan makna dari karya ini sepenuhnya merupakan tanggung jawab pembaca. Penulis tidak bertanggung jawab atas efek halusinasi mental, eksistensial crisis, atau pemahaman yang muncul dari pembacaan.
+                <br><br>
+                <strong>Lanjutkan dengan risiko sendiri.</strong>
+            </p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-back" onclick="goBack()">Kembali</button>
+                <button class="modal-btn modal-btn-continue" onclick="continueReading()">Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Galaxy Canvas Background -->
+    <canvas id="galaxyCanvas"></canvas>
+
+    <!-- Floating Cosmic Symbols -->
+    <div class="cosmic-symbol sym-1">◐</div>
+    <div class="cosmic-symbol sym-2">◑</div>
+    <div class="cosmic-symbol sym-3">◒</div>
+    <div class="cosmic-symbol sym-4">◓</div>
+    <div class="cosmic-symbol sym-5">⊙</div>
+
+    <a href="../index.html" class="back-btn">← kembali</a>
+
+    <div class="container">
+        <h1>Anatomi Titik yang<br>Saling Memunggungi</h1>
+        <div class="subtitle">[ koordinat_tidak_bertemu.sys ]</div>
+
+        <div class="poem">Di luar sana, musim gugur sedang <span class="cosmic">mencabuti bulu-bulu</span> 
+dari sayap seekor <span class="broken">lokomotif</span>. 
+
+Aku ingin menemuimu, 
+tapi kakiku adalah dua buah guling yang diisi dengan 
+<span class="emphasis">kerikil</span> dan <span class="whisper">suara radio statis</span>.
+
+Setiap kali aku melangkah, 
+lantai ini berubah menjadi <span class="cosmic">lidah</span> 
+yang menjilat telapak kakiku dengan rasa <span class="glow">cuka</span>.
+
+<div class="space"></div>
+
+Kau adalah <span class="emphasis">bau bensin</span> di tengah upacara pemakaman.
+
+Sangat tajam, 
+tapi tidak bisa kupeluk tanpa membuat paru-paruku 
+menjadi tumpukan <span class="broken">koran basah</span>.
+
+<div class="space"></div>
+
+<span class="glow">Lihatlah tangan kita.</span>
+
+Jari-jariku adalah deretan pensil yang sudah <span class="void">patah arangnya</span>.
+Jari-jarimu adalah rintik gerimis yang terbuat dari <span class="cosmic">air raksa</span>.
+
+Jika kita bersentuhan, 
+yang lahir bukan kehangatan, 
+tapi sebuah <span class="broken">lubang di tengah peta</span> 
+yang membuat semua kota kehilangan <span class="whisper">arah pulangnya</span>.
+
+<div class="space"></div>
+
+Ada sebuah lemari di tenggorokanku.
+
+Isinya adalah kancing-kancing baju yang kau lepaskan 
+saat kau memutuskan untuk menjadi <span class="cosmic">asap</span>.
+
+Aku mencoba menelannya, 
+tapi kancing itu berubah menjadi sekawanan <span class="emphasis">lalat</span> 
+yang membawa kabar tentang kematian 
+<span class="glow">warna biru di matamu</span>.
+
+<div class="space"></div>
+
+Kita adalah sepasang <span class="broken">bayangan</span> 
+yang dilemparkan oleh dua matahari yang berbeda.
+
+Berada di lantai yang sama, 
+tapi tidak pernah bisa saling <span class="void">menindih</span>.
+
+Kau melengkung ke arah utara yang isinya hanya 
+tumpukan <span class="cosmic">gigi palsu</span>,
+
+aku melengkung ke arah selatan yang isinya hanya 
+bau cat yang <span class="whisper">belum kering</span>.
+
+<div class="space"></div>
+
+<span class="void">Tidak ada ruang</span>.
+<span class="void">Tidak ada waktu</span>.
+
+Hanya ada suara gesekan antara 
+<span class="emphasis">kulit jeruk</span> dan <span class="cosmic">kawat berduri</span> 
+di dalam kepalaku.
+
+<div class="space"></div>
+
+Jika kau mendengar suara ketukan di jendela kamarmu, 
+<span class="whisper">itu bukan aku</span>.
+
+Itu adalah bayanganku yang sedang mencoba menukar nyawanya 
+dengan sebutir <span class="broken">kelereng yang pecah</span>.
+
+Sebab di mana pun kita diletakkan, 
+kita hanyalah dua buah <span class="glow">kutub magnet</span> 
+yang sama-sama terbuat dari 
+<span class="cosmic">penyesalan yang sudah membatu</span>.
+        </div>
+
+        <div class="footer">
+            -- dua titik, satu kegelapan --<br>
+            [ jarak: ∞ | waktu: tidak relevan | status: parallel_forever ]<br>
+            <span style="color: #8a5ac7;">※ Magnet sejenis tidak pernah bertemu ※</span>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // 🌌 GALAXY WITH BLACK HOLES ⚫
+        // ========================================
+        
+        const canvas = document.getElementById('galaxyCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let stars = [];
+        let blackHoles = [];
+        let mouseX = 0;
+        let mouseY = 0;
+        let time = 0;
+
+        const config = {
+            starSpeed: 0.6,
+            density: 1.5,
+            hueShift: 140,
+            speed: 1,
+            glowIntensity: 0.5,
+            saturation: 15,
+            mouseRepulsion: true,
+            repulsionStrength: 2,
+            twinkleIntensity: 0.45,
+            rotationSpeed: 0.1,
+            blackHoleCount: 2,           // Jumlah black hole
+            blackHoleGravity: 150,       // Kekuatan gravitasi
+            blackHoleSize: 40            // Ukuran black hole
+        };
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initStars();
+            initBlackHoles();
+        }
+
+        // ⚫ BLACK HOLE CLASS
+        class BlackHole {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = 20;  // BOLA HITAM KECIL FIXED!
+                this.angle = Math.random() * Math.PI * 2;
+                this.speed = 0.0003 + Math.random() * 0.0005;
+                this.orbitRadius = 200 + Math.random() * 300;
+                this.centerX = canvas.width / 2;
+                this.centerY = canvas.height / 2;
+                this.rotationSpeed = 0.01 + Math.random() * 0.02;
+                this.rotation = 0;
+            }
+
+            update() {
+                // Black hole bergerak melingkar
+                this.angle += this.speed;
+                this.x = this.centerX + Math.cos(this.angle) * this.orbitRadius;
+                this.y = this.centerY + Math.sin(this.angle) * this.orbitRadius;
+                this.rotation += this.rotationSpeed;
+            }
+
+            draw() {
+                // CINCIN LONJONG DULU (di belakang) - BESAR MEMBUNGKUS!
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                
+                for (let i = 0; i < 3; i++) {
+                    const diskRadius = 80 + i * 25;  // CINCIN BESAR! 80, 105, 130
+                    const diskHeight = diskRadius * 0.32;  // Tinggi cincin lonjong
+                    const gradient2 = ctx.createRadialGradient(0, 0, this.size, 0, 0, diskRadius);
+                    
+                    if (i === 0) {
+                        gradient2.addColorStop(0, 'rgba(138, 90, 199, 0)');
+                        gradient2.addColorStop(0.5, 'rgba(138, 90, 199, 0.4)');
+                        gradient2.addColorStop(1, 'rgba(138, 90, 199, 0)');
+                    } else if (i === 1) {
+                        gradient2.addColorStop(0, 'rgba(184, 160, 216, 0)');
+                        gradient2.addColorStop(0.5, 'rgba(184, 160, 216, 0.3)');
+                        gradient2.addColorStop(1, 'rgba(184, 160, 216, 0)');
+                    } else {
+                        gradient2.addColorStop(0, 'rgba(200, 176, 232, 0)');
+                        gradient2.addColorStop(0.5, 'rgba(200, 176, 232, 0.2)');
+                        gradient2.addColorStop(1, 'rgba(200, 176, 232, 0)');
+                    }
+                    
+                    ctx.fillStyle = gradient2;
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, diskRadius, diskHeight, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+
+                // GLOW TIPIS (di tengah)
+                const glowGradient = ctx.createRadialGradient(this.x, this.y, this.size, this.x, this.y, this.size + 15);
+                glowGradient.addColorStop(0, 'rgba(138, 90, 199, 0.15)');
+                glowGradient.addColorStop(1, 'rgba(138, 90, 199, 0)');
+                
+                ctx.fillStyle = glowGradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size + 15, 0, Math.PI * 2);
+                ctx.fill();
+
+                // BOLA HITAM DI TENGAH (paling depan)
+                const gradient1 = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                gradient1.addColorStop(0, 'rgba(0, 0, 0, 1)');
+                gradient1.addColorStop(0.6, 'rgba(0, 0, 0, 0.95)');
+                gradient1.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+                
+                ctx.fillStyle = gradient1;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Efek gravitasi pada bintang
+            attract(star) {
+                const dx = this.x - star.x;
+                const dy = this.y - star.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < config.blackHoleGravity && distance > 0) {
+                    const force = (config.blackHoleGravity - distance) / config.blackHoleGravity;
+                    const angle = Math.atan2(dy, dx);
+                    
+                    // Tarikan gravitasi
+                    star.x += Math.cos(angle) * force * 2;
+                    star.y += Math.sin(angle) * force * 2;
+                    
+                    // Efek rotasi mengelilingi black hole
+                    const perpAngle = angle + Math.PI / 2;
+                    star.x += Math.cos(perpAngle) * force * 1.5;
+                    star.y += Math.sin(perpAngle) * force * 1.5;
+                }
+                
+                // Bintang hilang jika terlalu dekat
+                if (distance < this.size * 0.8) {
+                    star.reset();
+                }
+            }
+        }
+
+        // ⭐ STAR CLASS
+        class Star {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * canvas.height;
+                this.pastY = this.y;
+                this.baseBrightness = 0.8 + Math.random() * 0.2;
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.z = Math.random() * canvas.width;
+                this.pastY = this.y;
+                this.pastX = this.x;
+                
+                this.twinklePhase = Math.random() * Math.PI * 2;
+                this.twinkleSpeed = 0.6 + Math.random() * 1.8;
+                
+                this.angle = Math.random() * Math.PI * 2;
+                this.radius = Math.sqrt(
+                    Math.pow(this.x - canvas.width / 2, 2) + 
+                    Math.pow(this.y - canvas.height / 2, 2)
+                );
+                
+                this.baseBrightness = 0.8 + Math.random() * 0.2;
+            }
+
+            update() {
+                this.pastX = this.x;
+                this.pastY = this.y;
+
+                this.angle += config.rotationSpeed * 0.001;
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                this.x = centerX + Math.cos(this.angle) * this.radius;
+                this.y = centerY + Math.sin(this.angle) * this.radius;
+
+                this.z -= config.speed * config.starSpeed * 2;
+
+                // Mouse repulsion
+                if (config.mouseRepulsion) {
+                    const dx = this.x - mouseX;
+                    const dy = this.y - mouseY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const repulsionRadius = 150;
+
+                    if (dist < repulsionRadius && dist > 0) {
+                        const force = (repulsionRadius - dist) / repulsionRadius;
+                        this.x += (dx / dist) * force * config.repulsionStrength * 5;
+                        this.y += (dy / dist) * force * config.repulsionStrength * 5;
+                    }
+                }
+
+                // Black hole gravity effect
+                blackHoles.forEach(blackHole => {
+                    blackHole.attract(this);
+                });
+
+                if (this.z <= 0) {
+                    this.reset();
+                }
+
+                this.twinklePhase += this.twinkleSpeed * 0.05;
+            }
+
+            draw() {
+                const sx = (this.x - canvas.width / 2) * (canvas.width / this.z) + canvas.width / 2;
+                const sy = (this.y - canvas.height / 2) * (canvas.width / this.z) + canvas.height / 2;
+
+                const size = (1 - this.z / canvas.width) * 2.5;
+
+                if (sx < 0 || sx > canvas.width || sy < 0 || sy > canvas.height) {
+                    return;
+                }
+
+                const pastSx = (this.pastX - canvas.width / 2) * (canvas.width / this.z) + canvas.width / 2;
+                const pastSy = (this.pastY - canvas.height / 2) * (canvas.width / this.z) + canvas.height / 2;
+
+                const twinkle = (Math.sin(this.twinklePhase) * 0.5 + 0.5) * config.twinkleIntensity + (1 - config.twinkleIntensity);
+
+                const brightness = (1 - this.z / canvas.width) * this.baseBrightness * twinkle;
+                const hue = config.hueShift;
+                const sat = config.saturation;
+                const light = Math.min(brightness * 85, 88);
+
+                // Trail
+                ctx.beginPath();
+                ctx.moveTo(pastSx, pastSy);
+                ctx.lineTo(sx, sy);
+                ctx.strokeStyle = `hsla(${hue}, ${sat}%, ${light}%, 0.5)`;
+                ctx.lineWidth = size * 0.6;
+                ctx.stroke();
+
+                // Glow
+                const glowSize = size * (1 + config.glowIntensity * 2.5);
+                const gradient = ctx.createRadialGradient(sx, sy, 0, sx, sy, glowSize);
+                gradient.addColorStop(0, `hsla(${hue}, ${sat}%, ${light + 20}%, ${0.8 * twinkle})`);
+                gradient.addColorStop(0.5, `hsla(${hue}, ${sat}%, ${light}%, ${0.4 * twinkle})`);
+                gradient.addColorStop(1, `hsla(${hue}, ${sat}%, ${light}%, 0)`);
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(sx - glowSize, sy - glowSize, glowSize * 2, glowSize * 2);
+
+                // Plus shape
+                const plusLength = size * 1.5;
+                const plusWidth = size * 0.4;
+                
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = `hsla(${hue}, ${sat}%, ${light + 30}%, 0.8)`;
+                
+                ctx.beginPath();
+                ctx.moveTo(sx - plusLength, sy);
+                ctx.lineTo(sx + plusLength, sy);
+                ctx.strokeStyle = `hsla(${hue}, ${Math.min(sat + 10, 100)}%, ${Math.min(light + 25, 95)}%, ${twinkle})`;
+                ctx.lineWidth = plusWidth;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(sx, sy - plusLength);
+                ctx.lineTo(sx, sy + plusLength);
+                ctx.strokeStyle = `hsla(${hue}, ${Math.min(sat + 10, 100)}%, ${Math.min(light + 25, 95)}%, ${twinkle})`;
+                ctx.lineWidth = plusWidth;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+                
+                ctx.shadowBlur = 0;
+
+                // Core
+                ctx.beginPath();
+                ctx.arc(sx, sy, size * 0.6, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${hue}, ${Math.min(sat + 20, 100)}%, ${Math.min(light + 35, 98)}%, ${twinkle})`;
+                ctx.fill();
+            }
+        }
+
+        function initStars() {
+            const starCount = Math.floor(canvas.width * canvas.height / 3000) * config.density;
+            stars = [];
+            for (let i = 0; i < starCount; i++) {
+                stars.push(new Star());
+            }
+        }
+
+        function initBlackHoles() {
+            blackHoles = [];
+            for (let i = 0; i < config.blackHoleCount; i++) {
+                blackHoles.push(new BlackHole());
+            }
+            console.log(`⚫ ${config.blackHoleCount} black holes created!`);
+        }
+
+        function animate() {
+            time++;
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Update dan draw black holes
+            blackHoles.forEach(blackHole => {
+                blackHole.update();
+                blackHole.draw();
+            });
+
+            // Update dan draw stars
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // Mouse tracking
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // Touch tracking
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                mouseX = e.touches[0].clientX;
+                mouseY = e.touches[0].clientY;
+            }
+        });
+
+        // Initialize
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        animate();
+
+        console.log('🌌 Galaxy with Black Holes activated! ⚫');
+
+        // Modal functions
+        function closeModal() {
+            document.getElementById('contentWarning').classList.add('hidden');
+        }
+
+        function continueReading() {
+            closeModal();
+        }
+
+        function goBack() {
+            window.location.href = '../index.html';
+        }
+
+        // Show modal on load
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('contentWarning').classList.remove('hidden');
+        });
+    </script>
+
+</body>
+</html>
