@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../images/icon.png">
+    <title>Arsitektur Tulang yang Lupa Cara Runtuh | ABSURDUM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Special+Elite&family=Rye&family=Pirata+One&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0d0d0d;
+            color: #b8a896;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        /* Dark graveyard atmosphere */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 30%, rgba(80, 20, 20, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(50, 30, 30, 0.1) 0%, transparent 50%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Skeleton Architecture Canvas Background */
+        #skeletonCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.25;
+            pointer-events: none;
+        }
+
+        /* Heavy vignette overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.85) 100%);
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Back Button */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(60, 50, 40, 0.3);
+            border: 2px solid #8b7355;
+            color: #bea990;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 100;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .back-btn:hover {
+            background: rgba(60, 50, 40, 0.6);
+            transform: translateX(-5px);
+            box-shadow: 0 0 15px rgba(139, 115, 85, 0.3);
+        }
+
+        /* Title with crumbling animation */
+        h1 {
+            font-size: clamp(1.8rem, 6vw, 3rem);
+            color: #d4c4b0;
+            text-shadow: 
+                2px 2px 0 #3d3229,
+                4px 4px 0 #2a221a,
+                0 0 20px rgba(80, 20, 20, 0.4);
+            text-align: center;
+            margin-bottom: 15px;
+            animation: crumble 6s infinite;
+            letter-spacing: 3px;
+            line-height: 1.4;
+            text-transform: uppercase;
+            transform-origin: bottom center;
+        }
+
+        @keyframes crumble {
+            0%, 90%, 100% { 
+                transform: rotate(0deg) scale(1);
+                filter: blur(0px);
+            }
+            92% { 
+                transform: rotate(-2deg) translateY(5px) scale(0.98);
+                filter: blur(1px);
+            }
+            94% { 
+                transform: rotate(2deg) translateY(-3px) scale(1.01);
+                filter: blur(0.5px);
+            }
+            96% { 
+                transform: rotate(-1deg) translateY(2px) scale(0.99);
+            }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6b5d52;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            margin-bottom: 50px;
+            letter-spacing: 3px;
+            opacity: 0.6;
+            animation: flicker 4s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Floating Skulls with Red Eyes */
+        .skull-symbol {
+            position: fixed;
+            font-size: 3.5rem;
+            opacity: 0;
+            z-index: 5;
+            pointer-events: none;
+            animation: skullFloat 15s infinite ease-in-out;
+            filter: drop-shadow(0 0 10px rgba(139, 0, 0, 0.5));
+        }
+
+        @keyframes skullFloat {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg) scale(1);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.2;
+            }
+            50% { 
+                transform: translateY(-80px) rotate(-15deg) scale(1.1);
+                opacity: 0.25;
+            }
+            90% {
+                opacity: 0.2;
+            }
+        }
+
+        .skull-1 { top: 10%; left: 8%; animation-delay: 0s; }
+        .skull-2 { top: 25%; right: 12%; animation-delay: 3s; }
+        .skull-3 { top: 50%; left: 5%; animation-delay: 6s; }
+        .skull-4 { bottom: 20%; right: 8%; animation-delay: 9s; }
+        .skull-5 { top: 70%; left: 50%; animation-delay: 12s; }
+        .skull-6 { top: 40%; right: 15%; animation-delay: 4s; }
+        .skull-7 { bottom: 35%; left: 20%; animation-delay: 7s; }
+
+        /* CSS Bone Symbols */
+        .bone-symbol {
+            position: fixed;
+            font-size: 3rem;
+            opacity: 0.12;
+            z-index: 5;
+            pointer-events: none;
+            animation: boneFloat 12s infinite ease-in-out;
+            filter: blur(0.5px) drop-shadow(0 0 8px rgba(139, 115, 85, 0.3));
+            color: #9d8b73;
+        }
+
+        @keyframes boneFloat {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg) scale(1);
+                opacity: 0.12;
+            }
+            25% { 
+                transform: translateY(-40px) rotate(15deg) scale(1.05);
+                opacity: 0.16;
+            }
+            50% { 
+                transform: translateY(0) rotate(-10deg) scale(0.95);
+                opacity: 0.08;
+            }
+            75% { 
+                transform: translateY(-25px) rotate(20deg) scale(1.02);
+                opacity: 0.14;
+            }
+        }
+
+        .bone-1 { top: 15%; left: 15%; animation-delay: 0s; }
+        .bone-2 { top: 30%; right: 10%; animation-delay: 2s; }
+        .bone-3 { bottom: 40%; left: 8%; animation-delay: 4s; }
+        .bone-4 { bottom: 25%; right: 20%; animation-delay: 6s; }
+
+        /* Pillar symbols representing standing architecture */
+        .pillar-symbol {
+            position: fixed;
+            font-size: 5rem;
+            opacity: 0.08;
+            z-index: 5;
+            pointer-events: none;
+            animation: pillarCrack 15s infinite ease-in-out;
+            color: #6b5d52;
+        }
+
+        @keyframes pillarCrack {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg); 
+                opacity: 0.08;
+            }
+            25% { 
+                transform: translateY(-20px) rotate(-3deg); 
+                opacity: 0.12;
+            }
+            50% { 
+                transform: translateY(0) rotate(3deg); 
+                opacity: 0.05;
+            }
+            75% { 
+                transform: translateY(-10px) rotate(-2deg); 
+                opacity: 0.1;
+            }
+        }
+
+        .pillar-1 { top: 18%; left: 65%; animation-delay: 0s; }
+        .pillar-2 { bottom: 28%; right: 10%; animation-delay: 5s; }
+        .pillar-3 { top: 55%; left: 15%; animation-delay: 10s; }
+
+        /* Poem Content - CREEPY SKELETON STYLING */
+        .poem {
+            line-height: 2.5;
+            white-space: pre-wrap;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            text-align: left;
+            position: relative;
+            font-family: 'Special Elite', 'Courier New', monospace;
+            letter-spacing: 0.5px;
+            color: #c4b5a0;
+        }
+
+        /* BROKEN - Cracked bone effect */
+        .broken {
+            display: inline-block;
+            font-family: 'Creepster', cursive;
+            color: #d4c4b0;
+            font-size: 1.3em;
+            transform: rotate(var(--rotate, -2deg)) translateY(var(--translateY, 2px));
+            animation: boneCrack 4s infinite;
+            text-shadow: 
+                1px 1px 0 #3d3229,
+                2px 2px 0 #2a221a,
+                0 0 10px rgba(60, 50, 40, 0.5);
+            filter: drop-shadow(0 0 5px rgba(80, 20, 20, 0.3));
+            letter-spacing: 1px;
+        }
+
+        @keyframes boneCrack {
+            0%, 100% { 
+                transform: rotate(-2deg) translateY(2px) scale(1);
+            }
+            33% { 
+                transform: rotate(2deg) translateY(-1px) scale(1.02);
+            }
+            66% { 
+                transform: rotate(-1deg) translateY(1px) scale(0.99);
+            }
+        }
+
+        /* EMPHASIS - Ancient bone glow */
+        .emphasis {
+            font-family: 'Rye', cursive;
+            color: #e8dcc8;
+            font-size: 1.25em;
+            font-weight: normal;
+            text-shadow: 
+                0 0 8px rgba(232, 220, 200, 0.4),
+                1px 1px 0 #5d4e3e,
+                2px 2px 0 #3d3229;
+            animation: ancientPulse 3s infinite;
+            letter-spacing: 1px;
+        }
+
+        @keyframes ancientPulse {
+            0%, 100% { 
+                opacity: 1;
+                text-shadow: 
+                    0 0 8px rgba(232, 220, 200, 0.4),
+                    1px 1px 0 #5d4e3e,
+                    2px 2px 0 #3d3229;
+            }
+            50% { 
+                opacity: 0.8;
+                text-shadow: 
+                    0 0 12px rgba(232, 220, 200, 0.6),
+                    1px 1px 0 #5d4e3e,
+                    2px 2px 0 #3d3229;
+            }
+        }
+
+        /* WHISPER - Faded ghostly text */
+        .whisper {
+            font-family: 'Special Elite', monospace;
+            color: #706556;
+            font-size: 0.9em;
+            opacity: 0.5;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(60, 50, 40, 0.3);
+            animation: ghostFade 5s infinite;
+        }
+
+        @keyframes ghostFade {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.25; }
+        }
+
+        /* DIALOGUE - Bone carved text */
+        .dialogue {
+            font-family: 'Pirata One', cursive;
+            color: #c9b899;
+            font-size: 1.1em;
+            padding-left: 25px;
+            border-left: 3px solid rgba(139, 115, 85, 0.4);
+            display: block;
+            margin: 15px 0;
+            text-shadow: 
+                1px 1px 0 #3d3229,
+                0 0 8px rgba(80, 60, 40, 0.4);
+            animation: boneCarve 4s infinite;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes boneCarve {
+            0%, 100% { 
+                border-left-color: rgba(139, 115, 85, 0.4);
+            }
+            50% { 
+                border-left-color: rgba(139, 115, 85, 0.7);
+            }
+        }
+
+        /* SCREAM - Blood on bone */
+        .scream {
+            font-family: 'Creepster', cursive;
+            color: #c89680;
+            font-size: 1.4em;
+            font-weight: bold;
+            text-shadow: 
+                0 0 8px rgba(139, 0, 0, 0.6),
+                0 0 15px rgba(139, 0, 0, 0.3),
+                2px 2px 0 #2a221a;
+            animation: bloodDrip 0.4s infinite;
+            letter-spacing: 2px;
+            transform-origin: center;
+        }
+
+        @keyframes bloodDrip {
+            0%, 100% { 
+                transform: translateX(0) scale(1);
+                filter: drop-shadow(0 0 5px rgba(139, 0, 0, 0.5));
+            }
+            25% { 
+                transform: translateX(-2px) scale(1.01);
+                filter: drop-shadow(0 0 8px rgba(139, 0, 0, 0.7));
+            }
+            75% { 
+                transform: translateX(2px) scale(0.99);
+                filter: drop-shadow(0 0 6px rgba(139, 0, 0, 0.6));
+            }
+        }
+
+        /* VOID - Decayed text */
+        .void {
+            font-family: 'Creepster', cursive;
+            color: #dddddd;
+            font-size: 1.1em;
+            text-decoration: line-through;
+            text-decoration-thickness: 2px;
+            opacity: 0.3;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+            animation: decay 3s infinite;
+        }
+
+        @keyframes decay {
+            0%, 100% { 
+                opacity: 0.3;
+                text-decoration-color: #5d4e3e;
+            }
+            50% { 
+                opacity: 0.15;
+                text-decoration-color: #3d3229;
+            }
+        }
+
+        /* HEAVY - Weighted bone */
+        .heavy {
+            font-family: 'Rye', cursive;
+            color: #a89478;
+            font-size: 1.35em;
+            font-weight: bold;
+            text-shadow: 
+                2px 2px 0 #1a1510,
+                3px 3px 0 rgba(42, 34, 26, 0.6),
+                0 0 10px rgba(60, 50, 40, 0.4);
+            letter-spacing: 1px;
+            animation: weightSink 5s infinite;
+        }
+
+        @keyframes weightSink {
+            0%, 100% { 
+                transform: translateY(0);
+            }
+            50% { 
+                transform: translateY(4px);
+            }
+        }
+
+        .space {
+            height: 35px;
+        }
+
+        /* Floating weight symbols */
+        .weight-symbol {
+            position: fixed;
+            font-size: 3.5rem;
+            opacity: 0.1;
+            z-index: 5;
+            pointer-events: none;
+            animation: weightFloat 12s infinite ease-in-out;
+            filter: grayscale(0.3) brightness(0.8);
+            color: #8b7355;
+        }
+
+        @keyframes weightFloat {
+            0%, 100% { 
+                transform: translateY(0) scale(1); 
+                opacity: 0.1;
+            }
+            50% { 
+                transform: translateY(60px) scale(1.05); 
+                opacity: 0.15;
+            }
+        }
+
+        .weight-1 { top: 15%; left: 75%; animation-delay: 0s; }
+        .weight-2 { bottom: 35%; right: 8%; animation-delay: 4s; }
+        .weight-3 { top: 50%; left: 8%; animation-delay: 8s; }
+
+        /* Footer */
+        .footer {
+            margin-top: 100px;
+            text-align: center;
+            font-size: 0.7rem;
+            opacity: 0.3;
+            padding-bottom: 40px;
+            color: #6b5d52;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .back-btn {
+                position: relative;
+                display: inline-block;
+                margin-bottom: 30px;
+            }
+            
+            .poem {
+                font-size: 0.95rem;
+            }
+
+            .skull-symbol {
+                font-size: 2.5rem;
+            }
+
+            .bone-symbol {
+                font-size: 2rem;
+            }
+
+            .pillar-symbol {
+                font-size: 4rem;
+            }
+
+            .broken, .emphasis, .scream {
+                font-size: 1.15em;
+            }
+
+            .heavy {
+                font-size: 1.2em;
+            }
+        }
+
+        /* Modal Peringatan Konten */
+        .content-warning-modal {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .content-warning-modal.hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(30, 25, 20, 0.95), rgba(40, 30, 25, 0.95));
+            border: 3px solid #8b7355;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 0 40px rgba(139, 115, 85, 0.4);
+            animation: modalSlide 0.5s ease;
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: 2px solid #8b7355;
+            color: #bea990;
+            width: 35px;
+            height: 35px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            background: #8b7355;
+            color: #1a1510;
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            color: #d4c4b0;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(139, 115, 85, 0.4);
+        }
+
+        .modal-text {
+            color: #b8a896;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: 2px solid;
+            background: transparent;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .modal-btn-continue {
+            border-color: #8b7355;
+            color: #bea990;
+        }
+
+        .modal-btn-continue:hover {
+            background: #8b7355;
+            color: #1a1510;
+        }
+
+        .modal-btn-back {
+            border-color: #5d4e3e;
+            color: #8b7355;
+        }
+
+        .modal-btn-back:hover {
+            background: #5d4e3e;
+            color: #1a1510;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Modal Peringatan Konten -->
+    <div class="content-warning-modal" id="contentWarning">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2 class="modal-title">⚠️ Peringatan Konten</h2>
+            <p class="modal-text">
+                Puisi ini mengandung konten absurd dan surealisme ekstrem yang dapat menyebabkan kebingungan, disorientasi, atau interpretasi yang sangat personal. 
+                <br><br>
+                Penafsiran dan makna dari karya ini sepenuhnya merupakan tanggung jawab pembaca. Penulis tidak bertanggung jawab atas efek halusinasi mental, eksistensial crisis, atau pemahaman yang muncul dari pembacaan.
+                <br><br>
+                <strong>Lanjutkan dengan risiko sendiri.</strong>
+            </p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-back" onclick="goBack()">Kembali</button>
+                <button class="modal-btn modal-btn-continue" onclick="continueReading()">Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skeleton Architecture Canvas Background -->
+    <canvas id="skeletonCanvas"></canvas>
+
+    <!-- Skulls with Red Eyes -->
+    <div class="skull-symbol skull-1">💀</div>
+    <div class="skull-symbol skull-2">💀</div>
+    <div class="skull-symbol skull-3">💀</div>
+    <div class="skull-symbol skull-4">💀</div>
+    <div class="skull-symbol skull-5">💀</div>
+    <div class="skull-symbol skull-6">💀</div>
+    <div class="skull-symbol skull-7">💀</div>
+
+    <!-- CSS Bone Symbols -->
+    <div class="bone-symbol bone-1">🦴</div>
+    <div class="bone-symbol bone-2">🦴</div>
+    <div class="bone-symbol bone-3">🦴</div>
+    <div class="bone-symbol bone-4">🦴</div>
+
+    <!-- Pillar Symbols -->
+    <div class="pillar-symbol pillar-1">🏛️</div>
+    <div class="pillar-symbol pillar-2">🏛️</div>
+    <div class="pillar-symbol pillar-3">🏛️</div>
+
+    <!-- Weight Symbols -->
+    <div class="weight-symbol weight-1">⚓</div>
+    <div class="weight-symbol weight-2">⚖️</div>
+    <div class="weight-symbol weight-3">🔗</div>
+
+    <a href="../index.html" class="back-btn">← kembali</a>
+
+    <div class="container">
+        <h1>Arsitektur Tulang yang<br>Lupa Cara Runtuh</h1>
+        <div class="subtitle">[ berdiri_paksa.exe | runtuh: access_denied ]</div>
+
+        <div class="poem">Aku meminjam napas dari tabung gas yang <span class="broken">bocor</span>,
+supaya setiap kali aku bicara, ada <span class="scream">ledakan kecil</span> di paru-paru.
+
+Lantai di bawah kakiku sudah berubah jadi <span class="heavy">rawa madu hitam</span>,
+semakin aku ingin lari, semakin aku menjadi <span class="broken">fosil</span> yang berdiri tegak.
+
+<div class="space"></div>
+
+<span class="dialogue">"Jangan tutup matamu,"</span> kata kancing kemejaku yang ketiga,
+<span class="dialogue">"Nanti dunia ini tertiup angin dan jadi debu di dalam kopimu."</span>
+
+<div class="space"></div>
+
+Aku menjahit bibirku dengan benang <span class="emphasis">layangan</span>,
+supaya teriakanku tidak lepas dan menabrak burung-burung di langit.
+
+Di punggungku, ada sebuah <span class="heavy">lemari besi</span> yang isinya cuma udara kosong,
+tapi beratnya melebihi seribu tahun <span class="broken">penyesalan</span> yang belum dibayar.
+
+<div class="space"></div>
+
+Aku bertemu dengan tukang gali kubur yang sedang memahat <span class="emphasis">patung es</span>,
+dia menatapku dengan mata yang isinya cuma <span class="void">angka nol</span>.
+
+Lalu dia bertanya dengan suara yang bunyinya seperti <span class="scream">kaca pecah</span>:
+
+<span class="dialogue">"Butuh alesan apa lagi yang bikin kamu kuat bertahan?"</span>
+
+<div class="space"></div>
+
+Aku terdiam.
+
+Jantungku yang sudah berubah jadi <span class="broken">jam beker rusak</span> mendadak berdering.
+
+Aku membuka mulut, tapi yang keluar bukan kata-kata,
+melainkan serombongan <span class="scream">semut merah</span> yang membawa bendera putih.
+
+<div class="space"></div>
+
+<span class="dialogue">"Aku bertahan,"</span> jawabku lewat telinga kiri,
+<span class="dialogue">"Karena aku takut kalau aku jatuh, bumi ini akan kehilangan titik tumpunya."</span>
+
+<div class="space"></div>
+
+Si tukang gali kubur tertawa, kepalanya berubah jadi <span class="emphasis">balon gas</span>,
+
+<span class="dialogue">"Bodoh! Bumi ini bulat, dia tidak butuh tiang yang sudah patah sepertimu."</span>
+
+<div class="space"></div>
+
+Aku melihat ke bawah.
+
+Kaki-kakiku sudah berubah jadi <span class="broken">akar</span> yang memeluk pipa air bawah tanah.
+
+Aku tidak bisa pergi. Aku tidak bisa mati.
+
+Aku hanya sebuah <span class="heavy">monumen lelah</span> yang dipaksa tetap berdiri
+oleh rasa takut bahwa <span class="emphasis">"berhenti"</span> adalah dosa yang tidak punya ampunan.
+
+<div class="space"></div>
+
+Lalu hujan turun dalam bentuk <span class="emphasis">tinta hitam</span>,
+menuliskan daftar beban baru di atas kulitku yang sudah penuh <span class="broken">coretan</span>.
+
+Aku menarik napas panjang,
+tapi oksigennya sudah berubah jadi <span class="scream">jarum jahit</span>.
+        </div>
+
+        <div class="footer">
+            -- berdiri tanpa pilihan --<br>
+            [ status: standing | collapse: forbidden | weight: infinite ]<br>
+            <span style="color: #8b7355;">※ Tidak bisa runtuh, tidak bisa lari ※</span>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // 🦴 SKELETON ARCHITECTURE ANIMATION
+        // ========================================
+        
+        const canvas = document.getElementById('skeletonCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let structures = [];
+        let cracks = [];
+        let skulls = [];
+        let time = 0;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initStructures();
+        }
+
+        // Skull class with red eyes
+        class Skull {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = 30 + Math.random() * 40;
+                this.opacity = 0.15 + Math.random() * 0.1;
+                this.eyeGlow = 0;
+                this.eyeGlowSpeed = 0.02 + Math.random() * 0.02;
+                this.sway = Math.random() * Math.PI * 2;
+                this.swaySpeed = 0.01 + Math.random() * 0.01;
+            }
+
+            update() {
+                this.sway += this.swaySpeed;
+                this.eyeGlow += this.eyeGlowSpeed;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(Math.sin(this.sway) * 0.1);
+                ctx.globalAlpha = this.opacity;
+                
+                // Skull outline
+                ctx.strokeStyle = '#9d8b73';
+                ctx.fillStyle = '#d4c4b0';
+                ctx.lineWidth = 2;
+                
+                // Head
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                
+                // Eye sockets with RED GLOW
+                const eyeGlowIntensity = Math.abs(Math.sin(this.eyeGlow));
+                
+                // Left eye
+                ctx.fillStyle = '#1a1510';
+                ctx.beginPath();
+                ctx.ellipse(-this.size * 0.3, -this.size * 0.15, this.size * 0.15, this.size * 0.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Left eye red glow
+                ctx.fillStyle = `rgba(139, 0, 0, ${0.6 + eyeGlowIntensity * 0.4})`;
+                ctx.beginPath();
+                ctx.arc(-this.size * 0.3, -this.size * 0.15, this.size * 0.08, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.shadowColor = 'rgba(139, 0, 0, 0.8)';
+                ctx.shadowBlur = 10 + eyeGlowIntensity * 15;
+                ctx.fillStyle = `rgba(200, 0, 0, ${0.8 + eyeGlowIntensity * 0.2})`;
+                ctx.beginPath();
+                ctx.arc(-this.size * 0.3, -this.size * 0.15, this.size * 0.05, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.shadowBlur = 0;
+                
+                // Right eye
+                ctx.fillStyle = '#1a1510';
+                ctx.beginPath();
+                ctx.ellipse(this.size * 0.3, -this.size * 0.15, this.size * 0.15, this.size * 0.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Right eye red glow
+                ctx.fillStyle = `rgba(139, 0, 0, ${0.6 + eyeGlowIntensity * 0.4})`;
+                ctx.beginPath();
+                ctx.arc(this.size * 0.3, -this.size * 0.15, this.size * 0.08, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.shadowColor = 'rgba(139, 0, 0, 0.8)';
+                ctx.shadowBlur = 10 + eyeGlowIntensity * 15;
+                ctx.fillStyle = `rgba(200, 0, 0, ${0.8 + eyeGlowIntensity * 0.2})`;
+                ctx.beginPath();
+                ctx.arc(this.size * 0.3, -this.size * 0.15, this.size * 0.05, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.shadowBlur = 0;
+                
+                // Nose cavity
+                ctx.fillStyle = '#1a1510';
+                ctx.beginPath();
+                ctx.moveTo(0, this.size * 0.1);
+                ctx.lineTo(-this.size * 0.1, this.size * 0.3);
+                ctx.lineTo(this.size * 0.1, this.size * 0.3);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Teeth
+                ctx.fillStyle = '#d4c4b0';
+                ctx.strokeStyle = '#3d3229';
+                ctx.lineWidth = 1;
+                for (let i = -2; i <= 2; i++) {
+                    ctx.fillRect(i * this.size * 0.12 - this.size * 0.05, this.size * 0.5, this.size * 0.08, this.size * 0.15);
+                    ctx.strokeRect(i * this.size * 0.12 - this.size * 0.05, this.size * 0.5, this.size * 0.08, this.size * 0.15);
+                }
+                
+                ctx.restore();
+            }
+        }
+
+        // Structure/Pillar class
+        class Structure {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.baseY = canvas.height;
+                this.height = 150 + Math.random() * 250;
+                this.width = 15 + Math.random() * 25;
+                this.opacity = 0.15 + Math.random() * 0.15;
+                this.crackProgress = Math.random();
+                this.crackSpeed = 0.0005 + Math.random() * 0.001;
+                this.sway = Math.random() * Math.PI * 2;
+                this.swaySpeed = 0.005 + Math.random() * 0.01;
+                this.color = Math.random() > 0.5 ? '#9d8b73' : '#6b5d52';
+            }
+
+            update() {
+                this.sway += this.swaySpeed;
+                this.crackProgress += this.crackSpeed;
+                if (this.crackProgress > 1) this.crackProgress = 0;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                
+                const swayOffset = Math.sin(this.sway) * 10;
+                
+                // Main pillar/bone structure
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = this.width;
+                ctx.lineCap = 'round';
+                
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.baseY);
+                ctx.lineTo(this.x + swayOffset, this.baseY - this.height);
+                ctx.stroke();
+                
+                // Cracks along the structure
+                ctx.strokeStyle = 'rgba(139, 115, 85, 0.3)';
+                ctx.lineWidth = 2;
+                
+                for (let i = 0; i < 3; i++) {
+                    const crackY = this.baseY - (this.height * (0.3 + i * 0.2));
+                    const crackLength = this.width * 0.6;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(this.x + swayOffset - crackLength, crackY);
+                    ctx.lineTo(this.x + swayOffset + crackLength, crackY);
+                    ctx.stroke();
+                }
+                
+                // Top bone joint
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x + swayOffset, this.baseY - this.height, this.width * 0.7, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+
+        // Crack class
+        class Crack {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.length = 20 + Math.random() * 80;
+                this.angle = Math.random() * Math.PI * 2;
+                this.branches = Math.floor(Math.random() * 3) + 1;
+                this.opacity = 0.1 + Math.random() * 0.1;
+                this.growth = 0;
+                this.growthSpeed = 0.005 + Math.random() * 0.01;
+            }
+
+            update() {
+                this.growth += this.growthSpeed;
+                if (this.growth > 1) {
+                    this.growth = 0;
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.angle = Math.random() * Math.PI * 2;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.strokeStyle = '#8b7355';
+                ctx.lineWidth = 1.5;
+                
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                
+                // Main crack
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(this.length * this.growth, 0);
+                ctx.stroke();
+                
+                // Branches
+                for (let i = 0; i < this.branches; i++) {
+                    const branchPos = (i + 1) / (this.branches + 1);
+                    const branchLength = this.length * 0.4;
+                    const branchAngle = (Math.random() - 0.5) * Math.PI / 2;
+                    
+                    if (this.growth > branchPos) {
+                        ctx.beginPath();
+                        ctx.moveTo(this.length * branchPos, 0);
+                        ctx.lineTo(
+                            this.length * branchPos + Math.cos(branchAngle) * branchLength * (this.growth - branchPos),
+                            Math.sin(branchAngle) * branchLength * (this.growth - branchPos)
+                        );
+                        ctx.stroke();
+                    }
+                }
+                
+                ctx.restore();
+            }
+        }
+
+        // Skeleton/Bone pattern
+        class SkeletonPattern {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = 30 + Math.random() * 50;
+                this.opacity = 0.08 + Math.random() * 0.08;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.01;
+            }
+
+            update() {
+                this.rotation += this.rotationSpeed;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.globalAlpha = this.opacity;
+                ctx.strokeStyle = '#9d8b73';
+                ctx.lineWidth = 2;
+                
+                // Ribcage-like pattern
+                for (let i = -2; i <= 2; i++) {
+                    ctx.beginPath();
+                    ctx.arc(0, i * 10, this.size * 0.4, 0, Math.PI);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.arc(0, i * 10, this.size * 0.4, Math.PI, Math.PI * 2);
+                    ctx.stroke();
+                }
+                
+                // Spine
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size * 0.5);
+                ctx.lineTo(0, this.size * 0.5);
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+        }
+
+        let skeletonPatterns = [];
+
+        function initStructures() {
+            structures = [];
+            cracks = [];
+            skeletonPatterns = [];
+            skulls = [];
+            
+            // Create standing structures
+            const structureCount = Math.floor(canvas.width / 150);
+            for (let i = 0; i < structureCount; i++) {
+                structures.push(new Structure());
+            }
+            
+            // Create cracks
+            for (let i = 0; i < 15; i++) {
+                cracks.push(new Crack());
+            }
+            
+            // Create skeleton patterns
+            for (let i = 0; i < 8; i++) {
+                skeletonPatterns.push(new SkeletonPattern());
+            }
+            
+            // Create skulls with red eyes
+            for (let i = 0; i < 6; i++) {
+                skulls.push(new Skull());
+            }
+        }
+
+        function animate() {
+            time++;
+            
+            // Fade effect instead of clear
+            ctx.fillStyle = 'rgba(13, 13, 13, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw and update skeleton patterns
+            skeletonPatterns.forEach(pattern => {
+                pattern.update();
+                pattern.draw();
+            });
+
+            // Draw and update cracks
+            cracks.forEach(crack => {
+                crack.update();
+                crack.draw();
+            });
+
+            // Draw and update structures
+            structures.forEach(structure => {
+                structure.update();
+                structure.draw();
+            });
+
+            // Draw and update skulls with red eyes
+            skulls.forEach(skull => {
+                skull.update();
+                skull.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // Initialize
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        animate();
+
+        console.log('💀 Creepy Skeleton Architecture activated with red-eyed skulls!');
+
+        // Modal functions
+        function closeModal() {
+            document.getElementById('contentWarning').classList.add('hidden');
+        }
+
+        function continueReading() {
+            closeModal();
+        }
+
+        function goBack() {
+            window.location.href = '../index.html';
+        }
+
+        // Show modal on load
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('contentWarning').classList.remove('hidden');
+        });
+    </script>
+
+</body>
+</html>
