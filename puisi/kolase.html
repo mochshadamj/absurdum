@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOLASE_FRAGMEN: MALFUNGSI_TITAN | ABSURDUM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <!-- MathJax for formula rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+    <style>
+        *, *::before, *::after {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg:       #060608;
+            --deep:     #0c0c10;
+            --panel:    #111118;
+            --border:   #2a2a3a;
+            --dim:      #3a3a50;
+            --muted:    #9090b0;
+            --body:     #c8c8dc;
+            --bright:   #e8e8f8;
+            --white:    #f5f5ff;
+            --red:      #cc2222;
+            --red-glow: rgba(204, 34, 34, 0.25);
+            --orange:   #dd6622;
+            --yellow:   #ccaa22;
+            --cyan:     #22aacc;
+            --accent:   #5566ee;
+            --heart-bg: rgba(180, 20, 20, 0.12);
+            --heart-border: #882222;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--body);
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 18px;
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+
+        /* Scanline overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.08) 2px,
+                rgba(0,0,0,0.08) 4px
+            );
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Noise canvas */
+        #bgCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(6,6,8,0.97);
+            z-index: 10000;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-overlay.hidden { display: none; }
+
+        .modal-box {
+            border: 1px solid var(--red);
+            padding: 44px 40px;
+            max-width: 480px; width: 90%;
+            background: var(--deep);
+            box-shadow: 0 0 60px var(--red-glow);
+            animation: modalRise 0.5s cubic-bezier(0.16,1,0.3,1);
+        }
+        @keyframes modalRise {
+            from { transform: translateY(24px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+
+        .modal-tag {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            color: var(--red);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            animation: blink 2s infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+        .modal-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            color: var(--white);
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+            line-height: 1.2;
+        }
+
+        .modal-text {
+            font-family: 'EB Garamond', serif;
+            font-size: 1rem;
+            color: var(--muted);
+            line-height: 1.9;
+            margin-bottom: 36px;
+        }
+
+        .modal-actions { display: flex; gap: 14px; }
+
+        .modal-btn {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 12px 24px;
+            border: 1px solid;
+            background: transparent;
+            cursor: crosshair;
+            transition: all 0.25s ease;
+        }
+        .btn-enter { border-color: var(--red); color: var(--red); }
+        .btn-enter:hover { background: var(--red); color: var(--bg); }
+        .btn-back  { border-color: var(--dim);  color: var(--muted); }
+        .btn-back:hover  { background: var(--dim); color: var(--white); }
+
+        /* ── NAVIGATION ── */
+        .back-btn {
+            position: fixed; top: 24px; left: 24px;
+            z-index: 100;
+            text-decoration: none;
+            color: var(--muted);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+            border-bottom: 1px solid transparent;
+        }
+        .back-btn:hover { color: var(--bright); border-bottom-color: var(--dim); }
+
+        .status-bar {
+            position: fixed; top: 24px; right: 24px;
+            z-index: 100;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--red);
+            letter-spacing: 2px;
+            animation: statusPulse 3s infinite;
+        }
+        @keyframes statusPulse { 0%,100%{opacity:0.8} 50%{opacity:0.3} }
+
+        /* ── CONTAINER ── */
+        .container {
+            position: relative; z-index: 10;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 110px 44px 160px;
+        }
+
+        /* ── HEADER ── */
+        .poem-header {
+            margin-bottom: 70px;
+            opacity: 0;
+            animation: emerge 1s ease 0.2s forwards;
+        }
+        @keyframes emerge {
+            from { opacity:0; transform:translateY(16px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        .header-tag {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+            color: var(--red);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.2rem, 6vw, 4rem);
+            color: var(--white);
+            letter-spacing: 4px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            text-shadow: 2px 0 0 var(--red), -2px 0 0 var(--cyan);
+            animation: titleGlitch 8s infinite;
+        }
+        @keyframes titleGlitch {
+            0%,85%,100% { text-shadow: 2px 0 0 var(--red), -2px 0 0 var(--cyan); }
+            86% { text-shadow: 6px 0 0 var(--red), -6px 0 0 var(--cyan); clip-path: inset(10% 0 80% 0); }
+            87% { text-shadow: -4px 0 0 var(--red), 4px 0 0 var(--cyan); clip-path: inset(60% 0 20% 0); }
+            88% { text-shadow: 2px 0 0 var(--red), -2px 0 0 var(--cyan); clip-path: none; }
+        }
+
+        .header-sub {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--dim);
+            letter-spacing: 3px;
+        }
+
+        /* ── POEM BODY ── */
+        .poem-body {
+            opacity: 0;
+            animation: emerge 1.2s ease 0.5s forwards;
+        }
+
+        .stanza {
+            margin-bottom: 44px;
+        }
+
+        .poem-line {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: clamp(1rem, 2.2vw, 1.18rem);
+            line-height: 2.0;
+            color: var(--body);
+            display: block;
+        }
+
+        /* ── TEXT VARIANTS ── */
+
+        /* CORE — normal body */
+        .t-core { color: var(--body); }
+
+        /* SURREAL — slightly muted italic */
+        .t-surreal { color: var(--muted); font-style: italic; }
+
+        /* BRIGHT — strong emphasis */
+        .t-bright { color: var(--bright); }
+
+        /* DAMAGE — red-tinted, the hurt */
+        .t-damage { color: #e08080; }
+
+        /* SYSTEM — monospace, clinical */
+        .t-sys {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8em;
+            color: var(--cyan);
+            letter-spacing: 1px;
+        }
+
+        /* FADE — barely there */
+        .t-fade { color: var(--dim); font-style: italic; }
+
+        /* ── FORMULA BLOCK ── */
+        .formula-block {
+            margin: 40px 0;
+            padding: 20px 28px;
+            background: rgba(85, 102, 238, 0.07);
+            border: 1px solid rgba(85, 102, 238, 0.3);
+            border-left: 3px solid var(--accent);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+            color: #aabbff;
+            line-height: 1.8;
+            letter-spacing: 0.5px;
+            overflow-x: auto;
+        }
+
+        .formula-block .MathJax { color: #aabbff !important; }
+
+        /* ── WARNING / DIAGNOSIS BLOCK ── */
+        .warning-block {
+            margin: 44px 0;
+            padding: 16px 20px;
+            border: 1px dashed var(--red);
+            background: rgba(204,34,34,0.06);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--red);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: warningPulse 2.5s infinite;
+        }
+        @keyframes warningPulse {
+            0%,100% { border-color: var(--red); background: rgba(204,34,34,0.06); }
+            50%      { border-color: var(--orange); background: rgba(204,34,34,0.03); }
+        }
+        .warning-block::before {
+            content: '[!] ';
+            color: var(--orange);
+            font-weight: bold;
+        }
+
+        /* ── GEO SEPARATOR ── */
+        .separator {
+            display: flex; align-items: center; gap: 12px;
+            margin: 40px 0;
+            opacity: 0.3;
+        }
+        .sep-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--dim), transparent); }
+        .sep-mark {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--dim);
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+
+        /* ── ★ HEART LINE — the core of the poem ── */
+        /*
+         * INDEX untuk halaman indeks:
+         * data-poem="kolase-titan"
+         * data-line="heart"
+         * class="heart-line"
+         * id="heart-line"
+         */
+        .heart-line {
+            display: block;
+            position: relative;
+            margin: 0 -20px;
+            padding: 22px 20px;
+            background: var(--heart-bg);
+            border-left: 3px solid var(--heart-border);
+            border-right: 1px solid rgba(136,34,34,0.3);
+            color: var(--white) !important;
+            font-style: normal !important;
+            font-size: clamp(1.05rem, 2.4vw, 1.25rem) !important;
+            line-height: 1.8 !important;
+            letter-spacing: 0.3px;
+            animation: heartPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes heartPulse {
+            0%,100% {
+                background: var(--heart-bg);
+                border-left-color: var(--heart-border);
+                box-shadow: inset 0 0 0 transparent;
+            }
+            50% {
+                background: rgba(180,20,20,0.18);
+                border-left-color: #bb3333;
+                box-shadow: inset 0 0 30px rgba(180,20,20,0.08);
+            }
+        }
+
+        .heart-line::before {
+            content: '❤';
+            position: absolute;
+            left: -14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            color: var(--red);
+            animation: heartbeat 1.2s ease-in-out infinite;
+            filter: drop-shadow(0 0 6px var(--red));
+        }
+
+        @keyframes heartbeat {
+            0%,100% { transform: translateY(-50%) scale(1);   opacity: 0.8; }
+            50%      { transform: translateY(-50%) scale(1.4); opacity: 1; }
+        }
+
+        .heart-label {
+            display: inline-block;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.55rem;
+            color: var(--red);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: 6px;
+        }
+
+        /* ── EXIT STATUS ── */
+        .exit-block {
+            margin-top: 60px;
+            padding: 24px 28px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--dim);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem;
+            line-height: 2.2;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+        }
+
+        .exit-block .key   { color: var(--red); }
+        .exit-block .val   { color: var(--muted); }
+        .exit-block .prompt { color: var(--dim); margin-right: 8px; }
+
+        /* ── FOOTER ── */
+        .footer {
+            margin-top: 80px;
+            padding-top: 28px;
+            border-top: 1px solid var(--border);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.58rem;
+            color: var(--dim);
+            letter-spacing: 2px;
+            line-height: 2.2;
+            opacity: 0.55;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 640px) {
+            .container { padding: 90px 24px 120px; }
+            .heart-line { margin: 0 -8px; padding: 18px 12px; }
+            .heart-line::before { left: -10px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="modal">
+    <div class="modal-box">
+        <div class="modal-tag">⚠ peringatan konten | status: aktif</div>
+        <h2 class="modal-title">MALFUNGSI<br>TITAN</h2>
+        <p class="modal-text">
+            Puisi ini mengandung kehancuran yang dikemas dalam titanium.<br>
+            Beberapa bagian mungkin terasa seperti kawat berduri di tenggorokan.<br><br>
+            Lanjutkan dengan risiko sendiri.
+        </p>
+        <div class="modal-actions">
+            <button class="modal-btn btn-back" onclick="goBack()">Kembali</button>
+            <button class="modal-btn btn-enter" onclick="enterPoem()">Masuk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Background canvas -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- Nav -->
+<a href="../index.html" class="back-btn">← kembali</a>
+<div class="status-bar" id="statusBar">WEAK_FOREVER_001 ▮</div>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="poem-header">
+        <span class="header-tag">◈ absurdum: malfungsi aksara</span>
+        <h1>KOLASE_FRAGMEN:<br>MALFUNGSI_TITAN</h1>
+        <span class="header-sub">[ status: corrupted | kekuatan: null | hati: crashed ]</span>
+    </div>
+
+    <!-- Poem Body -->
+    <div class="poem-body">
+
+        <!-- Stanza I -->
+        <div class="stanza">
+            <span class="poem-line">Kau bisa melukis gunung dengan <span class="t-bright">lidahmu yang terbuat dari titanium</span>,</span>
+            <span class="poem-line t-surreal">atau membangun jembatan dari rambut keriting yang berbau kawat gigi.</span>
+            <span class="poem-line">Kau bisa menelan galaksi yang sudah kedaluwarsa</span>
+            <span class="poem-line t-surreal">dan mengunyahnya hingga menjadi permen karet.</span>
+        </div>
+
+        <div class="stanza">
+            <span class="poem-line">Tapi di antara sela-sela gigimu,</span>
+            <span class="poem-line t-surreal">ada potongan kuku yang rasanya seperti gigil kedinginan di tengah musim panas—</span>
+            <span class="poem-line t-damage">itu adalah sisa dari malam aku menghancurkan hatimu.</span>
+        </div>
+
+        <!-- Formula -->
+        <div class="formula-block">
+            \(\oint \text{Kekuatan Fisik} \cdot d\Sigma = \text{Sebuah Payung Bolong di Dalam Kolam Renang}\)
+        </div>
+
+        <div class="separator">
+            <div class="sep-line"></div>
+            <span class="sep-mark">// fragmen_002</span>
+            <div class="sep-line"></div>
+        </div>
+
+        <!-- Stanza II -->
+        <div class="stanza">
+            <span class="poem-line">Otot-otot di lenganmu boleh menjadi <span class="t-bright">hutan beton yang bisa bernyanyi dalam bahasa api</span>.</span>
+            <span class="poem-line t-surreal">Mentalmu boleh terbuat dari cermin yang bisa memantulkan masa depan yang tidak pernah ada.</span>
+        </div>
+
+        <div class="stanza">
+            <span class="poem-line t-fade">Tapi di setiap detak jam dinding yang terbuat dari air liur alien,</span>
+            <span class="poem-line">kau hanyalah sebuah <span class="t-damage">lilin ulang tahun</span> yang mencoba memadamkan lautan api.</span>
+        </div>
+
+        <div class="separator">
+            <div class="sep-line"></div>
+            <span class="sep-mark">// ingat_malam_itu</span>
+            <div class="sep-line"></div>
+        </div>
+
+        <!-- Stanza III — memory -->
+        <div class="stanza">
+            <span class="poem-line t-bright">Ingat malam itu?</span>
+            <span class="poem-line">Saat aku menjatuhkan hatimu ke lantai,</span>
+            <span class="poem-line t-fade">bukan dengan tangan,</span>
+            <span class="poem-line t-damage">tapi dengan sebuah kedipan mata yang suaranya seperti seratus piring pecah di dalam sumur yang isinya terasi.</span>
+        </div>
+
+        <div class="stanza">
+            <span class="poem-line">Kau bukan lagi manusia.</span>
+            <span class="poem-line t-surreal">Kau adalah sepasang sepatu bot yang terisi penuh dengan kepompong kupu-kupu yang tidak pernah menetas.</span>
+        </div>
+
+        <div class="stanza" id="heart-line" data-poem="kolase-titan" data-line="heart">
+            <span class="heart-label"></span>
+            <span class="poem-line heart-line">
+                Tak peduli seberapa banyak otot atau mentalmu meningkat,
+                kau tetap selemah saat di malam aku menghancurkan hatimu.
+            </span>
+        </div>
+
+        <div class="separator">
+            <div class="sep-line"></div>
+            <span class="sep-mark">// fragmen_akhir</span>
+            <div class="sep-line"></div>
+        </div>
+
+        <!-- Stanza IV -->
+        <div class="stanza">
+            <span class="poem-line t-surreal">Kekuatanmu hanyalah sebuah balon yang ditiup oleh paru-paru seekor nyamuk yang sedang depresi.</span>
+        </div>
+
+        <div class="stanza">
+            <span class="poem-line">Kau bisa meremas bulan menjadi sepasang sandal jepit.</span>
+            <span class="poem-line t-fade">Tapi di hadapan kenangan yang baunya seperti buku matematika yang terbakar di bawah air,</span>
+            <span class="poem-line t-damage">kau hanyalah sebuah bayangan yang mencoba memanjat tali yang terbuat dari asap rokok.</span>
+        </div>
+
+        <!-- Warning / Diagnosis -->
+        <div class="warning-block">
+            DIAGNOSIS: EKSISTENSI_BERUBAH_MENJADI_DERETAN_ANGKA_ACAK
+        </div>
+
+        <!-- Stanza V — collapse -->
+        <div class="stanza">
+            <span class="poem-line">Kau mencoba berteriak, tapi yang keluar dari tenggorokanmu</span>
+            <span class="poem-line t-damage">justru gerimis yang rasanya seperti kawat berduri.</span>
+            <span class="poem-line t-surreal">Kau mencoba berdiri, tapi kakimu berubah menjadi sumpit</span>
+            <span class="poem-line t-fade">yang mencoba menahan beban planet.</span>
+        </div>
+
+        <div class="stanza">
+            <span class="poem-line t-surreal">Ototmu adalah kumpulan majalah mode lama yang sudah dimakan rayap sampai jadi puisi.</span>
+            <span class="poem-line t-surreal">Mentalmu adalah selembar plastik pembungkus gorengan yang sudah bolong-bolong</span>
+            <span class="poem-line t-fade">dan dipakai menutupi lubang hitam.</span>
+        </div>
+
+        <div class="stanza">
+            <span class="poem-line t-bright" style="letter-spacing: 1px;">Percayalah,</span>
+            <span class="poem-line t-damage">kau tidak akan pernah utuh lagi.</span>
+        </div>
+
+        <div class="stanza">
+            <span class="poem-line">Kau adalah sebuah lubang kunci yang kehilangan pintunya,</span>
+            <span class="poem-line t-surreal">ditinggalkan di tengah padang pasir yang berteriak dalam bahasa lampu neon yang mati.</span>
+        </div>
+
+        <!-- Exit status -->
+        <div class="exit-block">
+            <div><span class="prompt">$</span><span class="key">exit_status:</span>  <span class="val">WEAK_FOREVER_001</span></div>
+            <div><span class="prompt">$</span><span class="key">reason:</span>       <span class="val">the_heart_was_a_software_and_it_crashed</span></div>
+            <div><span class="prompt">$</span><span class="key">core_dump:</span>    <span class="val">malam_itu.exe → segmentation_fault</span></div>
+            <div><span class="prompt">$</span><span class="key">recovery:</span>     <span class="val">null</span></div>
+        </div>
+
+    </div><!-- end poem-body -->
+
+    <div class="footer">
+        -- end of transmission --<br>
+        [ process finished with exit code: WEAK_FOREVER_001 ]<br>
+        ※ semua kekuatan adalah fiksi yang tidak paham dirinya fiksi ※
+    </div>
+
+</div><!-- end container -->
+
+<script>
+    // ─── MODAL ───────────────────────────────────────
+    function enterPoem() { document.getElementById('modal').classList.add('hidden'); }
+    function goBack()    { window.location.href = '../index.html'; }
+
+    // ─── STATUS BAR GLITCH ────────────────────────────
+    const statusMessages = [
+        'WEAK_FOREVER_001 ▮',
+        'HEART: crashed ▮',
+        'TITANIUM: null ▮',
+        'EKSISTENSI: error ▮',
+        'WEAK_FOREVER_001 ▮',
+        '???????????? ▮',
+    ];
+    let si = 0;
+    setInterval(() => {
+        si = (si + 1) % statusMessages.length;
+        document.getElementById('statusBar').textContent = statusMessages[si];
+    }, 3500);
+
+    // ─── BACKGROUND CANVAS ───────────────────────────
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let time = 0;
+
+    function resize() {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Glitch strips + noise
+    function drawBg() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Faint grid
+        ctx.strokeStyle = 'rgba(42,42,58,0.4)';
+        ctx.lineWidth = 0.5;
+        for (let x = 0; x < canvas.width; x += 60) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += 60) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+
+        // Occasional glitch horizontal bands
+        if (Math.random() > 0.97) {
+            const y = Math.random() * canvas.height;
+            const h = Math.random() * 4 + 1;
+            ctx.fillStyle = `rgba(204,34,34,${Math.random() * 0.06})`;
+            ctx.fillRect(0, y, canvas.width, h);
+        }
+        if (Math.random() > 0.98) {
+            const y = Math.random() * canvas.height;
+            const h = Math.random() * 2 + 0.5;
+            ctx.fillStyle = `rgba(34,170,204,${Math.random() * 0.05})`;
+            ctx.fillRect(0, y, canvas.width, h);
+        }
+
+        // Scattered noise dots
+        for (let i = 0; i < 25; i++) {
+            const nx = Math.random() * canvas.width;
+            const ny = Math.random() * canvas.height;
+            const r  = Math.random() * 0.8 + 0.2;
+            ctx.globalAlpha = Math.random() * 0.2 + 0.05;
+            ctx.fillStyle = Math.random() > 0.7 ? '#cc2222' : '#3a3a50';
+            ctx.beginPath();
+            ctx.arc(nx, ny, r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.globalAlpha = 1;
+    }
+
+    function animate() {
+        time++;
+        if (time % 2 === 0) drawBg(); // every other frame
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    // ─── HEART LINE SCROLL HIGHLIGHT ─────────────────
+    // Sedikit brighten saat di-scroll ke
+    const heartEl = document.getElementById('heart-line');
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                heartEl.style.transition = 'background 0.6s ease';
+                heartEl.querySelector('.heart-line').style.background = 'rgba(180,20,20,0.22)';
+            } else {
+                heartEl.querySelector('.heart-line').style.background = '';
+            }
+        });
+    }, { threshold: 0.8 });
+    observer.observe(heartEl);
+</script>
+</body>
+</html>

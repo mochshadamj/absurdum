@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../images/icon.png">
+    <title>REKAMAN_TERAKHIR | ABSURDUM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:       #0a0a0f;
+            --deep:     #060609;
+            --panel:    #0f0f16;
+            --border:   #1e1e2e;
+            --dim:      #7878a8;
+            --muted:    #9898c0;
+            --body:     #c8c8e0;
+            --bright:   #eaeaff;
+            --white:    #f5f5ff;
+            --gold:     #d4b45a;
+            --gold-dim: rgba(200, 168, 74, 0.15);
+            --red:      #cc3333;
+            --glitch1:  #ff2266;
+            --glitch2:  #00ffcc;
+            --staff:    rgba(255,255,255,0.05);
+        }
+
+        html { scroll-behavior: auto; } /* no smooth scroll — we control everything */
+
+        body {
+            background: var(--bg);
+            color: var(--body);
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        .cursor {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 1rem;
+            transform: translate(-50%, -50%);
+            color: var(--gold);
+            opacity: 0.7;
+            transition: opacity 0.3s;
+            mix-blend-mode: screen;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: repeating-linear-gradient(
+                transparent, transparent 18px,
+                var(--staff) 18px, var(--staff) 19px
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 50%,
+                transparent 20%, rgba(6,6,9,0.5) 70%, rgba(6,6,9,0.92) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        #scoreCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 2; }
+        #waveCanvas  { position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; pointer-events: none; z-index: 3; opacity: 0.4; }
+
+        /* STATIC OVERLAY — tape noise texture */
+        #staticCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 4;
+            opacity: 0;
+            mix-blend-mode: screen;
+            transition: opacity 0.08s linear;
+        }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(4,4,8,0.98);
+            z-index: 10000;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-overlay.hidden { display: none; }
+
+        .modal-box {
+            border: 1px solid rgba(200,168,74,0.3);
+            padding: 52px 46px;
+            max-width: 480px; width: 90%;
+            background: var(--panel);
+            box-shadow: 0 0 120px rgba(200,168,74,0.06), inset 0 0 0 1px rgba(200,168,74,0.04);
+            animation: modalRise 0.9s cubic-bezier(0.16,1,0.3,1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Creepy scanline on modal */
+        .modal-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                transparent, transparent 3px,
+                rgba(0,0,0,0.15) 3px, rgba(0,0,0,0.15) 4px
+            );
+            pointer-events: none;
+        }
+
+        .modal-box::before {
+            content: '𝄞';
+            position: absolute;
+            font-size: 14rem;
+            color: rgba(200,168,74,0.03);
+            right: -30px; bottom: -50px;
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        @keyframes modalRise {
+            from { transform: translateY(24px) scale(0.97); opacity: 0; filter: blur(4px); }
+            to   { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); }
+        }
+
+        .modal-eyebrow {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 4px;
+            color: rgba(200,168,74,0.5);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .modal-tag {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 3px;
+            color: var(--red);
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            animation: tagBlink 2.4s infinite;
+        }
+        @keyframes tagBlink { 0%,100%{opacity:1} 45%{opacity:0.2} 50%{opacity:1} 95%{opacity:0.5} }
+
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.55rem;
+            color: var(--white);
+            margin-bottom: 24px;
+            line-height: 1.45;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        .modal-divider {
+            width: 40px; height: 1px;
+            background: rgba(200,168,74,0.3);
+            margin-bottom: 24px;
+        }
+
+        .modal-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.08rem;
+            color: var(--muted);
+            line-height: 2.1;
+            margin-bottom: 32px;
+        }
+
+        .modal-text em { color: var(--body); font-style: italic; }
+        .modal-text strong { color: rgba(200,168,74,0.7); font-weight: 400; }
+
+        .modal-warning {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.56rem;
+            color: rgba(255,34,102,0.4);
+            letter-spacing: 2px;
+            margin-bottom: 32px;
+            line-height: 1.8;
+        }
+
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 13px 26px;
+            border: 1px solid;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-play  { border-color: var(--gold); color: var(--gold); }
+        .btn-play:hover  { background: var(--gold); color: var(--bg); }
+        .btn-back  { border-color: rgba(120,120,168,0.3); color: var(--dim); }
+        .btn-back:hover  { border-color: var(--dim); }
+
+        /* ── NAV ── */
+        .back-btn {
+            position: fixed; top: 24px; left: 28px;
+            z-index: 100;
+            text-decoration: none;
+            color: var(--muted);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        .back-btn:hover { color: var(--bright); }
+
+        /* ── PLAYBACK STATUS ── */
+        .playback-status {
+            position: fixed; top: 20px; right: 28px;
+            z-index: 100;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .play-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--gold);
+            animation: playDot 1.2s ease-in-out infinite;
+        }
+        @keyframes playDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
+
+        .glitch-level { color: var(--muted); transition: color 0.5s; }
+        .glitch-level.high { color: var(--red); }
+
+        /* ── CONTAINER ── */
+        .container {
+            position: relative; z-index: 10;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 110px 50px 160px;
+        }
+
+        /* ── HEADER ── */
+        .poem-header {
+            margin-bottom: 80px;
+            opacity: 0;
+            animation: emerge 1.2s ease 0.3s forwards;
+        }
+        @keyframes emerge {
+            from { opacity:0; transform:translateY(16px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        .header-tag {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 4px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            display: block;
+            opacity: 0.7;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 5vw, 3.2rem);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--white);
+            line-height: 1.2;
+            margin-bottom: 16px;
+            position: relative;
+            will-change: transform;
+        }
+
+        h1.glitching {
+            animation: titleGlitch 0.3s steps(2) forwards;
+        }
+        @keyframes titleGlitch {
+            0%   { text-shadow: 3px 0 #ff2266, -3px 0 #00ffcc; clip-path: inset(20% 0 60% 0); }
+            33%  { text-shadow: -4px 0 #ff2266, 4px 0 #00ffcc; clip-path: inset(50% 0 20% 0); }
+            66%  { text-shadow: 2px 0 #ff2266, -2px 0 #00ffcc; clip-path: inset(10% 0 80% 0); }
+            100% { text-shadow: none; clip-path: none; }
+        }
+
+        .header-sub {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.62rem;
+            color: var(--muted);
+            letter-spacing: 3px;
+        }
+
+        /* ── MEASURE ── */
+        .measure {
+            margin-bottom: 56px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .measure.visible { opacity: 1; transform: translateY(0); }
+
+        .measure-bar {
+            display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
+        }
+
+        .measure-num {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.58rem;
+            color: var(--gold);
+            letter-spacing: 2px;
+            opacity: 0.6;
+            white-space: nowrap;
+        }
+
+        .measure-line {
+            flex: 1; height: 1px;
+            background: linear-gradient(to right, rgba(200,168,74,0.3), transparent);
+        }
+
+        .tempo-mark {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.75rem;
+            font-style: italic;
+            color: var(--muted);
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        /* ── POEM LINES ── */
+        .poem-line {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.05rem, 2.3vw, 1.22rem);
+            line-height: 2.2;
+            color: var(--body);
+            display: block;
+            position: relative;
+            transition: color 0.5s;
+        }
+
+        .t-bright  { color: var(--bright); }
+        .t-dim     { color: var(--muted); font-style: italic; }
+        .t-ghost   { color: #a0a0c8; font-style: italic; }
+        .t-gold    { color: var(--gold); }
+        .t-struck  { text-decoration: line-through; text-decoration-color: rgba(200,168,74,0.5); color: #9090b8; font-style: italic; }
+
+        .t-corrupt {
+            color: var(--body);
+            position: relative;
+            display: inline-block;
+            transition: color 0.05s, transform 0.05s;
+        }
+
+        /* Glitch corruption — triggered by JS with glitch amount */
+        .t-corrupt.glitching {
+            animation: textCorrupt 0.12s steps(1) infinite;
+        }
+        @keyframes textCorrupt {
+            0%   { color: #ff2266; transform: translateX(-2px) skewX(-5deg); }
+            33%  { color: #00ffcc; transform: translateX(2px) skewX(3deg); }
+            66%  { color: var(--body); transform: translateX(-1px); }
+            100% { color: #ff2266; transform: translateX(0); }
+        }
+
+        .direction {
+            display: inline-block;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 0.85em;
+            color: var(--gold);
+            opacity: 0.7;
+            margin-right: 4px;
+        }
+
+        .indent {
+            padding-left: 32px;
+            border-left: 1px solid rgba(200,168,74,0.15);
+            margin: 12px 0;
+        }
+
+        .barline {
+            display: flex; align-items: center; gap: 4px;
+            margin: 40px 0; opacity: 0.25;
+        }
+        .barline-l     { flex:1; height:1px; background: var(--muted); }
+        .barline-thick { width:3px; height:20px; background: var(--muted); border-radius:1px; }
+        .barline-thin  { width:1px; height:20px; background: var(--muted); }
+
+        /* ── GLITCH STANZA ── */
+        .measure-corrupt {
+            position: relative;
+            padding: 20px 24px;
+            border: 1px solid rgba(255,34,102,0.2);
+            background: rgba(255,34,102,0.03);
+            margin-bottom: 56px;
+        }
+
+        .measure-corrupt::before {
+            content: 'ERROR: BUFFER OVERFLOW';
+            display: block;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.55rem;
+            letter-spacing: 3px;
+            color: var(--red);
+            margin-bottom: 14px;
+            animation: tagBlink 1s infinite;
+        }
+
+        .corrupt-line {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(0.85rem, 1.8vw, 1rem);
+            line-height: 2;
+            color: #9090b8;
+            display: block;
+            position: relative;
+        }
+
+        .corrupt-line.glitch-heavy { animation: heavyGlitch 2.3s infinite; }
+        @keyframes heavyGlitch {
+            0%,88%,100% { transform:none; color: var(--muted); }
+            89% { transform: translateX(-4px) skewX(-8deg); color: #ff2266; }
+            91% { transform: translateX(3px) skewX(4deg); color: #00ffcc; }
+            93% { transform: translateX(-2px); color: var(--muted); }
+            95% { transform: translateX(4px) skewX(-3deg); color: #ff2266; }
+            97% { transform: none; filter: blur(1px); }
+        }
+
+        /* ── FINAL STANZA ── */
+        .measure-final {
+            text-align: center;
+            padding: 60px 0 40px;
+            margin-bottom: 56px;
+        }
+
+        .final-note {
+            font-size: 4rem; color: var(--gold);
+            display: block; margin-bottom: 24px;
+            animation: finalNotePulse 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(200,168,74,0.3));
+        }
+        @keyframes finalNotePulse { 0%,100%{opacity:0.8;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.95)} }
+
+        .poem-line.center { text-align: center; display: block; }
+
+        /* ── FOOTER ── */
+        .footer {
+            margin-top: 80px; padding-top: 24px;
+            border-top: 1px solid var(--border);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.58rem; color: #6868a0;
+            letter-spacing: 2px; line-height: 2.4; opacity: 0.8;
+        }
+
+        /* ── GLOBAL GLITCH OVERLAY — horizontal scan corruption ── */
+        #glitchOverlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 8;
+            opacity: 0;
+        }
+
+        @media (max-width: 640px) {
+            .container { padding: 90px 24px 140px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor">♩</div>
+
+<!-- MODAL — creepy, POV orang ketiga -->
+<div class="modal-overlay" id="modal">
+    <div class="modal-box">
+        <div class="modal-eyebrow">[ arsip: tidak ditemukan pemiliknya ]</div>
+        <div class="modal-tag">▶ memutar rekaman yang bukan milikmu</div>
+        <h2 class="modal-title">Seseorang pernah memainkan<br>lagu ini untuknya.</h2>
+        <div class="modal-divider"></div>
+        <p class="modal-text">
+            Kamu tidak tahu siapa yang memainkannya.<br>
+            Kamu tidak tahu siapa yang mendengarnya.<br>
+            <strong>Tapi melodinya masih di sini.</strong><br><br>
+            <em>Berputar sendiri, seperti ia lupa berhenti.</em>
+        </p>
+        <p class="modal-warning">
+            ⚠ rekaman ini tidak minta izin untuk mulai<br>
+            ⚠ rekaman ini juga tidak tahu cara berhenti<br>
+            ⚠ aktifkan audio — atau jangan, tapi kamu akan tetap mendengar sesuatu
+        </p>
+        <div class="modal-actions">
+            <button class="modal-btn btn-back" onclick="goBack()">Pergi</button>
+            <button class="modal-btn btn-play" onclick="startExperience()">▶ Dengarkan</button>
+        </div>
+    </div>
+</div>
+
+<canvas id="scoreCanvas"></canvas>
+<canvas id="waveCanvas"></canvas>
+<canvas id="staticCanvas"></canvas>
+<canvas id="glitchOverlay"></canvas>
+
+<a href="../index.html" class="back-btn">← kembali</a>
+
+<div class="playback-status" id="playbackStatus">
+    <div class="play-dot"></div>
+    <span id="statusText">MEMUTAR</span>
+    <span class="glitch-level" id="glitchLevel">GLITCH: 0%</span>
+</div>
+
+<div class="container">
+
+    <div class="poem-header">
+        <span class="header-tag">𝄞 absurdum: malfungsi aksara</span>
+        <h1 id="mainTitle">Rekaman Terakhir:<br>Glitch di Birama ke-7</h1>
+        <span class="header-sub">[ format: .mem | durasi: tidak terbatas | kondisi: corrupted ]</span>
+    </div>
+
+    <!-- BIRAMA I -->
+    <div class="measure" data-measure="1">
+        <div class="measure-bar">
+            <span class="measure-num">BIRAMA I</span>
+            <div class="measure-line"></div>
+            <span class="tempo-mark">Andante — perlahan, seperti ingat</span>
+        </div>
+        <span class="poem-line">Ia selalu memulai dari nada yang sama.</span>
+        <span class="poem-line t-dim">Jari-jarinya tahu urutan yang tidak pernah ia ajarkan kepada siapapun —</span>
+        <span class="poem-line">tiga nada turun, dua nada naik,</span>
+        <span class="poem-line t-dim">lalu jeda selama satu ketukan yang terasa seperti <span class="t-gold">selamanya</span>.</span>
+        <div class="indent">
+            <span class="poem-line t-ghost">Perempuan itu hafal jedanya.</span>
+            <span class="poem-line t-ghost">Ia hafal nadanya.</span>
+            <span class="poem-line t-ghost">Ia tidak hafal bagaimana cara berhenti mendengarnya.</span>
+        </div>
+    </div>
+
+    <div class="barline"><div class="barline-l"></div><div class="barline-thin"></div><div class="barline-thick"></div><div class="barline-l"></div></div>
+
+    <!-- BIRAMA II -->
+    <div class="measure" data-measure="2">
+        <div class="measure-bar">
+            <span class="measure-num">BIRAMA II</span>
+            <div class="measure-line"></div>
+            <span class="tempo-mark">Con moto — bergerak, tapi ke mana?</span>
+        </div>
+        <span class="poem-line"><span class="direction">mp.</span> Rekaman itu masih ada di suatu tempat.</span>
+        <span class="poem-line t-dim">Bukan di perangkat mana pun —</span>
+        <span class="poem-line">tapi di antara tulang selangkanya dan paru-paru kirinya,</span>
+        <span class="poem-line t-dim">di mana suara tidak bisa dihapus,</span>
+        <span class="poem-line t-ghost">hanya bisa <span class="t-corrupt" data-original="memudar">memudar</span>.</span>
+        <div class="indent">
+            <span class="poem-line">Orang itu merekam dirinya sendiri waktu itu.</span>
+            <span class="poem-line t-dim">Ia pikir tidak ada yang mendengar.</span>
+            <span class="poem-line t-ghost">Perempuan itu mendengar semuanya.</span>
+            <span class="poem-line t-ghost">Bahkan bagian yang ia salah mainkan lalu ia ulangi.</span>
+            <span class="poem-line t-dim">Terutama bagian itu.</span>
+        </div>
+    </div>
+
+    <div class="barline"><div class="barline-l"></div><div class="barline-thin"></div><div class="barline-thick"></div><div class="barline-l"></div></div>
+
+    <!-- BIRAMA III -->
+    <div class="measure" data-measure="3">
+        <div class="measure-bar">
+            <span class="measure-num">BIRAMA III</span>
+            <div class="measure-line"></div>
+            <span class="tempo-mark">Rubato — bebas, tidak teratur</span>
+        </div>
+        <span class="poem-line">Sekarang ia mencoba mengingat urutannya.</span>
+        <span class="poem-line t-dim">Tiga nada turun — ini masih ia ingat.</span>
+        <span class="poem-line">Dua nada naik — <span class="t-corrupt" data-original="ini juga">ini juga</span>.</span>
+        <span class="poem-line t-dim">Tapi jedanya —</span>
+        <div class="indent">
+            <span class="poem-line t-ghost">jedanya sudah bergeser.</span>
+            <span class="poem-line t-ghost">Bukan satu ketukan lagi.</span>
+            <span class="poem-line">Sekarang jedanya terasa seperti <span class="t-corrupt" data-original="dua ketukan">dua ketukan</span>,</span>
+            <span class="poem-line t-dim">atau tiga,</span>
+            <span class="poem-line t-ghost">atau mungkin tidak ada jeda sama sekali dan ia yang salah ingat.</span>
+        </div>
+    </div>
+
+    <div class="barline"><div class="barline-l"></div><div class="barline-thin"></div><div class="barline-thick"></div><div class="barline-l"></div></div>
+
+    <!-- BIRAMA IV -->
+    <div class="measure" data-measure="4">
+        <div class="measure-bar">
+            <span class="measure-num">BIRAMA IV</span>
+            <div class="measure-line"></div>
+            <span class="tempo-mark">Meno mosso — melambat tanpa sadar</span>
+        </div>
+        <span class="poem-line"><span class="direction">p.</span> Ada yang <span class="t-corrupt" data-original="aneh">aneh</span> dengan cara ia mengingat.</span>
+        <span class="poem-line t-dim">Melodinya masih ada, tapi seperti diputar dari balik tembok.</span>
+        <span class="poem-line">Atau seperti seseorang menyalakan radio di ruangan sebelah</span>
+        <span class="poem-line t-dim">dan kemudian pergi.</span>
+        <div class="indent">
+            <span class="poem-line t-ghost">Radio terus menyala.</span>
+            <span class="poem-line t-struck">Suaranya masih jernih.</span>
+            <span class="poem-line t-ghost">Suaranya sudah tidak jernih.</span>
+            <span class="poem-line t-dim">Ada sesuatu yang berdesis di antara nada-nada.</span>
+            <span class="poem-line">Seperti kertas yang terbakar dari tepinya,</span>
+            <span class="poem-line t-ghost">perlahan, tanpa api yang terlihat.</span>
+        </div>
+    </div>
+
+    <div class="barline"><div class="barline-l"></div><div class="barline-thin"></div><div class="barline-thick"></div><div class="barline-l"></div></div>
+
+    <!-- BIRAMA V -->
+    <div class="measure" data-measure="5">
+        <div class="measure-bar">
+            <span class="measure-num">BIRAMA V</span>
+            <div class="measure-line"></div>
+            <span class="tempo-mark">Inquieto — gelisah, tidak stabil</span>
+        </div>
+        <span class="poem-line"><span class="t-corrupt" data-original="Ia mencoba memutar ulang">Ia mencoba memutar ulang</span> di dalam kepalanya.</span>
+        <span class="poem-line t-dim">Tiga nada turun — <span class="t-corrupt" data-original="masih benar">masih benar</span>.</span>
+        <span class="poem-line">Dua nada naik — <span class="t-corrupt" data-original="nada pertama benar">nada pertama benar</span>, nada kedua sudah bergeser setengah.</span>
+        <span class="poem-line t-struck">Jedanya satu ketukan.</span>
+        <span class="poem-line t-ghost">Jedanya tidak ada.</span>
+        <span class="poem-line">Jedanya adalah <span class="t-corrupt" data-original="lubang tempat ia biasa berdiri">lubang tempat ia biasa berdiri</span>.</span>
+        <div class="indent">
+            <span class="poem-line t-dim">Rekaman ini sedang rusak.</span>
+            <span class="poem-line t-ghost">Ia tahu.</span>
+            <span class="poem-line t-ghost">Tapi ia tidak bisa berhenti memutar.</span>
+        </div>
+    </div>
+
+    <div class="barline"><div class="barline-l"></div><div class="barline-thin"></div><div class="barline-thick"></div><div class="barline-l"></div></div>
+
+    <!-- BIRAMA VI -->
+    <div class="measure" data-measure="6">
+        <div class="measure-bar">
+            <span class="measure-num">BIRAMA VI</span>
+            <div class="measure-line"></div>
+            <span class="tempo-mark">Agitato — resah</span>
+        </div>
+        <span class="poem-line"><span class="t-corrupt" data-original="Tiga nada turun">Tiga nada turun</span> — <span class="t-corrupt" data-original="dua benar">dua benar</span>, <span class="t-corrupt" data-original="satu sudah salah oktaf">satu sudah salah oktaf</span>.</span>
+        <span class="poem-line t-dim"><span class="t-corrupt" data-original="Dua nada naik">Dua nada naik</span> — <span class="t-corrupt" data-original="keduanya tidak bisa dikenali">keduanya tidak bisa dikenali</span>.</span>
+        <span class="poem-line"><span class="t-corrupt" data-original="Jedanya">Jedanya</span> — <span class="t-corrupt" data-original="ia tidak tahu lagi">ia tidak tahu lagi</span>.</span>
+        <div class="indent">
+            <span class="poem-line t-dim">Mungkin tidak pernah ada jeda.</span>
+            <span class="poem-line t-ghost">Mungkin orang itu selalu langsung ke nada berikutnya</span>
+            <span class="poem-line t-ghost">dan ia yang menambahkan jeda itu sendiri</span>
+            <span class="poem-line t-dim">karena ia butuh waktu untuk mengambil napas</span>
+            <span class="poem-line">setiap kali mendengarnya.</span>
+        </div>
+    </div>
+
+    <div class="barline"><div class="barline-l"></div><div class="barline-thin"></div><div class="barline-thick"></div><div class="barline-l"></div></div>
+
+    <!-- BIRAMA VII — GLITCH PENUH -->
+    <div class="measure-corrupt" data-measure="7">
+        <span class="corrupt-line glitch-heavy">BIRAMA VII — [ data tidak dapat dibaca ]</span>
+        <span class="corrupt-line" style="margin-top:12px;color:#d8d8f0;font-family:'Cormorant Garamond',serif;font-size:1.1rem;line-height:2.2;">
+            T██ a n██ t██ u██ — s██ u██ d██ a██ h
+        </span>
+        <span class="corrupt-line" style="color:#b0b0d0;font-family:'Cormorant Garamond',serif;font-size:1.05rem;line-height:2.2;">
+            tidak ada nada yang tersisa yang bisa ia pertanggungjawabkan kebenarannya.
+        </span>
+        <span class="corrupt-line" style="margin-top:8px;">[ seeking... seeking... seeking... ]</span>
+        <span class="corrupt-line glitch-heavy" style="color:rgba(255,34,102,0.8);margin-top:4px;">████ ██ █████ ████ — ████ ██ ███████</span>
+        <span class="corrupt-line" style="color:#d8d8f0;font-family:'Cormorant Garamond',serif;font-size:1.05rem;line-height:2.2;margin-top:12px;">
+            Tapi anehnya —
+        </span>
+        <span class="corrupt-line" style="color:var(--white);font-family:'Cormorant Garamond',serif;font-size:1.15rem;line-height:2.2;">
+            ia masih bisa merasakannya.
+        </span>
+        <span class="corrupt-line" style="color:#a8a8cc;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;line-height:2.2;">
+            Di suatu tempat antara ingatan dan sinyal yang putus, melodinya masih ada.
+        </span>
+        <span class="corrupt-line" style="color:#8888b0;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.95rem;line-height:2.2;">
+            Bukan karena ia mengingat dengan benar.
+        </span>
+        <span class="corrupt-line" style="color:#d8d8f0;font-family:'Cormorant Garamond',serif;font-size:1.1rem;line-height:2.2;">
+            Tapi karena tubuhnya masih hafal cara merindukannya.
+        </span>
+    </div>
+
+    <!-- CODA -->
+    <div class="measure-final" data-measure="coda">
+        <span class="final-note">𝅗𝅥</span>
+        <span class="poem-line center t-ghost" style="margin-bottom:8px;">Pada akhirnya hanya ada satu nada yang tidak rusak.</span>
+        <span class="poem-line center t-dim" style="margin-bottom:8px;">Bukan karena ia kuat.</span>
+        <span class="poem-line center" style="margin-bottom:8px;">Tapi karena ia adalah nada yang paling sering dimainkan</span>
+        <span class="poem-line center t-dim" style="margin-bottom:8px;">di saat tidak ada yang menonton.</span>
+        <div style="height:32px;"></div>
+        <span class="poem-line center t-gold" style="font-size:1.3rem;letter-spacing:1px;">Nada itu masih berbunyi.</span>
+        <span class="poem-line center t-ghost" style="margin-top:12px;font-size:0.95rem;">Pemainnya yang sudah tidak di sini untuk mendengarnya.</span>
+    </div>
+
+    <div class="footer">
+        -- akhir rekaman --<br>
+        [ durasi: tidak terbatas | format: .mem | glitch: 94.7% ]<br>
+        ※ semua melodi yang terlupakan masih berbunyi di suatu tempat ※
+    </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CURSOR
+// ═══════════════════════════════════════════════════════
+const cursor = document.getElementById('cursor');
+const noteSymbols = ['♩','♪','♫','♬','𝄞','♩','♪'];
+let noteIdx = 0;
+document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+});
+
+// ═══════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════
+function goBack() { window.history.back(); }
+
+function startExperience() {
+    document.getElementById('modal').classList.add('hidden');
+    initAudio();
+    const ps = document.getElementById('playbackStatus');
+    ps.style.opacity = '1';
+}
+
+// ═══════════════════════════════════════════════════════
+// AUDIO ENGINE
+// ═══════════════════════════════════════════════════════
+let audioCtx       = null;
+let masterGain     = null;
+let reverbGain     = null;
+let reverbNode     = null;
+let tapeNoiseNode  = null;
+let tapeNoiseGain  = null;
+let droneOsc       = null;
+let droneOsc2      = null;
+
+// ─── Glitch amount: updated INSTANTLY from scroll ─────
+let glitchAmount = 0;  // 0 to 1 — bidirectional, no delay
+
+// ─── Melody motif ─────────────────────────────────────
+const melody = [
+    440.00, 415.30, 392.00, 349.23, 329.63, 311.13, 293.66, 0,
+    329.63, 369.99, 392.00, 415.30, 392.00, 349.23, 311.13, 277.18, 0,
+    293.66, 293.66, 293.66, 261.63,
+];
+const rhythmMs = [
+    550,400,550,300,600,400,900,400,
+    400,350,400,250,400,350,500,700,600,
+    350,350,700,1200,
+];
+
+// ─── Reverb ───────────────────────────────────────────
+function createReverb(ctx, seconds, decay) {
+    const rate = ctx.sampleRate;
+    const len  = rate * seconds;
+    const buf  = ctx.createBuffer(2, len, rate);
+    for (let c = 0; c < 2; c++) {
+        const d = buf.getChannelData(c);
+        for (let i = 0; i < len; i++) {
+            d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+        }
+    }
+    const conv = ctx.createConvolver();
+    conv.buffer = buf;
+    return conv;
+}
+
+// ─── TAPE NOISE ───────────────────────────────────────
+// Continuous looping noise buffer — filtered to sound like tape hiss
+// The gain is modulated in real-time by glitchAmount — no scheduling delay
+function createTapeNoise(ctx) {
+    // Long noise buffer (4 seconds) that loops
+    const rate    = ctx.sampleRate;
+    const bufLen  = rate * 4;
+    const buf     = ctx.createBuffer(1, bufLen, rate);
+    const data    = buf.getChannelData(0);
+
+    // Shaped noise: mostly quiet with occasional crackle bursts
+    for (let i = 0; i < bufLen; i++) {
+        let v = (Math.random() * 2 - 1);
+
+        // Random crackle spikes — sparse
+        if (Math.random() < 0.001) {
+            v *= 8 + Math.random() * 12;
+        }
+        // Dropout silence patches
+        if (Math.random() < 0.0008) {
+            const dropLen = Math.floor(Math.random() * 800 + 200);
+            for (let j = 0; j < dropLen && i + j < bufLen; j++) {
+                data[i + j] = 0;
+            }
+            i += dropLen;
+            continue;
+        }
+
+        data[i] = Math.max(-1, Math.min(1, v));
+    }
+
+    // Source
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop   = true;
+
+    // Band-pass filter — narrow the noise to tape-hiss frequency range
+    const hiPass = ctx.createBiquadFilter();
+    hiPass.type  = 'highpass';
+    hiPass.frequency.value = 1200;
+    hiPass.Q.value = 0.5;
+
+    const loPass = ctx.createBiquadFilter();
+    loPass.type  = 'lowpass';
+    loPass.frequency.value = 8000;
+    loPass.Q.value = 0.3;
+
+    // Crackle character filter — slight peaking in mid-high
+    const peak = ctx.createBiquadFilter();
+    peak.type = 'peaking';
+    peak.frequency.value = 3500;
+    peak.Q.value = 1.2;
+    peak.gain.value = 6;
+
+    const gain = ctx.createGain();
+    gain.gain.value = 0; // starts silent, driven by glitchAmount
+
+    src.connect(hiPass);
+    hiPass.connect(loPass);
+    loPass.connect(peak);
+    peak.connect(gain);
+    gain.connect(masterGain);
+    gain.connect(reverbGain);
+
+    src.start();
+    return { src, gain, hiPass };
+}
+
+// ─── Play note ────────────────────────────────────────
+function playNote(freq, startTime, duration, gainVal, detune = 0) {
+    if (!audioCtx || freq === 0) return;
+
+    const osc  = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const vibOsc  = audioCtx.createOscillator();
+    const vibGain = audioCtx.createGain();
+    const gain    = audioCtx.createGain();
+    const gain2   = audioCtx.createGain();
+    const filter  = audioCtx.createBiquadFilter();
+
+    osc.type  = 'triangle';
+    osc2.type = 'sine';
+    osc.frequency.setValueAtTime(freq, startTime);
+    osc2.frequency.setValueAtTime(freq * 2, startTime);
+    osc.detune.setValueAtTime(detune, startTime);
+    osc2.detune.setValueAtTime(detune, startTime);
+
+    vibOsc.frequency.value = 2.8 + glitchAmount * 4;
+    vibGain.gain.value = 4 + glitchAmount * 18;
+    vibOsc.connect(vibGain);
+    vibGain.connect(osc.frequency);
+    vibOsc.start(startTime);
+    vibOsc.stop(startTime + duration + 0.2);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(Math.max(350, 4200 - glitchAmount * 3600), startTime);
+
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(gainVal, startTime + 0.04);
+    gain.gain.exponentialRampToValueAtTime(gainVal * 0.5, startTime + duration * 0.6);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+    gain2.gain.setValueAtTime(0, startTime);
+    gain2.gain.linearRampToValueAtTime(gainVal * 0.14, startTime + 0.04);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, startTime + duration * 0.65);
+
+    osc.connect(filter); osc2.connect(filter);
+    filter.connect(gain); filter.connect(gain2);
+    gain.connect(masterGain); gain.connect(reverbGain);
+    gain2.connect(reverbGain);
+
+    osc.start(startTime); osc.stop(startTime + duration + 0.15);
+    osc2.start(startTime); osc2.stop(startTime + duration + 0.15);
+}
+
+function playStutter(freq, startTime, gainVal) {
+    const count = 3 + Math.floor(Math.random() * 5);
+    const gap   = 0.055 + Math.random() * 0.04;
+    for (let i = 0; i < count; i++) playNote(freq, startTime + i * gap, gap * 0.7, gainVal * 0.6);
+}
+
+function playDropout(startTime, duration) {
+    if (!audioCtx) return;
+    const bufSize = Math.floor(audioCtx.sampleRate * duration);
+    const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * 0.3;
+    const src    = audioCtx.createBufferSource();
+    const gain   = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 800 + Math.random() * 1200;
+    filter.Q.value = 0.5;
+    src.buffer = buf;
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(0.08 * glitchAmount, startTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+    src.connect(filter); filter.connect(gain); gain.connect(masterGain);
+    src.start(startTime); src.stop(startTime + duration + 0.05);
+}
+
+function playPitchCrash(freq, startTime) {
+    if (!audioCtx) return;
+    const osc  = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(freq, startTime);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.2, startTime + 0.4);
+    gain.gain.setValueAtTime(0.12 * glitchAmount, startTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.4);
+    osc.connect(gain); gain.connect(reverbGain);
+    osc.start(startTime); osc.stop(startTime + 0.45);
+}
+
+// ─── Schedule melody ──────────────────────────────────
+function scheduleMelody() {
+    if (!audioCtx) return;
+    let t = audioCtx.currentTime + 0.5;
+
+    const playOnce = () => {
+        if (!audioCtx) return;
+
+        melody.forEach((freq, i) => {
+            const noteTime  = t;
+            const baseDur   = rhythmMs[i] / 1000;
+            const baseGain  = 0.42;
+            const g = glitchAmount;
+
+            if (g < 0.15) {
+                playNote(freq, noteTime, baseDur, baseGain);
+                t += baseDur;
+            } else if (g < 0.35) {
+                const detune = (Math.random() - 0.5) * g * 120;
+                playNote(freq, noteTime, baseDur * (0.9 + Math.random() * 0.2), baseGain * 0.95, detune);
+                t += baseDur * (0.95 + Math.random() * 0.1);
+            } else if (g < 0.55) {
+                if (Math.random() < g * 0.35) {
+                    playStutter(freq, noteTime, baseGain * 0.7);
+                    t += baseDur * 1.2;
+                } else {
+                    playNote(freq, noteTime, baseDur, baseGain * 0.85, (Math.random()-0.5)*g*250);
+                    if (Math.random() < 0.25) playDropout(noteTime + baseDur * 0.3, 0.1);
+                    t += baseDur;
+                }
+            } else if (g < 0.78) {
+                if (Math.random() < g * 0.45) {
+                    playDropout(noteTime, 0.08);
+                    t += baseDur * (0.5 + Math.random() * 0.8);
+                } else if (Math.random() < 0.2) {
+                    playPitchCrash(freq || 300, noteTime);
+                    t += baseDur * 1.5;
+                } else {
+                    playNote(freq, noteTime, Math.max(0.06, baseDur * (0.3 + Math.random() * 1.4)), baseGain * 0.65, (Math.random()-0.5)*g*500);
+                    t += baseDur * (0.6 + Math.random());
+                }
+            } else {
+                if (Math.random() < 0.6) {
+                    playDropout(noteTime, 0.05 + Math.random() * 0.15);
+                    t += baseDur * (0.3 + Math.random() * 0.6);
+                } else if (Math.random() < 0.3) {
+                    playStutter((freq || 200) * (0.5 + Math.random()), noteTime, baseGain * 0.3);
+                    t += baseDur;
+                } else {
+                    playNote(freq, noteTime, baseDur * 0.4, 0.05, (Math.random()-0.5)*800);
+                    t += baseDur * 0.5;
+                }
+            }
+        });
+
+        const loopGap = glitchAmount < 0.3 ? 1.5 : 0.5 + Math.random() * glitchAmount * 3;
+        t += loopGap;
+        const delay = Math.max(50, (t - audioCtx.currentTime - 0.3) * 1000);
+        setTimeout(playOnce, delay);
+    };
+    playOnce();
+}
+
+// ─── Drone ────────────────────────────────────────────
+function startDrone() {
+    if (!audioCtx) return;
+    droneOsc  = audioCtx.createOscillator();
+    droneOsc2 = audioCtx.createOscillator();
+    const dGain  = audioCtx.createGain();
+    const dGain2 = audioCtx.createGain();
+    const dFilt  = audioCtx.createBiquadFilter();
+
+    droneOsc.type  = 'sine';
+    droneOsc2.type = 'sine';
+    droneOsc.frequency.value  = 98.00;
+    droneOsc2.frequency.value = 130.81;
+    dFilt.type = 'lowpass';
+    dFilt.frequency.value = 300;
+
+    dGain.gain.setValueAtTime(0, audioCtx.currentTime);
+    dGain.gain.linearRampToValueAtTime(0.10, audioCtx.currentTime + 4);
+    dGain2.gain.setValueAtTime(0, audioCtx.currentTime);
+    dGain2.gain.linearRampToValueAtTime(0.06, audioCtx.currentTime + 5);
+
+    droneOsc.connect(dFilt); droneOsc2.connect(dFilt);
+    dFilt.connect(dGain); dFilt.connect(dGain2);
+    dGain.connect(reverbGain); dGain2.connect(reverbGain);
+    droneOsc.start(); droneOsc2.start();
+
+    setInterval(() => {
+        if (!audioCtx) return;
+        const wobble = glitchAmount * 4;
+        droneOsc.detune.setTargetAtTime((Math.random()-0.5)*wobble*120, audioCtx.currentTime, 0.8);
+        droneOsc2.detune.setTargetAtTime((Math.random()-0.5)*wobble*80, audioCtx.currentTime, 1.2);
+        if (glitchAmount > 0.5) {
+            dFilt.frequency.setTargetAtTime(150 + Math.random()*glitchAmount*800, audioCtx.currentTime, 0.5);
+        }
+    }, 600);
+}
+
+// ─── Init audio ───────────────────────────────────────
+function initAudio() {
+    audioCtx   = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.8;
+
+    reverbNode = createReverb(audioCtx, 4, 1.8);
+    reverbGain = audioCtx.createGain();
+    reverbGain.gain.value = 0.5;
+
+    masterGain.connect(audioCtx.destination);
+    reverbNode.connect(audioCtx.destination);
+    reverbGain.connect(reverbNode);
+
+    masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+    masterGain.gain.linearRampToValueAtTime(0.8, audioCtx.currentTime + 2.5);
+
+    // Init tape noise (starts silent)
+    const tape = createTapeNoise(audioCtx);
+    tapeNoiseGain = tape.gain;
+
+    scheduleMelody();
+    startDrone();
+
+    // Continuously update tape noise and reverb based on glitchAmount
+    // This runs every 80ms — near-instant response to scroll
+    setInterval(updateAudioGlitch, 80);
+}
+
+// ─────────────────────────────────────────────────────────
+// UPDATE AUDIO GLITCH — called on scroll AND by interval
+// No scheduling delay — just set target values NOW
+// ─────────────────────────────────────────────────────────
+function updateAudioGlitch() {
+    if (!audioCtx || !tapeNoiseGain) return;
+
+    const g = glitchAmount;
+    const now = audioCtx.currentTime;
+
+    // Tape noise volume curve:
+    // 0.0→0.3: silence, 0.3→0.6: starts hissing, 0.6→1.0: loud crackle
+    let noiseVol = 0;
+    if (g > 0.3) noiseVol = (g - 0.3) / 0.7 * 0.18;
+    // At very high glitch, add random crackle spikes
+    if (g > 0.65) noiseVol += (Math.random() < 0.3 ? Math.random() * 0.25 : 0);
+
+    tapeNoiseGain.gain.setTargetAtTime(noiseVol, now, 0.05);
+
+    // Reverb swell
+    if (reverbGain) {
+        reverbGain.gain.setTargetAtTime(0.45 + g * 0.5, now, 0.3);
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// SCROLL → GLITCH (INSTANT, BIDIRECTIONAL, NO LAG)
+// ═══════════════════════════════════════════════════════
+const glitchLevelEl = document.getElementById('glitchLevel');
+const statusEl      = document.getElementById('statusText');
+
+let lastScrollY  = 0;
+let ticking      = false;
+
+function onScroll() {
+    if (!ticking) {
+        requestAnimationFrame(processScroll);
+        ticking = true;
+    }
+}
+
+function processScroll() {
+    ticking = false;
+    const scrollY   = window.scrollY;
+    const maxScroll = document.body.scrollHeight - window.innerHeight;
+    const progress  = maxScroll > 0 ? scrollY / maxScroll : 0;
+
+    // ── DIRECT assignment — no lerp, no delay ──────────
+    // When you scroll up, glitchAmount drops IMMEDIATELY
+    glitchAmount = Math.min(1, Math.max(0, progress * 1.1));
+
+    // UI
+    const pct = Math.round(glitchAmount * 100);
+    glitchLevelEl.textContent = `GLITCH: ${pct}%`;
+    if (pct > 50) glitchLevelEl.classList.add('high');
+    else          glitchLevelEl.classList.remove('high');
+
+    if (pct > 80)      statusEl.textContent = 'CORRUPT';
+    else if (pct > 40) statusEl.textContent = 'DEGRADED';
+    else               statusEl.textContent = 'MEMUTAR';
+
+    // Cursor
+    if (Math.random() < 0.08) {
+        noteIdx = (noteIdx + 1) % noteSymbols.length;
+        cursor.textContent = noteSymbols[noteIdx];
+    }
+
+    // CSS glitch on text spans — immediate, proportional to scroll
+    if (glitchAmount > 0.25) {
+        document.querySelectorAll('.t-corrupt').forEach(el => {
+            const threshold = glitchAmount * 0.18;
+            if (Math.random() < threshold) {
+                el.classList.add('glitching');
+                setTimeout(() => el.classList.remove('glitching'), 100 + Math.random() * 180);
+            }
+        });
+    } else {
+        // Below threshold — remove all glitching immediately
+        document.querySelectorAll('.t-corrupt.glitching').forEach(el => {
+            el.classList.remove('glitching');
+        });
+    }
+
+    // Title glitch
+    if (glitchAmount > 0.55 && Math.random() < 0.06) {
+        const t = document.getElementById('mainTitle');
+        t.classList.add('glitching');
+        setTimeout(() => t.classList.remove('glitching'), 280);
+    }
+
+    // Update audio immediately too
+    updateAudioGlitch();
+
+    // Update static canvas opacity
+    const staticCanvas = document.getElementById('staticCanvas');
+    let staticOpacity = 0;
+    if (glitchAmount > 0.4) staticOpacity = (glitchAmount - 0.4) / 0.6 * 0.12;
+    staticCanvas.style.opacity = staticOpacity;
+
+    // Update glitch overlay
+    updateGlitchOverlay();
+
+    lastScrollY = scrollY;
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+
+// ═══════════════════════════════════════════════════════
+// STATIC CANVAS — TV/tape static noise texture
+// ═══════════════════════════════════════════════════════
+const staticCanvas = document.getElementById('staticCanvas');
+const stx          = staticCanvas.getContext('2d');
+let   staticTime   = 0;
+
+function resizeStatic() {
+    staticCanvas.width  = window.innerWidth;
+    staticCanvas.height = window.innerHeight;
+}
+resizeStatic();
+
+function drawStatic() {
+    if (glitchAmount < 0.35) return;
+
+    const W = staticCanvas.width;
+    const H = staticCanvas.height;
+    const imageData = stx.createImageData(W, H);
+    const data = imageData.data;
+
+    // Sparse static — only fire pixels at random
+    const density = glitchAmount * 0.06;
+    for (let i = 0; i < data.length; i += 4) {
+        if (Math.random() < density) {
+            const v = Math.floor(Math.random() * 255);
+            data[i]   = v;
+            data[i+1] = v;
+            data[i+2] = v;
+            data[i+3] = 180;
+        }
+    }
+    stx.putImageData(imageData, 0, 0);
+}
+
+// ═══════════════════════════════════════════════════════
+// GLITCH OVERLAY — horizontal scan-line corruption
+// ═══════════════════════════════════════════════════════
+const glitchCanvas = document.getElementById('glitchOverlay');
+const gx = glitchCanvas.getContext('2d');
+
+function resizeGlitch() {
+    glitchCanvas.width  = window.innerWidth;
+    glitchCanvas.height = window.innerHeight;
+}
+resizeGlitch();
+
+let glitchSlices = [];
+
+function updateGlitchOverlay() {
+    // Regenerate slices based on current glitch level
+    glitchSlices = [];
+    if (glitchAmount < 0.4) return;
+
+    const count = Math.floor(glitchAmount * 8);
+    for (let i = 0; i < count; i++) {
+        if (Math.random() < glitchAmount * 0.4) {
+            glitchSlices.push({
+                y:     Math.random() * glitchCanvas.height,
+                h:     1 + Math.random() * 4,
+                shift: (Math.random() - 0.5) * glitchAmount * 60,
+                col:   Math.random() < 0.5 ? 'rgba(255,34,102,0.08)' : 'rgba(0,255,204,0.06)',
+                life:  Math.random() * 8,
+            });
+        }
+    }
+}
+
+function drawGlitchOverlay() {
+    gx.clearRect(0, 0, glitchCanvas.width, glitchCanvas.height);
+    if (!glitchSlices.length) return;
+
+    glitchSlices.forEach(s => {
+        if (s.life > 0) {
+            gx.fillStyle = s.col;
+            gx.fillRect(0, s.y, glitchCanvas.width, s.h);
+            s.life--;
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════════
+// SCORE CANVAS — floating music notes
+// ═══════════════════════════════════════════════════════
+const scoreCanvas = document.getElementById('scoreCanvas');
+const sc = scoreCanvas.getContext('2d');
+const noteChars = ['♩','♪','♫','♬','𝄞','𝄢','♭','♯','𝄽'];
+let floatingNotes = [];
+
+class FloatingNote {
+    constructor() { this.reset(); }
+    reset() {
+        this.x       = Math.random() * scoreCanvas.width;
+        this.y       = scoreCanvas.height + 20;
+        this.char    = noteChars[Math.floor(Math.random() * noteChars.length)];
+        this.size    = 12 + Math.random() * 20;
+        this.opacity = 0.05 + Math.random() * 0.12;
+        this.vy      = -(0.3 + Math.random() * 0.5);
+        this.vx      = (Math.random() - 0.5) * 0.3;
+        this.life    = 0;
+        this.maxLife = 200 + Math.random() * 300;
+        this.corrupt = false;
+    }
+    update() {
+        this.life++;
+        this.x += this.vx + (Math.random()-0.5) * glitchAmount * 3;
+        this.y += this.vy;
+        if (glitchAmount > 0.4 && Math.random() < 0.02) this.corrupt = !this.corrupt;
+        if (glitchAmount < 0.2) this.corrupt = false; // clear corrupt when scrolling up
+        if (this.life > this.maxLife || this.y < -30) this.reset();
+    }
+    draw() {
+        const fade = this.life < 30 ? this.life/30 : this.life > this.maxLife-30 ? (this.maxLife-this.life)/30 : 1;
+        sc.save();
+        sc.globalAlpha = this.opacity * fade;
+        sc.fillStyle   = this.corrupt ? 'rgba(255,34,102,0.8)' : 'rgba(200,168,74,0.8)';
+        sc.font = `${this.size}px serif`;
+        if (this.corrupt && glitchAmount > 0.5) {
+            sc.translate(this.x, this.y);
+            sc.rotate((Math.random()-0.5) * glitchAmount * 0.4);
+            sc.fillText(this.char, 0, 0);
+        } else {
+            sc.fillText(this.char, this.x, this.y);
+        }
+        sc.restore();
+    }
+}
+
+function resizeScore() {
+    scoreCanvas.width  = window.innerWidth;
+    scoreCanvas.height = window.innerHeight;
+}
+resizeScore();
+window.addEventListener('resize', () => { resizeScore(); resizeStatic(); resizeGlitch(); });
+
+for (let i = 0; i < 28; i++) {
+    const n = new FloatingNote();
+    n.y    = Math.random() * scoreCanvas.height;
+    n.life = Math.random() * n.maxLife;
+    floatingNotes.push(n);
+}
+
+// ═══════════════════════════════════════════════════════
+// WAVEFORM CANVAS
+// ═══════════════════════════════════════════════════════
+const waveCanvas = document.getElementById('waveCanvas');
+const wc = waveCanvas.getContext('2d');
+let waveTime = 0;
+
+function resizeWave() {
+    waveCanvas.width  = window.innerWidth;
+    waveCanvas.height = 80;
+}
+resizeWave();
+
+function drawWave() {
+    wc.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
+    const W = waveCanvas.width, H = waveCanvas.height, midY = H / 2;
+
+    wc.beginPath();
+    wc.strokeStyle = glitchAmount > 0.5
+        ? `rgba(255,34,102,${0.4 + glitchAmount * 0.3})`
+        : `rgba(200,168,74,${0.3 + glitchAmount * 0.2})`;
+    wc.lineWidth = 1.5;
+
+    let inGap = false;
+    for (let x = 0; x < W; x++) {
+        const t = (x / W) * Math.PI * 8 + waveTime;
+        let y = midY;
+        y += Math.sin(t) * (12 - glitchAmount * 4);
+        y += Math.sin(t * 2.3) * (5 + glitchAmount * 3);
+        if (glitchAmount > 0.3) y += (Math.random()-0.5) * glitchAmount * 20;
+
+        // Tape dropout gaps in waveform
+        if (glitchAmount > 0.55 && Math.random() < glitchAmount * 0.025) {
+            wc.stroke();
+            wc.beginPath();
+            x += 10 + Math.random() * 30;
+            continue;
+        }
+
+        if (x === 0) wc.moveTo(x, y);
+        else wc.lineTo(x, y);
+    }
+    wc.stroke();
+}
+
+// ═══════════════════════════════════════════════════════
+// INTERSECTION OBSERVER — reveal measures
+// ═══════════════════════════════════════════════════════
+const measureEls = document.querySelectorAll('.measure');
+const revealObs  = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            revealObs.unobserve(e.target);
+        }
+    });
+}, { threshold: 0.15 });
+measureEls.forEach(m => revealObs.observe(m));
+
+// ═══════════════════════════════════════════════════════
+// MAIN ANIMATION LOOP
+// ═══════════════════════════════════════════════════════
+function loop() {
+    waveTime += 0.04 + glitchAmount * 0.06;
+
+    sc.fillStyle = 'rgba(10,10,15,0.04)';
+    sc.fillRect(0, 0, scoreCanvas.width, scoreCanvas.height);
+    floatingNotes.forEach(n => { n.update(); n.draw(); });
+
+    drawWave();
+    drawStatic();
+    drawGlitchOverlay();
+
+    requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>

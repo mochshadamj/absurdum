@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../images/icon.png">
+    <title>MEMORANDUM_07 | ABSURDUM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:        #f5f2eb;
+            --paper:     #ede9df;
+            --paper2:    #e6e1d4;
+            --ink:       #1a1814;
+            --ink-dim:   #4a4640;
+            --ink-fade:  #8a857a;
+            --ink-ghost: #b5b0a8;
+            --red:       #8b2020;
+            --red-dim:   rgba(139, 32, 32, 0.12);
+            --red-faint: rgba(139, 32, 32, 0.06);
+            --stamp:     rgba(139, 32, 32, 0.18);
+            --border:    #c8c2b5;
+            --border2:   #d8d3c8;
+            --accent:    #5a4e3a;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: default;
+            position: relative;
+        }
+
+        /* Aged paper horizontal lines */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: repeating-linear-gradient(
+                transparent,
+                transparent 31px,
+                rgba(160, 148, 125, 0.13) 31px,
+                rgba(160, 148, 125, 0.13) 32px
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Canvas for paper atmosphere */
+        #paperCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Vignette — warm edges */
+        .vignette {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            background: radial-gradient(
+                ellipse at 50% 40%,
+                transparent 30%,
+                rgba(120, 100, 70, 0.10) 65%,
+                rgba(80, 60, 35, 0.25) 100%
+            );
+        }
+
+        /* Left margin red rule — old notebook */
+        .margin-rule {
+            position: fixed;
+            top: 0; bottom: 0;
+            left: calc(50% - 360px);
+            width: 1px;
+            background: linear-gradient(
+                to bottom,
+                transparent,
+                rgba(139, 32, 32, 0.18) 8%,
+                rgba(139, 32, 32, 0.18) 92%,
+                transparent
+            );
+            pointer-events: none;
+            z-index: 3;
+        }
+        @media (max-width: 800px) { .margin-rule { display: none; } }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(20, 18, 14, 0.92);
+            z-index: 10000;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-overlay.hidden { display: none; }
+
+        .modal-box {
+            background: var(--paper);
+            border: 1px solid var(--border);
+            padding: 48px 44px;
+            max-width: 460px; width: 90%;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3), inset 0 0 0 6px var(--paper2);
+            animation: modalRise 0.6s cubic-bezier(0.16,1,0.3,1);
+        }
+        @keyframes modalRise {
+            from { transform: translateY(20px) rotate(-0.5deg); opacity: 0; }
+            to   { transform: translateY(0) rotate(0deg); opacity: 1; }
+        }
+
+        .modal-stamp {
+            position: absolute;
+            top: -14px; right: 30px;
+            background: var(--red);
+            color: #f5f2eb;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.55rem;
+            letter-spacing: 3px;
+            padding: 5px 14px;
+            text-transform: uppercase;
+        }
+
+        .modal-tag {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            color: var(--ink-fade);
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        .modal-title {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.4rem;
+            color: var(--ink);
+            margin-bottom: 18px;
+            line-height: 1.4;
+            font-weight: 400;
+        }
+
+        .modal-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.05rem;
+            color: var(--ink-dim);
+            line-height: 1.9;
+            margin-bottom: 32px;
+            font-style: italic;
+        }
+
+        .modal-actions { display: flex; gap: 14px; }
+
+        .modal-btn {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 11px 22px;
+            border: 1px solid;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .btn-enter { border-color: var(--ink); color: var(--ink); }
+        .btn-enter:hover { background: var(--ink); color: var(--bg); }
+        .btn-back  { border-color: var(--border); color: var(--ink-fade); }
+        .btn-back:hover { background: var(--border2); }
+
+        /* ── NAV ── */
+        .back-btn {
+            position: fixed; top: 24px; left: 28px;
+            z-index: 100;
+            text-decoration: none;
+            color: var(--ink-fade);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        .back-btn:hover { color: var(--ink); }
+
+        /* ── LANGUAGE TOGGLE ── */
+        .lang-toggle {
+            position: fixed;
+            top: 20px; right: 28px;
+            z-index: 100;
+            display: flex;
+            gap: 0;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .lang-btn {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            padding: 8px 18px;
+            border: none;
+            background: var(--paper2);
+            color: var(--ink-fade);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .lang-btn.active {
+            background: var(--ink);
+            color: var(--bg);
+        }
+
+        .lang-btn:not(.active):hover {
+            background: var(--border2);
+            color: var(--ink);
+        }
+
+        /* Language transition */
+        .lang-id, .lang-en {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        body.lang-english .lang-id {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-6px);
+            position: absolute;
+        }
+
+        body.lang-english .lang-en {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+            position: relative;
+        }
+
+        body:not(.lang-english) .lang-en {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(6px);
+            position: absolute;
+        }
+
+        body:not(.lang-english) .lang-id {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+            position: relative;
+        }
+
+        /* ── CONTAINER ── */
+        .container {
+            position: relative; z-index: 10;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 110px 50px 160px;
+        }
+
+        /* ── DOCUMENT HEADER ── */
+        .doc-header {
+            border-bottom: 2px solid var(--ink);
+            padding-bottom: 24px;
+            margin-bottom: 40px;
+            position: relative;
+            opacity: 0;
+            animation: emerge 1s ease 0.2s forwards;
+        }
+
+        @keyframes emerge {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .doc-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 28px;
+        }
+
+        .doc-classification {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            color: var(--ink-fade);
+            text-transform: uppercase;
+            line-height: 2;
+        }
+
+        .doc-number {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            color: var(--ink-dim);
+            text-align: right;
+            line-height: 2;
+        }
+
+        /* BIG STAMP */
+        .doc-stamp {
+            position: absolute;
+            top: 8px; right: 0;
+            border: 3px solid var(--stamp);
+            color: var(--stamp);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            padding: 6px 14px;
+            text-transform: uppercase;
+            transform: rotate(6deg);
+            pointer-events: none;
+            white-space: nowrap;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-family: 'Libre Baskerville', serif;
+            font-size: clamp(1.3rem, 3.5vw, 2rem);
+            font-weight: 400;
+            color: var(--ink);
+            line-height: 1.35;
+            letter-spacing: 1px;
+        }
+
+        h1 .doc-num-inline {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7em;
+            color: var(--ink-fade);
+            letter-spacing: 3px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* ── POEM BODY ── */
+        .poem-body {
+            opacity: 0;
+            animation: emerge 1.2s ease 0.4s forwards;
+            position: relative;
+        }
+
+        /* Clause / Pasal blocks */
+        .clause {
+            margin-bottom: 44px;
+            position: relative;
+        }
+
+        .clause-header {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            color: var(--ink-fade);
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border2);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .clause-header .clause-status {
+            color: var(--red);
+            opacity: 0.6;
+        }
+
+        .poem-line {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.05rem, 2.3vw, 1.22rem);
+            line-height: 2.15;
+            color: var(--ink-dim);
+            display: block;
+        }
+
+        /* Indent block */
+        .indent {
+            padding-left: 28px;
+            border-left: 2px solid var(--border);
+            margin: 16px 0;
+        }
+
+        /* Footnote style */
+        .footnote {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.88rem;
+            color: var(--ink-ghost);
+            font-style: italic;
+            line-height: 1.8;
+            padding-left: 20px;
+            border-left: 1px solid var(--border2);
+            margin-top: 12px;
+        }
+
+        /* ── TEXT VARIANTS ── */
+        .t-formal   { color: var(--ink); font-weight: normal; }
+        .t-dim      { color: var(--ink-fade); font-style: italic; }
+        .t-ghost    { color: var(--ink-ghost); font-style: italic; }
+        .t-redacted {
+            background: var(--ink);
+            color: var(--ink);
+            padding: 0 4px;
+            user-select: none;
+            cursor: not-allowed;
+            transition: background 0.4s ease;
+            border-radius: 1px;
+        }
+        .t-redacted:hover {
+            background: var(--red);
+        }
+        .t-clause-num {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75em;
+            color: var(--ink-fade);
+            letter-spacing: 1px;
+        }
+        .t-finding {
+            color: var(--ink);
+            font-style: italic;
+            position: relative;
+        }
+        .t-finding::after {
+            content: '';
+            position: absolute;
+            bottom: 2px; left: 0; right: 0;
+            height: 1px;
+            background: var(--ink-ghost);
+        }
+
+        /* ── SEPARATOR ── */
+        .separator {
+            display: flex; align-items: center; gap: 16px;
+            margin: 36px 0;
+            opacity: 0.4;
+        }
+        .sep-line { flex: 1; height: 1px; background: var(--border); }
+        .sep-mark {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.55rem;
+            color: var(--ink-fade);
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+
+        /* ── CONCLUSION / GREY AREA BOX ── */
+        .grey-area {
+            margin: 44px 0;
+            padding: 28px 32px;
+            background: var(--red-faint);
+            border: 1px solid rgba(139,32,32,0.2);
+            border-left: 3px solid rgba(139,32,32,0.4);
+            position: relative;
+        }
+
+        .grey-area-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.55rem;
+            letter-spacing: 3px;
+            color: var(--red);
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            opacity: 0.7;
+        }
+
+        .grey-area .poem-line {
+            color: var(--ink-dim);
+        }
+
+        /* ── EXIT / CLOSING ── */
+        .doc-closing {
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 2px solid var(--ink);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .doc-closing-left {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.58rem;
+            color: var(--ink-fade);
+            letter-spacing: 2px;
+            line-height: 2.2;
+        }
+
+        .doc-closing-right {
+            text-align: right;
+        }
+
+        .signature-line {
+            width: 180px;
+            height: 1px;
+            background: var(--ink-dim);
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        /* Actual "signature" — a squiggle via CSS */
+        .signature-squiggle {
+            position: absolute;
+            top: -18px;
+            left: 20px;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 1.3rem;
+            color: var(--ink-dim);
+            opacity: 0.5;
+            transform: rotate(-8deg);
+            letter-spacing: -2px;
+        }
+
+        .signature-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.55rem;
+            color: var(--ink-ghost);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            margin-top: 60px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.55rem;
+            color: var(--ink-ghost);
+            letter-spacing: 2px;
+            line-height: 2.2;
+            opacity: 0.5;
+            border-top: 1px solid var(--border2);
+            padding-top: 20px;
+        }
+
+        /* ── WATERMARK ── */
+        .watermark {
+            position: fixed;
+            bottom: 60px; right: -40px;
+            font-family: 'Libre Baskerville', serif;
+            font-size: 7rem;
+            color: rgba(0,0,0,0.03);
+            transform: rotate(-30deg);
+            pointer-events: none;
+            z-index: 2;
+            white-space: nowrap;
+            user-select: none;
+            letter-spacing: 4px;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 640px) {
+            .container { padding: 90px 24px 120px; }
+            .doc-meta  { flex-direction: column; gap: 12px; }
+            .doc-stamp { display: none; }
+            .doc-closing { flex-direction: column; gap: 30px; }
+            .doc-closing-right { align-self: flex-end; }
+            h1 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="modal">
+    <div class="modal-box">
+        <div class="modal-stamp">Diklasifikasi</div>
+        <div class="modal-tag">Dokumen resmi / official document</div>
+        <h2 class="modal-title">Peringatan sebelum membaca dokumen ini</h2>
+        <p class="modal-text">
+            Dokumen ini berisi abu-abu.<br>
+            Bukan hitam. Bukan putih.<br>
+            Hanya prosedur yang tidak pernah benar-benar selesai.
+        </p>
+        <div class="modal-actions">
+            <button class="modal-btn btn-back" onclick="goBack()">Kembali</button>
+            <button class="modal-btn btn-enter" onclick="enterPoem()">Buka Dokumen</button>
+        </div>
+    </div>
+</div>
+
+<!-- Paper atmosphere -->
+<canvas id="paperCanvas"></canvas>
+<div class="vignette"></div>
+<div class="margin-rule"></div>
+
+<!-- Nav -->
+<a href="../index.html" class="back-btn">← kembali</a>
+
+<!-- Language Toggle -->
+<div class="lang-toggle">
+    <button class="lang-btn active" id="btnId" onclick="setLang('id')">ID</button>
+    <button class="lang-btn" id="btnEn" onclick="setLang('en')">EN</button>
+</div>
+
+<!-- Watermark -->
+<div class="watermark">ABU-ABU</div>
+
+<div class="container">
+
+    <!-- ── DOCUMENT HEADER ── -->
+    <div class="doc-header">
+        <div class="doc-meta">
+            <div class="doc-classification">
+                <span class="lang-id">Klasifikasi: Tidak Dapat Dijelaskan<br>Departemen: Urusan yang Tidak Selesai<br>Perihal: Abu-Abu</span>
+                <span class="lang-en">Classification: Inexplicable<br>Department: Unfinished Affairs<br>Subject: Grey</span>
+            </div>
+            <div class="doc-number">
+                <span class="lang-id">Nomor: MEM-07/ABU/∅<br>Tanggal: Tidak Tercatat<br>Status: Terbuka Selamanya</span>
+                <span class="lang-en">Number: MEM-07/GREY/∅<br>Date: Unrecorded<br>Status: Perpetually Open</span>
+            </div>
+        </div>
+        <div class="doc-stamp lang-id">Belum Selesai</div>
+        <div class="doc-stamp lang-en">Unresolved</div>
+
+        <h1>
+            <span class="doc-num-inline">MEMORANDUM_07</span>
+            <span class="lang-id">PROSEDUR EVAKUASI DARI SESUATU YANG TIDAK PERNAH TERBAKAR</span>
+            <span class="lang-en">EVACUATION PROCEDURE FROM SOMETHING THAT NEVER BURNED</span>
+        </h1>
+    </div>
+
+    <!-- ── POEM BODY ── -->
+    <div class="poem-body">
+
+        <!-- Pasal I -->
+        <div class="clause">
+            <div class="clause-header">
+                <span class="lang-id">Pasal I — Kondisi Awal</span>
+                <span class="lang-en">Article I — Initial Conditions</span>
+                <span class="clause-status lang-id">tidak dapat diverifikasi</span>
+                <span class="clause-status lang-en">unverifiable</span>
+            </div>
+
+            <span class="poem-line lang-id">
+                Tidak ada api yang tercatat dalam laporan ini.
+            </span>
+            <span class="poem-line lang-en">
+                No fire has been recorded in this report.
+            </span>
+
+            <span class="poem-line lang-id t-dim">
+                Hanya sebuah ruangan yang masih berbau asap
+                dari sesuatu yang tidak pernah benar-benar menyala.
+            </span>
+            <span class="poem-line lang-en t-dim">
+                Only a room that still smells of smoke
+                from something that never truly caught fire.
+            </span>
+
+            <div class="indent">
+                <span class="poem-line lang-id">
+                    <span class="t-clause-num">§ 1.1 —</span>
+                    Pintu darurat ditemukan dalam keadaan terbuka,
+                    namun tidak ada bukti bahwa seseorang pernah melewatinya.
+                </span>
+                <span class="poem-line lang-en">
+                    <span class="t-clause-num">§ 1.1 —</span>
+                    The emergency exit was found open,
+                    yet there is no evidence that anyone passed through it.
+                </span>
+
+                <span class="poem-line lang-id t-dim">
+                    <span class="t-clause-num">§ 1.2 —</span>
+                    Di atas meja, ada secangkir teh yang masih hangat
+                    milik seseorang yang sudah tidak lagi berada di sini.
+                </span>
+                <span class="poem-line lang-en t-dim">
+                    <span class="t-clause-num">§ 1.2 —</span>
+                    On the table, a cup of tea still warm
+                    belonging to someone no longer present.
+                </span>
+            </div>
+
+            <div class="footnote lang-id">
+                * Catatan: Kehangatan tidak dihitung sebagai bukti keberadaan.
+            </div>
+            <div class="footnote lang-en">
+                * Note: Warmth is not counted as evidence of presence.
+            </div>
+        </div>
+
+        <div class="separator">
+            <div class="sep-line"></div>
+            <span class="sep-mark lang-id">// pasal_II</span>
+            <span class="sep-mark lang-en">// article_II</span>
+            <div class="sep-line"></div>
+        </div>
+
+        <!-- Pasal II -->
+        <div class="clause">
+            <div class="clause-header">
+                <span class="lang-id">Pasal II — Temuan di Lapangan</span>
+                <span class="lang-en">Article II — Field Findings</span>
+                <span class="clause-status lang-id">ambigu</span>
+                <span class="clause-status lang-en">ambiguous</span>
+            </div>
+
+            <span class="poem-line lang-id">
+                Ditemukan: satu pasang bayangan yang ukurannya tidak lagi sama.
+            </span>
+            <span class="poem-line lang-en">
+                Found: one pair of shadows no longer matching in size.
+            </span>
+
+            <span class="poem-line lang-id t-dim">
+                Salah satunya tampak lebih panjang dari yang seharusnya —
+                seolah-olah pernah berdiri di bawah matahari milik orang lain.
+            </span>
+            <span class="poem-line lang-en t-dim">
+                One appeared longer than it should —
+                as though it once stood beneath someone else's sun.
+            </span>
+
+            <div class="indent">
+                <span class="poem-line lang-id">
+                    <span class="t-clause-num">§ 2.1 —</span>
+                    Cahaya yang dipantulkan oleh permukaan bermata dua
+                    tidak dihitung sebagai bukti kehadiran.
+                </span>
+                <span class="poem-line lang-en">
+                    <span class="t-clause-num">§ 2.1 —</span>
+                    Light reflected from a two-faced surface
+                    does not qualify as evidence of presence.
+                </span>
+
+                <span class="poem-line lang-id t-ghost">
+                    <span class="t-clause-num">§ 2.2 —</span>
+                    Rekaman suara menunjukkan adanya jeda selama
+                    <span class="t-redacted" title="diklasifikasi">████████████</span>
+                    detik sebelum jawaban diberikan.
+                </span>
+                <span class="poem-line lang-en t-ghost">
+                    <span class="t-clause-num">§ 2.2 —</span>
+                    Audio recordings show a pause of
+                    <span class="t-redacted" title="classified">████████████</span>
+                    seconds before any answer was given.
+                </span>
+            </div>
+
+            <div class="footnote lang-id">
+                ** Jeda tidak diakui sebagai bentuk komunikasi oleh departemen ini.
+                Namun demikian, jeda tersebut masih terdengar.
+            </div>
+            <div class="footnote lang-en">
+                ** Silence is not recognized as a form of communication by this department.
+                Nevertheless, it can still be heard.
+            </div>
+        </div>
+
+        <div class="separator">
+            <div class="sep-line"></div>
+            <span class="sep-mark lang-id">// pasal_III</span>
+            <span class="sep-mark lang-en">// article_III</span>
+            <div class="sep-line"></div>
+        </div>
+
+        <!-- Pasal III -->
+        <div class="clause">
+            <div class="clause-header">
+                <span class="lang-id">Pasal III — Kronologi yang Tidak Dapat Dikonfirmasi</span>
+                <span class="lang-en">Article III — Unconfirmable Chronology</span>
+                <span class="clause-status lang-id">dalam investigasi</span>
+                <span class="clause-status lang-en">under investigation</span>
+            </div>
+
+            <span class="poem-line lang-id">
+                Pukul <span class="t-redacted">██:██</span> —
+                seseorang memilih untuk tidak membuka jendela.
+            </span>
+            <span class="poem-line lang-en">
+                At <span class="t-redacted">██:██</span> —
+                someone chose not to open the window.
+            </span>
+
+            <span class="poem-line lang-id t-dim">
+                Pukul <span class="t-redacted">██:██</span> —
+                tanaman di sudut ruangan berhenti tumbuh
+                tanpa ada yang memperhatikan.
+            </span>
+            <span class="poem-line lang-en t-dim">
+                At <span class="t-redacted">██:██</span> —
+                the plant in the corner stopped growing
+                without anyone noticing.
+            </span>
+
+            <span class="poem-line lang-id t-ghost">
+                Pukul <span class="t-redacted">██:██</span> —
+                kalimat yang sudah disiapkan selama tiga bulan
+                dikembalikan ke dalam saku tanpa pernah diucapkan.
+            </span>
+            <span class="poem-line lang-en t-ghost">
+                At <span class="t-redacted">██:██</span> —
+                a sentence prepared over three months
+                was returned to a pocket, never spoken.
+            </span>
+
+            <div class="footnote lang-id">
+                *** Departemen tidak dapat memastikan urutan kejadian di atas.
+                Semua waktu bersifat perkiraan. Semua perkiraan bersifat abu-abu.
+            </div>
+            <div class="footnote lang-en">
+                *** The department cannot confirm the sequence of the above events.
+                All times are approximate. All approximations are grey.
+            </div>
+        </div>
+
+        <div class="separator">
+            <div class="sep-line"></div>
+            <span class="sep-mark lang-id">// pasal_IV</span>
+            <span class="sep-mark lang-en">// article_IV</span>
+            <div class="sep-line"></div>
+        </div>
+
+        <!-- Pasal IV -->
+        <div class="clause">
+            <div class="clause-header">
+                <span class="lang-id">Pasal IV — Alasan Evakuasi</span>
+                <span class="lang-en">Article IV — Grounds for Evacuation</span>
+                <span class="clause-status lang-id">♦ abu-abu</span>
+                <span class="clause-status lang-en">♦ grey</span>
+            </div>
+
+            <span class="poem-line lang-id">
+                Evakuasi dilakukan bukan karena bangunan ini berbahaya.
+            </span>
+            <span class="poem-line lang-en">
+                The evacuation was not conducted because the building was dangerous.
+            </span>
+
+            <span class="poem-line lang-id t-dim">
+                Evakuasi dilakukan karena
+                bangunan ini terlalu aman —
+            </span>
+            <span class="poem-line lang-en t-dim">
+                The evacuation was conducted because
+                the building was too safe —
+            </span>
+
+            <div class="indent">
+                <span class="poem-line lang-id t-ghost">
+                    terlalu aman untuk sesuatu yang tidak lagi ingin diselamatkan.
+                </span>
+                <span class="poem-line lang-en t-ghost">
+                    too safe for something that no longer wished to be saved.
+                </span>
+            </div>
+
+            <span class="poem-line lang-id" style="margin-top: 20px;">
+                Tidak ada yang berlari.
+            </span>
+            <span class="poem-line lang-en" style="margin-top: 20px;">
+                No one ran.
+            </span>
+
+            <span class="poem-line lang-id t-dim">
+                Yang ada hanyalah seseorang yang berjalan
+                dengan kecepatan yang cukup untuk disebut pergi,
+                namun cukup lambat untuk disebut masih di sini.
+            </span>
+            <span class="poem-line lang-en t-dim">
+                There was only someone walking
+                at a speed fast enough to be called leaving,
+                yet slow enough to still be called present.
+            </span>
+        </div>
+
+        <!-- Grey Area Box -->
+        <div class="grey-area">
+            <div class="grey-area-label lang-id">◆ Zona Abu-Abu — Tidak Dapat Diklasifikasikan</div>
+            <div class="grey-area-label lang-en">◆ Grey Zone — Cannot Be Classified</div>
+
+            <span class="poem-line lang-id">
+                Di antara "aku sudah mencoba" dan "aku tidak pernah benar-benar mencoba",
+            </span>
+            <span class="poem-line lang-en">
+                Between "I tried" and "I never truly tried",
+            </span>
+
+            <span class="poem-line lang-id t-dim">
+                ada sebuah wilayah yang luasnya tepat sebesar
+                satu helaan napas yang tidak jadi dikeluarkan.
+            </span>
+            <span class="poem-line lang-en t-dim">
+                there exists a territory exactly as wide as
+                one breath that was never released.
+            </span>
+
+            <span class="poem-line lang-id" style="margin-top: 16px;">
+                Departemen ini tidak memiliki formulir untuk wilayah tersebut.
+            </span>
+            <span class="poem-line lang-en" style="margin-top: 16px;">
+                This department has no form for that territory.
+            </span>
+
+            <span class="poem-line lang-id t-dim">
+                Namun wilayah itu tetap ada.
+            </span>
+            <span class="poem-line lang-en t-dim">
+                Yet it persists.
+            </span>
+
+            <div class="footnote lang-id" style="margin-top: 16px;">
+                **** Ketidaktersediaan formulir tidak menghapus wilayah.
+                Wilayah hanya menjadi semakin luas setiap kali diabaikan.
+            </div>
+            <div class="footnote lang-en" style="margin-top: 16px;">
+                **** The absence of a form does not erase the territory.
+                The territory only expands each time it is ignored.
+            </div>
+        </div>
+
+        <div class="separator">
+            <div class="sep-line"></div>
+            <span class="sep-mark lang-id">// kesimpulan</span>
+            <span class="sep-mark lang-en">// conclusion</span>
+            <div class="sep-line"></div>
+        </div>
+
+        <!-- Pasal V — Penutup -->
+        <div class="clause">
+            <div class="clause-header">
+                <span class="lang-id">Pasal V — Kesimpulan Sementara</span>
+                <span class="lang-en">Article V — Provisional Conclusion</span>
+                <span class="clause-status lang-id">berlaku selamanya</span>
+                <span class="clause-status lang-en">indefinitely valid</span>
+            </div>
+
+            <span class="poem-line lang-id">
+                Berdasarkan temuan-temuan di atas,
+                departemen menyimpulkan bahwa:
+            </span>
+            <span class="poem-line lang-en">
+                Based on the findings above,
+                the department concludes that:
+            </span>
+
+            <div class="indent" style="margin-top: 16px;">
+                <span class="poem-line lang-id t-finding">
+                    tidak ada yang salah.
+                </span>
+                <span class="poem-line lang-en t-finding">
+                    nothing was wrong.
+                </span>
+
+                <span class="poem-line lang-id t-ghost" style="margin-top: 8px;">
+                    tidak ada yang benar.
+                </span>
+                <span class="poem-line lang-en t-ghost" style="margin-top: 8px;">
+                    nothing was right.
+                </span>
+
+                <span class="poem-line lang-id" style="margin-top: 8px;">
+                    hanya ada dua bangunan yang berdiri terlalu lama
+                    di atas tanah yang sudah lama bergeser.
+                </span>
+                <span class="poem-line lang-en" style="margin-top: 8px;">
+                    there were only two buildings standing too long
+                    on ground that had long since shifted.
+                </span>
+            </div>
+
+            <span class="poem-line lang-id t-dim" style="margin-top: 24px;">
+                Evakuasi dinyatakan selesai.
+            </span>
+            <span class="poem-line lang-en t-dim" style="margin-top: 24px;">
+                The evacuation is declared complete.
+            </span>
+
+            <span class="poem-line lang-id t-ghost">
+                Bangunan dinyatakan kosong.
+            </span>
+            <span class="poem-line lang-en t-ghost">
+                The building is declared empty.
+            </span>
+
+            <span class="poem-line lang-id" style="margin-top: 16px;">
+                Asapnya masih ada.
+            </span>
+            <span class="poem-line lang-en" style="margin-top: 16px;">
+                The smoke remains.
+            </span>
+        </div>
+
+        <!-- Doc closing -->
+        <div class="doc-closing">
+            <div class="doc-closing-left lang-id">
+                Dokumen ini bersifat final.<br>
+                Dokumen ini tidak bersifat final.<br>
+                <span style="color: var(--ink-ghost);">ref: MEM-07/ABU/∅ | hal. 1 dari ∞</span>
+            </div>
+            <div class="doc-closing-left lang-en">
+                This document is final.<br>
+                This document is not final.<br>
+                <span style="color: var(--ink-ghost);">ref: MEM-07/GREY/∅ | p. 1 of ∞</span>
+            </div>
+
+            <div class="doc-closing-right">
+                <div class="signature-line">
+                    <span class="signature-squiggle">— —  —</span>
+                </div>
+                <div class="signature-label lang-id">tanda tangan yang tidak terbaca</div>
+                <div class="signature-label lang-en">an illegible signature</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="lang-id">
+                -- akhir transmisi --<br>
+                [ proses selesai dengan status: abu-abu ]<br>
+                ※ semua alasan adalah fiksi yang tidak paham dirinya adalah alasan ※
+            </span>
+            <span class="lang-en">
+                -- end of transmission --<br>
+                [ process finished with status: grey ]<br>
+                ※ all reasons are fiction that does not know it is a reason ※
+            </span>
+        </div>
+
+    </div><!-- end poem-body -->
+</div><!-- end container -->
+
+<script>
+    // ── MODAL ──
+    function enterPoem() { document.getElementById('modal').classList.add('hidden'); }
+    function goBack() { window.location.href = '../index.html'; }
+
+    // ── LANGUAGE TOGGLE ──
+    function setLang(lang) {
+        const btnId = document.getElementById('btnId');
+        const btnEn = document.getElementById('btnEn');
+        if (lang === 'en') {
+            document.body.classList.add('lang-english');
+            btnEn.classList.add('active');
+            btnId.classList.remove('active');
+            document.documentElement.lang = 'en';
+        } else {
+            document.body.classList.remove('lang-english');
+            btnId.classList.add('active');
+            btnEn.classList.remove('active');
+            document.documentElement.lang = 'id';
+        }
+    }
+
+    // ── REDACTED TEXT ──
+    document.querySelectorAll('.t-redacted').forEach(el => {
+        let timer;
+        el.addEventListener('mousedown', () => {
+            timer = setTimeout(() => {
+                el.style.background = 'transparent';
+                el.style.color = 'var(--red)';
+                el.style.cursor = 'default';
+            }, 1200);
+        });
+        el.addEventListener('mouseup', () => clearTimeout(timer));
+        el.addEventListener('mouseleave', () => clearTimeout(timer));
+        el.addEventListener('dblclick', () => {
+            el.style.background = '';
+            el.style.color = '';
+            el.style.cursor = '';
+        });
+    });
+
+    // ── PAPER CANVAS — aged document texture ──
+    const canvas = document.getElementById('paperCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Seeded random — deterministic so texture stays consistent
+    function seededRand(seed) {
+        let s = seed;
+        return function() {
+            s = (s * 9301 + 49297) % 233280;
+            return s / 233280;
+        };
+    }
+
+    function drawPaperTexture() {
+        const W = canvas.width  = window.innerWidth;
+        const H = canvas.height = window.innerHeight;
+        const r = seededRand(42);
+
+        ctx.clearRect(0, 0, W, H);
+
+        // ── 1. GRAIN — fine noise dots ──
+        for (let i = 0; i < W * H * 0.012; i++) {
+            const x   = r() * W;
+            const y   = r() * H;
+            const sz  = r() * 1.2 + 0.2;
+            const warm = r() > 0.5;
+            ctx.globalAlpha = r() * 0.06 + 0.01;
+            ctx.fillStyle = warm ? '#8a7a5a' : '#c0b898';
+            ctx.fillRect(x, y, sz, sz);
+        }
+
+        // ── 2. FOXING SPOTS — age stains ──
+        const spots = [
+            { x: 0.08, y: 0.12, r: 0.018, o: 0.06 },
+            { x: 0.91, y: 0.07, r: 0.012, o: 0.05 },
+            { x: 0.85, y: 0.55, r: 0.022, o: 0.04 },
+            { x: 0.05, y: 0.72, r: 0.015, o: 0.055 },
+            { x: 0.92, y: 0.88, r: 0.02,  o: 0.045 },
+            { x: 0.15, y: 0.42, r: 0.009, o: 0.04 },
+            { x: 0.78, y: 0.31, r: 0.011, o: 0.035 },
+        ];
+
+        spots.forEach(s => {
+            const grd = ctx.createRadialGradient(
+                s.x * W, s.y * H, 0,
+                s.x * W, s.y * H, s.r * Math.min(W, H)
+            );
+            grd.addColorStop(0,   `rgba(139, 110, 60, ${s.o})`);
+            grd.addColorStop(0.5, `rgba(160, 125, 70, ${s.o * 0.5})`);
+            grd.addColorStop(1,   'rgba(160, 125, 70, 0)');
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = grd;
+            ctx.beginPath();
+            ctx.ellipse(
+                s.x * W, s.y * H,
+                s.r * Math.min(W, H) * (1 + r() * 0.4),
+                s.r * Math.min(W, H) * (0.7 + r() * 0.4),
+                r() * Math.PI, 0, Math.PI * 2
+            );
+            ctx.fill();
+        });
+
+        // ── 3. EDGE DARKENING — worn corners ──
+        const corners = [
+            [0, 0], [W, 0], [0, H], [W, H]
+        ];
+        corners.forEach(([cx, cy]) => {
+            const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W,H) * 0.38);
+            g.addColorStop(0,   'rgba(100, 80, 45, 0.10)');
+            g.addColorStop(0.5, 'rgba(100, 80, 45, 0.04)');
+            g.addColorStop(1,   'rgba(100, 80, 45, 0)');
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, W, H);
+        });
+
+        // ── 4. FOLD LINES — like a letter folded in thirds ──
+        [0.33, 0.66].forEach(pos => {
+            const y = H * pos;
+            // slight crease shadow
+            const grad = ctx.createLinearGradient(0, y - 6, 0, y + 6);
+            grad.addColorStop(0,   'rgba(90, 75, 50, 0)');
+            grad.addColorStop(0.5, 'rgba(90, 75, 50, 0.045)');
+            grad.addColorStop(1,   'rgba(90, 75, 50, 0)');
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, y - 6, W, 12);
+
+            // thin crease line
+            ctx.globalAlpha = 0.06;
+            ctx.strokeStyle = '#7a6840';
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(0, y + (r()-0.5)*2);
+            ctx.lineTo(W, y + (r()-0.5)*2);
+            ctx.stroke();
+        });
+
+        // ── 5. SUBTLE WATER STAIN ring — top right ──
+        const wg = ctx.createRadialGradient(W*0.88, H*0.09, H*0.04, W*0.88, H*0.09, H*0.10);
+        wg.addColorStop(0,   'rgba(160,130,80,0)');
+        wg.addColorStop(0.85,'rgba(160,130,80,0.03)');
+        wg.addColorStop(0.92,'rgba(140,110,65,0.055)');
+        wg.addColorStop(1,   'rgba(140,110,65,0)');
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = wg;
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.globalAlpha = 1;
+    }
+
+    drawPaperTexture();
+    window.addEventListener('resize', drawPaperTexture);
+
+    // ── BREATHING — very subtle page warmth pulse ──
+    const vignette = document.querySelector('.vignette');
+    let breathT = 0;
+    function breathe() {
+        breathT += 0.004;
+        const pulse = Math.sin(breathT) * 0.03 + 0.97; // 0.94 – 1.00
+        vignette.style.opacity = pulse;
+        requestAnimationFrame(breathe);
+    }
+    breathe();
+
+    // ── SCROLL — parallax paper grain slight shift ──
+    window.addEventListener('scroll', () => {
+        const y = window.scrollY * 0.015;
+        canvas.style.transform = `translateY(${y}px)`;
+    }, { passive: true });
+
+    // ── CLAUSE HEADER — flicker on scroll into view ──
+    const clauseHeaders = document.querySelectorAll('.clause-header');
+    const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.style.transition = 'opacity 0.1s';
+                e.target.style.opacity = '0.4';
+                setTimeout(() => {
+                    e.target.style.opacity = '1';
+                    setTimeout(() => {
+                        e.target.style.opacity = '0.6';
+                        setTimeout(() => { e.target.style.opacity = '1'; }, 80);
+                    }, 60);
+                }, 40);
+                io.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.8 });
+    clauseHeaders.forEach(h => io.observe(h));
+</script>
+</body>
+</html>

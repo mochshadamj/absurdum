@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../images/icon.png">
+    <title>Titik yang Tidak Punya Bayangan | ABSURDUM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --void: #050508;
+            --deep: #0a0a12;
+            --mist: #11111e;
+            --dim: #2a2a42;
+            --pale: #aaaacc;
+            --ghost: #8888aa;
+            --silver: #d8d8ee;
+            --white: #f0f0ff;
+            --accent: #6666dd;
+            --accent-dim: rgba(68, 68, 204, 0.15);
+            --red-dim: rgba(180, 40, 40, 0.08);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--void);
+            color: var(--silver);
+            font-family: 'EB Garamond', Georgia, serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* Custom cursor */
+        .cursor {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: var(--pale);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s ease;
+            mix-blend-mode: difference;
+        }
+
+        /* VOID CANVAS */
+        #voidCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Radial void overlay */
+        .void-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            background: radial-gradient(ellipse at 50% 50%, transparent 0%, rgba(5,5,8,0.7) 70%, var(--void) 100%);
+        }
+
+        /* Back button */
+        .back-btn {
+            position: fixed;
+            top: 28px;
+            left: 28px;
+            z-index: 100;
+            text-decoration: none;
+            color: var(--ghost);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: color 0.4s ease;
+            border-bottom: 1px solid transparent;
+        }
+
+        .back-btn:hover {
+            color: var(--pale);
+            border-bottom-color: var(--ghost);
+        }
+
+        /* Coordinate display */
+        .coordinate {
+            position: fixed;
+            top: 28px;
+            right: 28px;
+            z-index: 100;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--ghost);
+            letter-spacing: 2px;
+            opacity: 0.5;
+            animation: coordFlicker 7s infinite;
+        }
+
+        @keyframes coordFlicker {
+            0%, 90%, 100% { opacity: 0.5; }
+            92% { opacity: 0.1; }
+            94% { opacity: 0.5; }
+            96% { opacity: 0.15; }
+        }
+
+        /* Main container */
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 120px 40px 160px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 8, 0.97);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .modal-overlay.hidden { display: none; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-box {
+            border: 1px solid var(--ghost);
+            padding: 50px 40px;
+            max-width: 460px;
+            width: 90%;
+            background: var(--deep);
+            animation: modalRise 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalRise {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+            color: var(--ghost);
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-family: 'EB Garamond', serif;
+            font-size: 1.6rem;
+            color: var(--white);
+            margin-bottom: 20px;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+
+        .modal-text {
+            font-family: 'EB Garamond', serif;
+            font-size: 1rem;
+            color: var(--pale);
+            line-height: 1.9;
+            margin-bottom: 40px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .modal-btn {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 12px 24px;
+            border: 1px solid;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-enter {
+            border-color: var(--pale);
+            color: var(--pale);
+        }
+
+        .btn-enter:hover {
+            background: var(--pale);
+            color: var(--void);
+        }
+
+        .btn-back {
+            border-color: var(--ghost);
+            color: var(--ghost);
+        }
+
+        .btn-back:hover {
+            background: var(--ghost);
+            color: var(--void);
+        }
+
+        /* Title section */
+        .poem-header {
+            margin-bottom: 80px;
+            opacity: 0;
+            animation: emerge 1.5s ease 0.3s forwards;
+        }
+
+        @keyframes emerge {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .poem-tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+            color: var(--ghost);
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            display: block;
+        }
+
+        h1 {
+            font-family: 'EB Garamond', serif;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 400;
+            color: var(--white);
+            line-height: 1.25;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .poem-subtitle {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--ghost);
+            letter-spacing: 3px;
+            opacity: 0.6;
+            font-style: italic;
+        }
+
+        /* Divider — a single point */
+        .point-divider {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--accent);
+            margin: 50px 0;
+            opacity: 0;
+            animation: emerge 1s ease 0.8s forwards;
+            box-shadow: 0 0 12px var(--accent);
+        }
+
+        /* POEM BODY */
+        .poem-body {
+            opacity: 0;
+            animation: emerge 1.5s ease 0.6s forwards;
+        }
+
+        .stanza {
+            margin-bottom: 48px;
+            position: relative;
+        }
+
+        .poem-line {
+            font-family: 'EB Garamond', serif;
+            font-size: clamp(1.05rem, 2.2vw, 1.2rem);
+            line-height: 2.1;
+            color: var(--silver);
+            display: block;
+        }
+
+        /* Text style variants */
+
+        /* void — faint but readable */
+        .t-void {
+            color: var(--pale);
+            font-style: italic;
+            opacity: 0.75;
+        }
+
+        /* coordinate — mono, small, clinical */
+        .t-coord {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75em;
+            color: var(--accent);
+            letter-spacing: 2px;
+            opacity: 0.7;
+        }
+
+        /* weight — heavy existential */
+        .t-heavy {
+            color: var(--white);
+            letter-spacing: 0.5px;
+        }
+
+        /* hollow — strikethrough memory */
+        .t-hollow {
+            text-decoration: line-through;
+            text-decoration-color: var(--pale);
+            color: var(--pale);
+            opacity: 0.65;
+            font-style: italic;
+        }
+
+        /* glow — accent highlight */
+        .t-glow {
+            color: var(--white);
+            text-shadow: 0 0 20px rgba(200, 200, 240, 0.3);
+        }
+
+        /* pulse — the flickering */
+        .t-pulse {
+            animation: textPulse 6s ease-in-out infinite;
+            color: var(--pale);
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* whisper — faint italic, aside */
+        .t-whisper {
+            color: var(--pale);
+            font-style: italic;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        /* shatter — breaks apart visually */
+        .t-shatter {
+            letter-spacing: 6px;
+            color: var(--pale);
+            opacity: 0.7;
+        }
+
+        /* Geometry decorations */
+        .geo-separator {
+            margin: 52px 0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            opacity: 0.25;
+        }
+
+        .geo-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--ghost), transparent);
+        }
+
+        .geo-shape {
+            width: 8px;
+            height: 8px;
+            border: 1px solid var(--ghost);
+            transform: rotate(45deg);
+            flex-shrink: 0;
+        }
+
+        /* Fragment blocks */
+        .fragment-block {
+            border-left: 1px solid var(--dim);
+            padding-left: 24px;
+            margin: 32px 0;
+        }
+
+        /* Final section — the hening */
+        .hening {
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        .hening-word {
+            font-family: 'EB Garamond', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 400;
+            color: var(--white);
+            letter-spacing: 12px;
+            opacity: 0;
+            animation: heningAppear 3s ease 1.5s forwards;
+        }
+
+        @keyframes heningAppear {
+            0% { opacity: 0; letter-spacing: 30px; }
+            100% { opacity: 0.85; letter-spacing: 12px; }
+        }
+
+        .hening-sub {
+            display: block;
+            margin-top: 20px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            color: var(--pale);
+            opacity: 0;
+            animation: emerge 1s ease 2.5s forwards;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 120px;
+            padding-top: 40px;
+            border-top: 1px solid var(--dim);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--pale);
+            letter-spacing: 2px;
+            opacity: 0.5;
+            line-height: 2;
+        }
+
+        /* Parallax floating points */
+        .float-point {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 100px 28px 120px;
+            }
+            .back-btn, .coordinate {
+                font-size: 0.6rem;
+            }
+            .modal-box {
+                padding: 36px 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom cursor -->
+    <div class="cursor" id="cursor"></div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <span class="modal-label">Koordinat: ∅</span>
+            <h2 class="modal-title">Peringatan sebelum masuk ke dalam ketiadaan</h2>
+            <p class="modal-text">
+                Puisi ini ada di antara ada dan hampir ada.<br>
+                Pembaca mungkin menemukan dirinya di tempat yang tidak memiliki koordinat.<br><br>
+                Semua interpretasi adalah tanggung jawab pembaca sendiri.
+            </p>
+            <div class="modal-actions">
+                <button class="modal-btn btn-back" onclick="goBack()">Kembali</button>
+                <button class="modal-btn btn-enter" onclick="enterPoem()">Masuk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas -->
+    <canvas id="voidCanvas"></canvas>
+    <div class="void-overlay"></div>
+
+    <!-- Navigation -->
+    <a href="../index.html" class="back-btn">← kembali</a>
+    <div class="coordinate" id="coordDisplay">koordinat: ∅</div>
+
+    <!-- Floating geometry points -->
+    <div class="float-point" id="fp1" style="width:2px;height:2px;background:#4444cc;opacity:0.3;top:20%;left:15%"></div>
+    <div class="float-point" id="fp2" style="width:3px;height:3px;background:#8888aa;opacity:0.15;top:60%;right:20%"></div>
+    <div class="float-point" id="fp3" style="width:1px;height:1px;background:#c8c8e0;opacity:0.4;top:40%;left:80%"></div>
+    <div class="float-point" id="fp4" style="width:2px;height:2px;background:#4444cc;opacity:0.2;bottom:30%;left:10%"></div>
+
+    <div class="container">
+        <div class="poem-header">
+            <span class="poem-tag">◌ absurdum: malfungsi aksara</span>
+            <h1>Titik yang Tidak<br>Punya Bayangan</h1>
+            <span class="poem-subtitle">[ koordinat: ∅ | jarak: antara ada dan hampir ]</span>
+        </div>
+
+        <div class="point-divider"></div>
+
+        <div class="poem-body">
+
+            <!-- Stanza I -->
+            <div class="stanza">
+                <span class="poem-line">Di mana ada dua buah <span class="t-pulse">hening</span> yang saling bertabrakan,</span>
+                <span class="poem-line">di sanalah letak sebuah titik yang tidak punya <span class="t-void">bayangan</span>.</span>
+            </div>
+
+            <div class="stanza">
+                <span class="poem-line t-void">Aku berada di dalam jarak antara dua tarikan napas</span>
+                <span class="poem-line t-void">yang tidak pernah bertemu.</span>
+            </div>
+
+            <div class="fragment-block">
+                <span class="poem-line">Bukan sebagai udara,</span>
+                <span class="poem-line">tapi sebagai sebuah <span class="t-coord">kesalahan dalam perhitungan angka nol</span>.</span>
+            </div>
+
+            <div class="geo-separator"><div class="geo-line"></div><div class="geo-shape"></div><div class="geo-line"></div></div>
+
+            <!-- Stanza II -->
+            <div class="stanza">
+                <span class="poem-line t-glow">Keberadaan di sini hanyalah sebuah arah</span>
+                <span class="poem-line t-glow">yang selalu berputar membelakangi dirinya sendiri.</span>
+            </div>
+
+            <div class="stanza">
+                <span class="poem-line">Jika kau melangkah ke depan,</span>
+                <span class="poem-line">kau justru akan menemukan bekas telapak kaki</span>
+                <span class="poem-line t-void">yang ditinggalkan oleh suara yang belum pernah diucapkan.</span>
+            </div>
+
+            <div class="stanza">
+                <span class="poem-line t-shatter">A k u &nbsp; t i d a k &nbsp; s e d a n g &nbsp; p e r g i .</span>
+            </div>
+
+            <div class="fragment-block">
+                <span class="poem-line t-whisper">Aku hanya sedang terjadi</span>
+                <span class="poem-line t-whisper">di tempat yang tidak memiliki koordinat.</span>
+            </div>
+
+            <div class="geo-separator"><div class="geo-line"></div><div class="geo-shape"></div><div class="geo-line"></div></div>
+
+            <!-- Stanza III -->
+            <div class="stanza">
+                <span class="poem-line">Setiap kali kau mencoba mengingat warnaku,</span>
+                <span class="poem-line">ingatlah tentang bagaimana rasanya kehilangan sebuah kata</span>
+                <span class="poem-line t-pulse">yang bahkan belum sempat terpikirkan</span>
+                <span class="poem-line t-void">oleh bahasa mana pun.</span>
+            </div>
+
+            <div class="stanza">
+                <span class="poem-line">Bayangkan sebuah bidang datar yang hanya memiliki satu sisi.</span>
+            </div>
+
+            <div class="fragment-block">
+                <span class="poem-line">Aku adalah sudut yang mencoba melengkung</span>
+                <span class="poem-line t-void">namun justru berakhir menjadi</span>
+                <span class="poem-line t-coord">sebuah ketiadaan yang simetris.</span>
+            </div>
+
+            <div class="geo-separator"><div class="geo-line"></div><div class="geo-shape"></div><div class="geo-line"></div></div>
+
+            <!-- Stanza IV -->
+            <div class="stanza" style="text-align:center; padding: 20px 0;">
+                <span class="poem-line" style="display:block; margin-bottom: 4px;">Tidak ada berat.</span>
+                <span class="poem-line t-void" style="display:block; margin-bottom: 4px;">Tidak ada ringan.</span>
+                <span class="poem-line t-whisper" style="display:block;">Hanya ada sebuah selisih antara <em>ada</em> dan <em>hampir</em>.</span>
+            </div>
+
+            <div class="geo-separator"><div class="geo-line"></div><div class="geo-shape"></div><div class="geo-line"></div></div>
+
+            <!-- Stanza V -->
+            <div class="stanza">
+                <span class="poem-line">Jangan mencari aku di dalam penglihatan,</span>
+                <span class="poem-line t-void">karena aku adalah celah di antara setiap kedipan mata.</span>
+            </div>
+
+            <div class="stanza">
+                <span class="poem-line">Jangan mencari aku di dalam pendengaran,</span>
+                <span class="poem-line t-void">karena aku adalah getaran dari kebungkaman yang paling <span class="t-pulse">terik</span>.</span>
+            </div>
+
+            <div class="fragment-block">
+                <span class="poem-line t-whisper">Jika suatu saat kau merasakan sebuah kehadiran</span>
+                <span class="poem-line t-whisper">yang terasa seperti sebuah lubang yang dibungkus oleh kekosongan,</span>
+                <span class="poem-line">maka itu bukanlah aku.</span>
+                <span class="poem-line t-hollow">Itu hanyalah sisa dari sebuah tanda tanya yang sudah menemukan jawabannya</span>
+                <span class="poem-line t-void">namun tetap memilih untuk menghilang.</span>
+            </div>
+
+            <div class="geo-separator"><div class="geo-line"></div><div class="geo-shape"></div><div class="geo-line"></div></div>
+
+            <!-- Stanza VI -->
+            <div class="stanza" style="text-align:center;">
+                <span class="poem-line t-heavy" style="display:block; margin-bottom: 8px;">Semua posisi telah digeser.</span>
+                <span class="poem-line t-void" style="display:block; margin-bottom: 8px;">Semua letak telah dihapus.</span>
+            </div>
+
+            <div class="stanza">
+                <span class="poem-line">Sekarang, aku hanyalah sebuah garis yang memotong dirinya sendiri</span>
+                <span class="poem-line t-coord">hingga menjadi sebuah titik yang tidak bisa dibagi lagi.</span>
+            </div>
+
+            <!-- Final — HENING -->
+            <div class="hening">
+                <span class="hening-word">HENING</span>
+                <span class="hening-sub">
+                    bukan karena suara telah hilang —<br>
+                    tapi karena tempat di mana suara itu seharusnya ada,<br>
+                    telah berubah menjadi sebuah ketidakmungkinan yang luas.
+                </span>
+            </div>
+
+        </div><!-- end poem-body -->
+
+        <div class="footer">
+            -- end of coordinates --<br>
+            [ titik: ∅ | bayangan: null | posisi: tidak terdefinisi ]<br>
+            ※ ketidakmungkinan yang luas ※
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CURSOR
+        // ============================================
+        const cursor = document.getElementById('cursor');
+        let mx = 0, my = 0;
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX; my = e.clientY;
+            cursor.style.left = mx + 'px';
+            cursor.style.top = my + 'px';
+        });
+
+        // ============================================
+        // COORDINATE DISPLAY
+        // ============================================
+        const coordDisplay = document.getElementById('coordDisplay');
+        document.addEventListener('mousemove', e => {
+            const nx = (e.clientX / window.innerWidth * 2 - 1).toFixed(3);
+            const ny = (e.clientY / window.innerHeight * 2 - 1).toFixed(3);
+            if (Math.random() > 0.95) {
+                coordDisplay.textContent = 'koordinat: ∅';
+            } else {
+                coordDisplay.textContent = `${nx} , ${ny}`;
+            }
+        });
+
+        // ============================================
+        // VOID CANVAS — particles & geometry
+        // ============================================
+        const canvas = document.getElementById('voidCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+        let lines = [];
+        let time = 0;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.3;
+                this.opacity = Math.random() * 0.35 + 0.05;
+                this.vx = (Math.random() - 0.5) * 0.12;
+                this.vy = (Math.random() - 0.5) * 0.12;
+                this.life = 0;
+                this.maxLife = 300 + Math.random() * 400;
+                this.color = Math.random() > 0.85 ? '#4444cc' : '#8888aa';
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life++;
+                if (this.life > this.maxLife || this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            draw() {
+                const progress = this.life / this.maxLife;
+                const fade = progress < 0.1 ? progress * 10 : progress > 0.9 ? (1 - progress) * 10 : 1;
+                ctx.save();
+                ctx.globalAlpha = this.opacity * fade;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Slowly drifting geometric ghost shapes
+        class GhostCircle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.r = 60 + Math.random() * 200;
+                this.opacity = 0.02 + Math.random() * 0.04;
+                this.speed = 0.0003 + Math.random() * 0.0005;
+                this.phase = Math.random() * Math.PI * 2;
+            }
+            draw() {
+                const pulse = Math.sin(time * this.speed + this.phase);
+                ctx.save();
+                ctx.globalAlpha = this.opacity * (0.7 + pulse * 0.3);
+                ctx.strokeStyle = '#4444cc';
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r * (0.9 + pulse * 0.1), 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        // Connecting filaments between near particles
+        function drawFilaments() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 120) {
+                        ctx.save();
+                        ctx.globalAlpha = (1 - dist / 120) * 0.07;
+                        ctx.strokeStyle = '#5a5a7a';
+                        ctx.lineWidth = 0.4;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+            }
+        }
+
+        let ghosts = [];
+
+        function init() {
+            resize();
+            particles = Array.from({ length: 80 }, () => new Particle());
+            ghosts = Array.from({ length: 5 }, () => new GhostCircle());
+        }
+
+        function animate() {
+            time++;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ghosts.forEach(g => g.draw());
+            drawFilaments();
+            particles.forEach(p => { p.update(); p.draw(); });
+
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+        window.addEventListener('resize', () => { resize(); });
+
+        // ============================================
+        // PARALLAX FLOATING POINTS
+        // ============================================
+        const fps = [
+            document.getElementById('fp1'),
+            document.getElementById('fp2'),
+            document.getElementById('fp3'),
+            document.getElementById('fp4'),
+        ];
+        const fpSpeeds = [0.018, 0.01, 0.025, 0.013];
+
+        document.addEventListener('mousemove', e => {
+            const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+            const dx = e.clientX - cx, dy = e.clientY - cy;
+            fps.forEach((fp, i) => {
+                fp.style.transform = `translate(${dx * fpSpeeds[i]}px, ${dy * fpSpeeds[i]}px)`;
+            });
+        });
+
+        // ============================================
+        // MODAL
+        // ============================================
+        function enterPoem() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        function goBack() {
+            window.location.href = '../index.html';
+        }
+    </script>
+</body>
+</html>
