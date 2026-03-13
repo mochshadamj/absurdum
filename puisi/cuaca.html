@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="icon" type="image/png" href="../images/icon.png">
+    <title>PRAKIRAAN | ABSURDUM</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --bg0: #0d1117;
+            --bg1: #0a0f14;
+            --bg2: #060c12;
+            --card: #111820;
+            --card2: #0d1520;
+            --border: #1e2d3d;
+            --dim: #3a5a7a;
+            --muted: #5a8aaa;
+            --body: #8ab4cc;
+            --bright: #b8d8ee;
+            --white: #e4f0f8;
+            --accent: #4a9aba;
+            --warn: #c4824a;
+            --danger: #b04040;
+            --good: #4a8a6a;
+            --mono: 'DM Mono', monospace;
+            --sans: 'DM Sans', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg0);
+            color: var(--body);
+            font-family: var(--sans);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Grain overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.6;
+        }
+
+        /* ── NAV ── */
+        .topnav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(13, 17, 23, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: 0.58rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover {
+            color: var(--bright);
+        }
+
+        .nav-title {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            letter-spacing: 4px;
+            color: var(--dim);
+            text-transform: uppercase;
+        }
+
+        .nav-status {
+            font-family: var(--mono);
+            font-size: 0.58rem;
+            color: var(--dim);
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.3
+            }
+        }
+
+        /* ── HERO — current conditions ── */
+        .hero {
+            padding: 40px 20px 32px;
+            max-width: 680px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero-location {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            letter-spacing: 4px;
+            color: var(--dim);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hero-location::before {
+            content: '▸';
+            color: var(--accent);
+            animation: blink 3s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.2
+            }
+        }
+
+        .hero-name {
+            font-family: var(--sans);
+            font-size: clamp(1.6rem, 6vw, 2.6rem);
+            font-weight: 200;
+            color: var(--white);
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-family: var(--mono);
+            font-size: 0.62rem;
+            color: var(--muted);
+            letter-spacing: 2px;
+            margin-bottom: 32px;
+            font-style: italic;
+        }
+
+        .hero-current {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: start;
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 24px;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-current::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--accent), transparent);
+        }
+
+        .current-temp {
+            font-family: var(--sans);
+            font-size: clamp(3rem, 12vw, 5rem);
+            font-weight: 200;
+            color: var(--white);
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+
+        .current-unit {
+            font-family: var(--mono);
+            font-size: 1rem;
+            color: var(--muted);
+            vertical-align: super;
+            letter-spacing: 1px;
+        }
+
+        .current-desc {
+            font-family: var(--sans);
+            font-size: clamp(0.95rem, 3vw, 1.15rem);
+            font-weight: 300;
+            color: var(--bright);
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .current-feels {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            color: var(--muted);
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+
+        .current-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .stat {
+            font-family: var(--mono);
+            font-size: 0.58rem;
+            color: var(--dim);
+            letter-spacing: 1px;
+            line-height: 2;
+        }
+
+        .stat span {
+            display: block;
+            color: var(--body);
+            font-size: 0.68rem;
+        }
+
+        .current-icon {
+            text-align: center;
+            padding-top: 4px;
+        }
+
+        /* ── HOURLY STRIP ── */
+        .hourly-strip {
+            max-width: 680px;
+            margin: 0 auto 8px;
+            padding: 0 20px;
+        }
+
+        .hourly-scroll {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            background: var(--card);
+            border: 1px solid var(--border);
+            scrollbar-width: none;
+        }
+
+        .hourly-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hour-item {
+            flex-shrink: 0;
+            padding: 14px 16px;
+            text-align: center;
+            border-right: 1px solid var(--border);
+            min-width: 70px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .hour-item:hover {
+            background: rgba(74, 154, 186, 0.06);
+        }
+
+        .hour-item:last-child {
+            border-right: none;
+        }
+
+        .hour-time {
+            font-family: var(--mono);
+            font-size: 0.55rem;
+            color: var(--dim);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .hour-temp {
+            font-family: var(--sans);
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: var(--bright);
+            margin-top: 6px;
+        }
+
+        .hour-desc {
+            font-family: var(--mono);
+            font-size: 0.48rem;
+            color: var(--muted);
+            letter-spacing: 1px;
+            margin-top: 4px;
+            line-height: 1.5;
+        }
+
+        /* ── SECTION LABEL ── */
+        .section-label {
+            max-width: 680px;
+            margin: 28px auto 10px;
+            padding: 0 20px;
+            font-family: var(--mono);
+            font-size: 0.55rem;
+            letter-spacing: 4px;
+            color: var(--dim);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── DAY CARDS ── */
+        .days-container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .day-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-left: 3px solid transparent;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(74, 154, 186, 0.03), transparent);
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .day-card:hover::after {
+            opacity: 1;
+        }
+
+        .day-card.expanded {
+            border-left-color: var(--accent);
+            background: var(--card2);
+        }
+
+        .day-header {
+            display: grid;
+            grid-template-columns: 80px 1fr auto auto;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .day-name {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            color: var(--body);
+            text-transform: uppercase;
+        }
+
+        .day-desc {
+            font-family: var(--sans);
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: var(--bright);
+        }
+
+        .day-range {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--muted);
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        .day-expand-btn {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            color: var(--dim);
+            letter-spacing: 2px;
+            transition: transform 0.3s ease, color 0.2s;
+            user-select: none;
+        }
+
+        .day-card.expanded .day-expand-btn {
+            transform: rotate(180deg);
+            color: var(--accent);
+        }
+
+        /* Detail panel */
+        .day-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .day-card.expanded .day-detail {
+            max-height: 600px;
+        }
+
+        .detail-inner {
+            padding: 20px 0 4px;
+            border-top: 1px solid var(--border);
+            margin-top: 16px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .detail-stat {
+            font-family: var(--mono);
+            font-size: 0.58rem;
+            letter-spacing: 1px;
+        }
+
+        .detail-stat .ds-label {
+            color: var(--dim);
+            margin-bottom: 3px;
+            display: block;
+            font-size: 0.52rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .detail-stat .ds-val {
+            color: var(--bright);
+            font-size: 0.72rem;
+        }
+
+        .detail-note {
+            font-family: var(--sans);
+            font-size: 0.78rem;
+            font-weight: 300;
+            color: var(--muted);
+            line-height: 1.85;
+            font-style: italic;
+            padding: 14px 0 0;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── SEVERITY COLOR CODING ── */
+        .day-card[data-severity="0"] {
+            border-left-color: transparent;
+        }
+
+        .day-card[data-severity="1"] .day-desc {
+            color: #7acca0;
+        }
+
+        .day-card[data-severity="2"] .day-desc {
+            color: var(--bright);
+        }
+
+        .day-card[data-severity="3"] .day-desc {
+            color: #d4aa70;
+        }
+
+        .day-card[data-severity="4"] .day-desc {
+            color: var(--warn);
+        }
+
+        .day-card[data-severity="5"] .day-desc {
+            color: #b06050;
+        }
+
+        .day-card[data-severity="6"] .day-desc {
+            color: var(--danger);
+        }
+
+        /* ── VOID WEEK — prakiraan tidak tersedia ── */
+        .void-week {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 0 20px 80px;
+        }
+
+        .void-card {
+            background: var(--bg2);
+            border: 1px solid #1a2530;
+            padding: 48px 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .void-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(74, 154, 186, 0.04), transparent 60%);
+        }
+
+        .void-label {
+            font-family: var(--mono);
+            font-size: 0.52rem;
+            letter-spacing: 4px;
+            color: var(--dim);
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            animation: blink 3s infinite;
+        }
+
+        .void-message {
+            font-family: var(--sans);
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            font-weight: 200;
+            color: var(--muted);
+            line-height: 2;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .void-coord {
+            margin-top: 24px;
+            font-family: var(--mono);
+            font-size: 0.52rem;
+            color: var(--border);
+            letter-spacing: 3px;
+        }
+
+        /* ── FOOTER NOTE ── */
+        .footer-note {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 20px 20px 60px;
+            font-family: var(--mono);
+            font-size: 0.52rem;
+            color: var(--dim);
+            letter-spacing: 2px;
+            line-height: 2.5;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── SVG ICONS ── */
+        .wx-icon svg {
+            width: 40px;
+            height: 40px;
+            opacity: 0.8;
+        }
+
+        .wx-icon-sm svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+        /* scrollbar for hourly */
+        .hourly-scroll {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media(max-width:480px) {
+            .day-header {
+                grid-template-columns: 60px 1fr auto;
+                gap: 10px;
+            }
+
+            .day-range {
+                display: none;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-current {
+                grid-template-columns: 1fr;
+            }
+
+            .current-icon {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="topnav">
+        <a href="../index.html" class="back-btn">← kembali</a>
+        <span class="nav-title">PRAKIRAAN</span>
+        <span class="nav-status">
+            <span class="nav-dot"></span>
+            <span id="liveTime">--:--</span>
+        </span>
+    </nav>
+
+    <!-- ── HERO ── -->
+    <div class="hero">
+        <div class="hero-location">LOKASI TIDAK TERIDENTIFIKASI &nbsp;·&nbsp; <span id="heroDate">--</span></div>
+        <h1 class="hero-name">Prakiraan<br>Jangka Panjang</h1>
+        <p class="hero-subtitle">// data diperbarui setiap saat &nbsp;|&nbsp; akurasi: tidak dijamin &nbsp;|&nbsp;
+            berlaku untuk: siapapun yang membaca ini</p>
+
+        <div class="hero-current">
+            <div>
+                <div class="current-desc" id="currentDesc">Berawan Sebagian dengan Kemungkinan Ingatan</div>
+                <div class="current-feels" id="currentFeels">TERASA SEPERTI: <span id="currentFeelsVal">—</span></div>
+                <div class="current-stats">
+                    <div class="stat">KELEMBABAN INGATAN<span id="statHumidity">—</span></div>
+                    <div class="stat">ANGIN<span id="statWind">—</span></div>
+                    <div class="stat">VISIBILITAS<span id="statVis">—</span></div>
+                    <div class="stat">INDEKS UV PENYESALAN<span id="statUV">—</span></div>
+                </div>
+            </div>
+            <div>
+                <div class="current-temp"><span id="currentTemp">—</span><span class="current-unit">°R</span></div>
+                <div class="current-icon wx-icon" id="currentIcon"></div>
+            </div>
+        </div>
+
+        <!-- Hourly -->
+        <div class="hourly-scroll" id="hourlyStrip"></div>
+    </div>
+
+    <!-- ── 7 HARI KE DEPAN ── -->
+    <div class="section-label">7 hari ke depan</div>
+    <div class="days-container" id="daysContainer"></div>
+
+    <!-- ── MINGGU 2 ── -->
+    <div class="section-label">minggu ke-2</div>
+    <div class="days-container" id="week2Container"></div>
+
+    <!-- ── MINGGU 3 ── -->
+    <div class="section-label">minggu ke-3</div>
+    <div class="days-container" id="week3Container"></div>
+
+    <!-- ── VOID ── -->
+    <div class="section-label">prakiraan jangka jauh</div>
+    <div class="void-week">
+        <div class="void-card">
+            <div class="void-label">// DATA TIDAK TERSEDIA</div>
+            <p class="void-message">
+                Prakiraan untuk periode ini<br>
+                tidak dapat dibuat.<br><br>
+                Bukan karena terlalu jauh.<br>
+                Tapi karena ada hal-hal yang<br>
+                bahkan model cuaca paling canggih pun<br>
+                tidak bisa dihitung<br>
+                dari data yang ada sekarang.
+            </p>
+            <div class="void-coord">// lat: — &nbsp;·&nbsp; lon: — &nbsp;·&nbsp; alt: tidak relevan</div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        * Prakiraan ini dibuat berdasarkan pola historis dan kondisi terkini.<br>
+        * Satuan yang digunakan: °R (derajat Rindu), km/kenangan, % (persen kemungkinan).<br>
+        * Badan Meteorologi Kejiwaan tidak bertanggung jawab atas ketidakakuratan.<br>
+        * Ketidakakuratan mungkin terjadi. Ketidakakuratan mungkin adalah satu-satunya hal yang akurat.<br>
+        * ∴ ABSURDUM / PRAKIRAAN / v1.0.0
+    </div>
+
+    <script>
+        // ══════════════════════════════════════════
+        // SVG ICONS
+        // ══════════════════════════════════════════
+        const icons = {
+            cerah: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="20" cy="20" r="7" stroke="#f0c060" stroke-width="1.5"/>
+    <line x1="20" y1="4" x2="20" y2="8" stroke="#f0c060" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="20" y1="32" x2="20" y2="36" stroke="#f0c060" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="4" y1="20" x2="8" y2="20" stroke="#f0c060" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="32" y1="20" x2="36" y2="20" stroke="#f0c060" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="8.7" y1="8.7" x2="11.5" y2="11.5" stroke="#f0c060" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="28.5" y1="28.5" x2="31.3" y2="31.3" stroke="#f0c060" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="31.3" y1="8.7" x2="28.5" y2="11.5" stroke="#f0c060" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="11.5" y1="28.5" x2="8.7" y2="31.3" stroke="#f0c060" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>`,
+            berawan: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="15" cy="22" r="7" stroke="#8ab4cc" stroke-width="1.5"/>
+    <circle cx="24" cy="20" r="9" stroke="#8ab4cc" stroke-width="1.5"/>
+    <circle cx="30" cy="23" r="5" stroke="#8ab4cc" stroke-width="1.5"/>
+    <rect x="8" y="23" width="26" height="6" rx="3" fill="#111820"/>
+    <line x1="8" y1="27" x2="34" y2="27" stroke="#8ab4cc" stroke-width="1"/>
+  </svg>`,
+            hujan: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="14" cy="16" r="6" stroke="#5a8aaa" stroke-width="1.2"/>
+    <circle cx="23" cy="14" r="8" stroke="#5a8aaa" stroke-width="1.2"/>
+    <circle cx="29" cy="17" r="4.5" stroke="#5a8aaa" stroke-width="1.2"/>
+    <rect x="8" y="17" width="24" height="5" rx="2.5" fill="#111820"/>
+    <line x1="8" y1="21" x2="32" y2="21" stroke="#5a8aaa" stroke-width="1"/>
+    <line x1="14" y1="26" x2="12" y2="31" stroke="#5a8aaa" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="20" y1="26" x2="18" y2="33" stroke="#5a8aaa" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="26" y1="26" x2="24" y2="31" stroke="#5a8aaa" stroke-width="1.2" stroke-linecap="round"/>
+  </svg>`,
+            badai: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="13" cy="15" r="6" stroke="#3a5a7a" stroke-width="1.2"/>
+    <circle cx="22" cy="13" r="8" stroke="#3a5a7a" stroke-width="1.2"/>
+    <circle cx="28" cy="16" r="4.5" stroke="#3a5a7a" stroke-width="1.2"/>
+    <rect x="7" y="16" width="24" height="5" rx="2.5" fill="#111820"/>
+    <line x1="7" y1="20" x2="31" y2="20" stroke="#3a5a7a" stroke-width="1"/>
+    <polyline points="22,22 18,30 22,30 18,38" stroke="#c4824a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </svg>`,
+            kabut: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="6" y1="14" x2="34" y2="14" stroke="#5a8aaa" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="4,3"/>
+    <line x1="4" y1="20" x2="36" y2="20" stroke="#5a8aaa" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6,3"/>
+    <line x1="8" y1="26" x2="32" y2="26" stroke="#5a8aaa" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="4,3"/>
+    <line x1="10" y1="32" x2="30" y2="32" stroke="#3a5a7a" stroke-width="1" stroke-linecap="round" stroke-dasharray="3,4"/>
+  </svg>`,
+            gelap: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="4" width="32" height="32" stroke="#1e2d3d" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="20" cy="20" r="8" stroke="#1e2d3d" stroke-width="1"/>
+    <line x1="12" y1="12" x2="28" y2="28" stroke="#1e2d3d" stroke-width="1"/>
+    <line x1="28" y1="12" x2="12" y2="28" stroke="#1e2d3d" stroke-width="1"/>
+  </svg>`,
+        };
+
+        function iconHtml(type, small = false) {
+            const cls = small ? 'wx-icon-sm' : 'wx-icon';
+            return `<div class="${cls}">${icons[type] || icons.berawan}</div>`;
+        }
+
+        // ══════════════════════════════════════════
+        // DATA — 21 hari prakiraan
+        // ══════════════════════════════════════════
+        const days = [
+            // MINGGU 1 — severity 1-3, masih ada celah cerah
+            {
+                name: 'HARI 01', short: 'H1',
+                desc: 'Berawan Sebagian dengan Sedikit Celah',
+                range: '-3°R / 12°R',
+                icon: 'berawan', severity: 1,
+                stats: {
+                    kelembaban: '61%',
+                    angin: '2 kenangan/jam dari barat laut',
+                    visibilitas: 'cukup jelas',
+                    uv: '3 (Sedang)',
+                    tekanan: '1.013 hPa (stabil)',
+                    embun: '5°R',
+                },
+                note: 'Kondisi hari ini relatif dapat ditoleransi. Ada beberapa momen di mana langit terbuka dan cahaya masuk dengan sudut yang tidak biasanya terasa menyakitkan.\n\nDisarankan untuk tidak membuka jendela terlalu lebar. Cukup selebar yang kamu butuhkan untuk bernapas.'
+            },
+            {
+                name: 'HARI 02', short: 'H2',
+                desc: 'Cerah Berawan — Angin Sedang',
+                range: '-1°R / 14°R',
+                icon: 'cerah', severity: 1,
+                stats: {
+                    kelembaban: '54%',
+                    angin: '4 kenangan/jam, tidak menentu',
+                    visibilitas: 'baik (6,2 km/masa lalu)',
+                    uv: '4 (Sedang)',
+                    tekanan: '1.015 hPa (naik pelan)',
+                    embun: '3°R',
+                },
+                note: 'Hari ini adalah hari yang cukup baik untuk berada di luar, jika kamu tahu cara mendefinisikan "luar".\n\nAngin tidak terlalu kencang, tapi cukup untuk membawa sesuatu yang tidak kamu minta.'
+            },
+            {
+                name: 'HARI 03', short: 'H3',
+                desc: 'Mendung dengan Kemungkinan Ingatan Tiba-tiba',
+                range: '-5°R / 9°R',
+                icon: 'berawan', severity: 2,
+                stats: {
+                    kelembaban: '72%',
+                    angin: '6 kenangan/jam dari selatan',
+                    visibilitas: 'terbatas (3,1 km/masa lalu)',
+                    uv: '2 (Rendah)',
+                    tekanan: '1.008 hPa (turun)',
+                    embun: '7°R',
+                },
+                note: 'Kemungkinan 67% terjadi ingatan tiba-tiba antara pukul 14.00–17.00. Sumber ingatan: tidak diketahui, kemungkinan dipicu oleh bau, lagu, atau tidak ada apa-apa sama sekali.\n\nDisarankan tidak berada di tempat yang terlalu familiar.'
+            },
+            {
+                name: 'HARI 04', short: 'H4',
+                desc: 'Hujan Ringan — Kemungkinan Berlanjut',
+                range: '-8°R / 6°R',
+                icon: 'hujan', severity: 2,
+                stats: {
+                    kelembaban: '81%',
+                    angin: '8 kenangan/jam, tidak konsisten',
+                    visibilitas: 'buruk (1,4 km/masa lalu)',
+                    uv: '1 (Sangat Rendah)',
+                    tekanan: '1.002 hPa (turun)',
+                    embun: '11°R',
+                },
+                note: 'Hujan ringan diperkirakan mulai dini hari dan berlanjut tanpa kepastian kapan berhenti. Intensitas mungkin meningkat tanpa peringatan.\n\nPayung tidak akan membantu untuk jenis hujan ini.'
+            },
+            {
+                name: 'HARI 05', short: 'H5',
+                desc: 'Berawan Tebal — Jarak Pandang Terbatas',
+                range: '-10°R / 4°R',
+                icon: 'kabut', severity: 3,
+                stats: {
+                    kelembaban: '88%',
+                    angin: '11 kenangan/jam',
+                    visibilitas: 'sangat terbatas (0,6 km/masa lalu)',
+                    uv: '0',
+                    tekanan: '998 hPa (turun cepat)',
+                    embun: '14°R',
+                },
+                note: 'Jarak pandang hari ini sangat terbatas. Disarankan untuk tidak membuat keputusan penting.\n\nBukan karena kondisinya berbahaya secara teknis. Tapi karena di bawah langit seperti ini, semua keputusan terasa lebih berat dari yang seharusnya.'
+            },
+            {
+                name: 'HARI 06', short: 'H6',
+                desc: 'Kabut Tebal — Dilarang Menavigasi',
+                range: '-14°R / 0°R',
+                icon: 'kabut', severity: 3,
+                stats: {
+                    kelembaban: '93%',
+                    angin: '9 kenangan/jam, berputar',
+                    visibilitas: '0,2 km/masa lalu',
+                    uv: '0',
+                    tekanan: '994 hPa',
+                    embun: '17°R',
+                },
+                note: 'Kabut hari ini sangat tebal sehingga beberapa hal yang sudah diputuskan mungkin terlihat tidak jelas kembali.\n\nIni bukan bug pada sistem. Ini adalah kondisi cuaca yang tidak dapat dihindari.'
+            },
+            {
+                name: 'HARI 07', short: 'H7',
+                desc: 'Sedikit Lebih Terang — Jangan Tertipu',
+                range: '-11°R / 3°R',
+                icon: 'berawan', severity: 2,
+                stats: {
+                    kelembaban: '79%',
+                    angin: '7 kenangan/jam',
+                    visibilitas: '1,8 km/masa lalu',
+                    uv: '2 (Rendah)',
+                    tekanan: '997 hPa (naik sedikit)',
+                    embun: '13°R',
+                },
+                note: 'Ada sedikit perbaikan hari ini dibanding kemarin. Perlu dicatat bahwa "sedikit perbaikan" adalah istilah teknis dan tidak berarti "baik".\n\nMasih disarankan untuk tidak berencana terlalu jauh ke depan.'
+            },
+
+            // MINGGU 2 — severity 3-5, makin berat
+            {
+                name: 'HARI 08', short: 'H8',
+                desc: 'Hujan Sedang — Intensitas Meningkat',
+                range: '-16°R / -2°R',
+                icon: 'hujan', severity: 3,
+                stats: {
+                    kelembaban: '91%',
+                    angin: '14 kenangan/jam dari semua arah',
+                    visibilitas: '0,8 km/masa lalu',
+                    uv: '0',
+                    tekanan: '991 hPa',
+                    embun: '20°R',
+                },
+                note: 'Hujan sedang dengan kemungkinan meningkat ke intensitas berat antara pukul 23.00–04.00. Waktu tersebut diketahui sebagai jam dengan kondisi paling tidak stabil.\n\nDisarankan untuk tidak sendirian di ruangan yang terlalu sunyi.'
+            },
+            {
+                name: 'HARI 09', short: 'H9',
+                desc: 'Badai Kecil — Peringatan Dini',
+                range: '-20°R / -5°R',
+                icon: 'badai', severity: 4,
+                stats: {
+                    kelembaban: '95%',
+                    angin: '19 kenangan/jam, kencang',
+                    visibilitas: '0,3 km/masa lalu',
+                    uv: '0',
+                    tekanan: '986 hPa (turun cepat)',
+                    embun: '23°R',
+                },
+                note: '⚠ PERINGATAN DINI: Kondisi cuaca memburuk secara signifikan. Badai kecil diprakirakan dengan angin kencang membawa serpihan percakapan yang tidak selesai.\n\nTetap di dalam. Tutup semua jendela yang menghadap ke kenangan.'
+            },
+            {
+                name: 'HARI 10', short: 'H10',
+                desc: 'Pasca-badai — Kerusakan Belum Dinilai',
+                range: '-18°R / -4°R',
+                icon: 'kabut', severity: 4,
+                stats: {
+                    kelembaban: '89%',
+                    angin: '12 kenangan/jam, melemah',
+                    visibilitas: '0,5 km/masa lalu',
+                    uv: '0',
+                    tekanan: '989 hPa',
+                    embun: '21°R',
+                },
+                note: 'Badai telah berlalu. Kerusakan belum sepenuhnya dinilai dan mungkin tidak akan pernah dinilai secara resmi.\n\nBeberepa hal yang kemarin di tempat yang benar sekarang berada di tempat yang berbeda. Tidak semua bisa dikembalikan ke posisi semula.'
+            },
+            {
+                name: 'HARI 11', short: 'H11',
+                desc: 'Mendung Berat — Angin Dari Barat',
+                range: '-22°R / -7°R',
+                icon: 'berawan', severity: 4,
+                stats: {
+                    kelembaban: '92%',
+                    angin: '16 kenangan/jam dari barat',
+                    visibilitas: '0,4 km/masa lalu',
+                    uv: '0',
+                    tekanan: '985 hPa',
+                    embun: '24°R',
+                },
+                note: 'Angin hari ini datang dari barat — arah yang dalam peta ini berhubungan dengan zona "hal-hal yang lebih baik tidak diingat".\n\nKelembaban sangat tinggi. Kondisi ini diketahui mempersulit membedakan mana yang fakta dan mana yang hanya terasa seperti fakta.'
+            },
+            {
+                name: 'HARI 12', short: 'H12',
+                desc: 'Hujan Deras — Tidak Ada Jeda',
+                range: '-27°R / -9°R',
+                icon: 'hujan', severity: 5,
+                stats: {
+                    kelembaban: '97%',
+                    angin: '21 kenangan/jam',
+                    visibilitas: '0,1 km/masa lalu',
+                    uv: '0',
+                    tekanan: '981 hPa',
+                    embun: '28°R',
+                },
+                note: 'Hujan deras diperkirakan sepanjang hari tanpa jeda yang berarti. Disarankan untuk tidak mencoba menghitung berapa lama ini sudah berlangsung.\n\nAngkanya mungkin tidak akan membuat kamu merasa lebih baik.'
+            },
+            {
+                name: 'HARI 13', short: 'H13',
+                desc: 'Badai Sedang — Indeks UV: Ekstrem',
+                range: '-31°R / -12°R',
+                icon: 'badai', severity: 5,
+                stats: {
+                    kelembaban: '98%',
+                    angin: '26 kenangan/jam, kencang sekali',
+                    visibilitas: '< 0,1 km/masa lalu',
+                    uv: '11 (Ekstrem)',
+                    tekanan: '976 hPa',
+                    embun: '32°R',
+                },
+                note: '⚠⚠ PERINGATAN EKSTREM: Indeks UV Penyesalan mencapai 11 (Ekstrem). Paparan tanpa perlindungan dalam waktu singkat dapat menyebabkan efek yang berlangsung jauh lebih lama dari yang diperkirakan.\n\nTidak ada perlindungan yang direkomendasikan. Tidak ada yang benar-benar melindungi dari ini.'
+            },
+            {
+                name: 'HARI 14', short: 'H14',
+                desc: 'Belum Ada Data — Server Tidak Merespons',
+                range: '—°R / —°R',
+                icon: 'gelap', severity: 5,
+                stats: {
+                    kelembaban: '??%',
+                    angin: 'data tidak tersedia',
+                    visibilitas: 'tidak dapat diukur',
+                    uv: 'tidak dapat diukur',
+                    tekanan: 'tidak terbaca',
+                    embun: '??°R',
+                },
+                note: 'Data prakiraan untuk hari ini tidak tersedia.\n\nServer masih berjalan. Koneksi masih aktif. Data memang ada — tapi ada sesuatu yang membuat sistem tidak bisa membacanya dengan benar.\n\nCoba lagi nanti. Atau jangan.'
+            },
+
+            // MINGGU 3 — severity 5-6, paling gelap
+            {
+                name: 'HARI 15', short: 'H15',
+                desc: 'Gelap Total — Sistem Memperingatkan',
+                range: '-40°R / -20°R',
+                icon: 'gelap', severity: 6,
+                stats: {
+                    kelembaban: '100%',
+                    angin: 'tidak dapat diukur',
+                    visibilitas: '0 km/masa lalu',
+                    uv: 'tidak relevan',
+                    tekanan: 'tidak stabil',
+                    embun: 'tidak relevan',
+                },
+                note: 'Sistem cuaca mendeteksi kondisi yang tidak ada namanya dalam database standar.\n\nKondisi ini bukan badai. Bukan hujan. Ini hanya gelap — dengan cara yang sangat spesifik yang berbeda dari sekadar tidak ada cahaya.'
+            },
+            {
+                name: 'HARI 16', short: 'H16',
+                desc: 'Kondisi Tidak Berubah',
+                range: '-40°R / -20°R',
+                icon: 'gelap', severity: 6,
+                stats: {
+                    kelembaban: '100%',
+                    angin: 'tidak dapat diukur',
+                    visibilitas: '0 km/masa lalu',
+                    uv: 'tidak relevan',
+                    tekanan: 'tidak stabil',
+                    embun: 'tidak relevan',
+                },
+                note: 'Tidak ada perubahan dari kemarin.\n\nSistem terus berjalan dan terus mencatat. Tapi ada pertanyaan yang belum bisa dijawab: untuk apa mencatat kondisi yang tidak berubah?\n\nSistem tidak tahu. Sistem tetap mencatat.'
+            },
+            {
+                name: 'HARI 17', short: 'H17',
+                desc: 'Tanda-tanda Kecil — Belum Pasti',
+                range: '-37°R / -17°R',
+                icon: 'kabut', severity: 5,
+                stats: {
+                    kelembaban: '97%',
+                    angin: '3 kenangan/jam — terdeteksi lagi',
+                    visibilitas: '0,05 km/masa lalu',
+                    uv: '0',
+                    tekanan: '983 hPa — naik sangat sedikit',
+                    embun: '35°R',
+                },
+                note: 'Ada sedikit pergerakan pada beberapa sensor yang kemarin tidak merespons.\n\nBelum bisa disebut perbaikan. Lebih tepatnya: ada sesuatu yang bergerak. Belum jelas ke mana. Tapi bergerak.'
+            },
+            {
+                name: 'HARI 18', short: 'H18',
+                desc: 'Kabut Tipis — Visibilitas Sangat Rendah',
+                range: '-33°R / -14°R',
+                icon: 'kabut', severity: 5,
+                stats: {
+                    kelembaban: '94%',
+                    angin: '5 kenangan/jam',
+                    visibilitas: '0,15 km/masa lalu',
+                    uv: '0',
+                    tekanan: '986 hPa',
+                    embun: '31°R',
+                },
+                note: 'Kabut mulai menipis di beberapa titik. Tapi "menipis" di sini berarti dari tidak bisa melihat apa-apa menjadi bisa melihat samar-samar — dan samar-samar kadang lebih membingungkan dari tidak melihat sama sekali.'
+            },
+            {
+                name: 'HARI 19', short: 'H19',
+                desc: 'Mendung Berat — Masih',
+                range: '-29°R / -10°R',
+                icon: 'berawan', severity: 4,
+                stats: {
+                    kelembaban: '90%',
+                    angin: '8 kenangan/jam',
+                    visibilitas: '0,4 km/masa lalu',
+                    uv: '1',
+                    tekanan: '990 hPa',
+                    embun: '27°R',
+                },
+                note: 'Masih mendung. Sudah cukup lama.\n\nSistem mencatat ini sebagai kondisi yang "membaik secara teknis" dibanding tiga hari lalu. Tapi ada perbedaan antara membaik dan baik. Hari ini masih di antara keduanya.'
+            },
+            {
+                name: 'HARI 20', short: 'H20',
+                desc: 'Berawan — Ada Angin Dari Timur',
+                range: '-22°R / -5°R',
+                icon: 'berawan', severity: 3,
+                stats: {
+                    kelembaban: '83%',
+                    angin: '10 kenangan/jam dari timur',
+                    visibilitas: '1,2 km/masa lalu',
+                    uv: '2',
+                    tekanan: '995 hPa',
+                    embun: '21°R',
+                },
+                note: 'Angin hari ini datang dari timur — arah yang berbeda dari beberapa minggu terakhir.\n\nBelum tentu lebih baik. Hanya berbeda. Tapi perbedaan setelah waktu yang panjang tanpa perubahan adalah sesuatu yang setidaknya bisa dicatat.'
+            },
+            {
+                name: 'HARI 21', short: 'H21',
+                desc: 'Data Prakiraan Berakhir Di Sini',
+                range: '—',
+                icon: 'gelap', severity: 0,
+                stats: {
+                    kelembaban: '—',
+                    angin: '—',
+                    visibilitas: '—',
+                    uv: '—',
+                    tekanan: '—',
+                    embun: '—',
+                },
+                note: 'Ini adalah batas prakiraan yang bisa dibuat dengan data yang ada.\n\nBukan karena tidak mau lebih jauh. Tapi karena setelah titik ini, variabelnya terlalu banyak dan tidak semuanya bisa diukur.\n\nCuaca setelah hari ke-21 tergantung pada hal-hal yang belum terjadi.'
+            },
+        ];
+
+        // ══════════════════════════════════════════
+        // CURRENT CONDITIONS — based on real time
+        // ══════════════════════════════════════════
+        const hourlyData = [
+            { time: '00:00', temp: '-18', icon: 'gelap', desc: 'gelap' },
+            { time: '01:00', temp: '-20', icon: 'gelap', desc: 'gelap total' },
+            { time: '02:00', temp: '-22', icon: 'gelap', desc: 'paling gelap' },
+            { time: '03:00', temp: '-24', icon: 'gelap', desc: 'paling gelap' },
+            { time: '04:00', temp: '-23', icon: 'badai', desc: 'ada pergerakan' },
+            { time: '05:00', temp: '-20', icon: 'badai', desc: 'angin mulai' },
+            { time: '06:00', temp: '-17', icon: 'hujan', desc: 'hujan ringan' },
+            { time: '07:00', temp: '-14', icon: 'hujan', desc: 'hujan' },
+            { time: '08:00', temp: '-10', icon: 'kabut', desc: 'kabut' },
+            { time: '09:00', temp: '-7', icon: 'kabut', desc: 'kabut tipis' },
+            { time: '10:00', temp: '-4', icon: 'berawan', desc: 'mendung' },
+            { time: '11:00', temp: '-1', icon: 'berawan', desc: 'mendung' },
+            { time: '12:00', temp: '2', icon: 'berawan', desc: 'sedikit cerah' },
+            { time: '13:00', temp: '4', icon: 'cerah', desc: 'cerah sebentar' },
+            { time: '14:00', temp: '5', icon: 'cerah', desc: 'celah cahaya' },
+            { time: '15:00', temp: '4', icon: 'berawan', desc: 'berawan lagi' },
+            { time: '16:00', temp: '2', icon: 'berawan', desc: 'mendung' },
+            { time: '17:00', temp: '-1', icon: 'hujan', desc: 'gerimis' },
+            { time: '18:00', temp: '-4', icon: 'hujan', desc: 'hujan' },
+            { time: '19:00', temp: '-7', icon: 'hujan', desc: 'hujan sedang' },
+            { time: '20:00', temp: '-10', icon: 'kabut', desc: 'kabut malam' },
+            { time: '21:00', temp: '-13', icon: 'kabut', desc: 'kabut tebal' },
+            { time: '22:00', temp: '-15', icon: 'gelap', desc: 'gelap' },
+            { time: '23:00', temp: '-17', icon: 'gelap', desc: 'gelap' },
+        ];
+
+        function initCurrent() {
+            const now = new Date();
+            const h = now.getHours();
+            const cur = hourlyData[h];
+
+            document.getElementById('currentTemp').textContent = cur.temp;
+            document.getElementById('currentDesc').textContent = {
+                gelap: 'Gelap Tidak Bersuara',
+                badai: 'Badai Internal — Peringatan Aktif',
+                hujan: 'Hujan Campuran (Air + Lainnya)',
+                kabut: 'Berkabut — Jarak Pandang Terbatas',
+                berawan: 'Berawan Sebagian dengan Kemungkinan Ingatan',
+                cerah: 'Cerah Tidak Menentu'
+            }[cur.icon];
+
+            const feels = parseInt(cur.temp) - Math.floor(Math.random() * 5 + 2);
+            document.getElementById('currentFeelsVal').textContent = feels + '°R';
+
+            document.getElementById('statHumidity').textContent = (60 + h * 1.5).toFixed(0) + '%';
+            document.getElementById('statWind').textContent = (3 + Math.abs(Math.sin(h)) * 12).toFixed(1) + ' kenangan/jam';
+            document.getElementById('statVis').textContent = h >= 13 && h <= 15 ? '4,2 km' : '0,' + Math.floor(Math.random() * 9 + 1) + ' km/masa lalu';
+            document.getElementById('statUV').textContent = h >= 10 && h <= 16 ? (Math.floor(Math.random() * 6 + 3)) + ' (Sedang)' : '0';
+            document.getElementById('currentIcon').innerHTML = icons[cur.icon] || icons.berawan;
+
+            // Hourly strip
+            const strip = document.getElementById('hourlyStrip');
+            strip.innerHTML = '';
+            for (let i = 0; i < 24; i++) {
+                const hd = hourlyData[i];
+                const isNow = i === h;
+                strip.innerHTML += `
+      <div class="hour-item" style="${isNow ? 'background:rgba(74,154,186,0.08);border-bottom:2px solid var(--accent)' : ''}">
+        <div class="hour-time">${hd.time}${isNow ? ' ◂' : ''}</div>
+        ${iconHtml(hd.icon, true)}
+        <div class="hour-temp">${hd.temp}°R</div>
+        <div class="hour-desc">${hd.desc}</div>
+      </div>`;
+            }
+            // Scroll to now
+            setTimeout(() => {
+                const nowEl = strip.children[h];
+                if (nowEl) strip.scrollLeft = nowEl.offsetLeft - strip.clientWidth / 2 + nowEl.clientWidth / 2;
+            }, 100);
+        }
+
+        // ══════════════════════════════════════════
+        // RENDER DAY CARDS
+        // ══════════════════════════════════════════
+        function renderDays(containerEl, slice) {
+            slice.forEach((d, i) => {
+                const card = document.createElement('div');
+                card.className = 'day-card';
+                card.dataset.severity = d.severity;
+
+                card.innerHTML = `
+      <div class="day-header">
+        <span class="day-name">${d.name}</span>
+        <span class="day-desc">${d.desc}</span>
+        <span class="day-range">${d.range}</span>
+        <span class="day-expand-btn">▾</span>
+      </div>
+      <div class="day-detail">
+        <div class="detail-inner">
+          <div class="detail-grid">
+            <div class="detail-stat">
+              <span class="ds-label">Kelembaban Ingatan</span>
+              <span class="ds-val">${d.stats.kelembaban}</span>
+            </div>
+            <div class="detail-stat">
+              <span class="ds-label">Angin</span>
+              <span class="ds-val">${d.stats.angin}</span>
+            </div>
+            <div class="detail-stat">
+              <span class="ds-label">Visibilitas</span>
+              <span class="ds-val">${d.stats.visibilitas}</span>
+            </div>
+            <div class="detail-stat">
+              <span class="ds-label">Indeks UV Penyesalan</span>
+              <span class="ds-val">${d.stats.uv}</span>
+            </div>
+            <div class="detail-stat">
+              <span class="ds-label">Tekanan Batin</span>
+              <span class="ds-val">${d.stats.tekanan}</span>
+            </div>
+            <div class="detail-stat">
+              <span class="ds-label">Titik Embun</span>
+              <span class="ds-val">${d.stats.embun}</span>
+            </div>
+          </div>
+          <div class="detail-note">${d.note.replace(/\n/g, '<br>')}</div>
+        </div>
+      </div>`;
+
+                card.addEventListener('click', () => {
+                    const wasOpen = card.classList.contains('expanded');
+                    // Close all
+                    document.querySelectorAll('.day-card.expanded').forEach(c => c.classList.remove('expanded'));
+                    if (!wasOpen) card.classList.add('expanded');
+                });
+
+                containerEl.appendChild(card);
+            });
+        }
+
+        // ══════════════════════════════════════════
+        // CLOCK
+        // ══════════════════════════════════════════
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('liveTime').textContent = h + ':' + m;
+
+            const days2 = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            document.getElementById('heroDate').textContent =
+                `${days2[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+        }
+
+        // ══════════════════════════════════════════
+        // INIT
+        // ══════════════════════════════════════════
+        initCurrent();
+        updateClock();
+        setInterval(updateClock, 30000);
+
+        renderDays(document.getElementById('daysContainer'), days.slice(0, 7));
+        renderDays(document.getElementById('week2Container'), days.slice(7, 14));
+        renderDays(document.getElementById('week3Container'), days.slice(14, 21));
+    </script>
+</body>
+
+</html>

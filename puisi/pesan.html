@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../images/icon.png">
+    <title>KOTAK_MASUK | ABSURDUM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:       #050805;
+            --screen:   #0a120a;
+            --green:    #4aff6a;
+            --green-dim:#1a8a2a;
+            --green-ghost: #0d4a18;
+            --amber:    #ffb832;
+            --amber-dim:#8a5a00;
+            --sent:     #1aff4a;
+            --border:   #0d3a0d;
+            --pixel:    'VT323', monospace;
+            --mono:     'Share Tech Mono', monospace;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--green);
+            font-family: var(--pixel);
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: default;
+        }
+
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.15) 2px,
+                rgba(0,0,0,0.15) 4px
+            );
+            pointer-events: none;
+            z-index: 200;
+        }
+
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background: radial-gradient(
+                ellipse at 50% 50%,
+                rgba(74,255,106,0.03) 0%,
+                transparent 70%
+            );
+            pointer-events: none;
+            z-index: 199;
+        }
+
+        #noiseCanvas {
+            position: fixed; inset: 0;
+            pointer-events: none;
+            z-index: 198;
+            opacity: 0.025;
+        }
+
+        .back-btn {
+            position: fixed; top: 16px; left: 20px;
+            z-index: 300;
+            text-decoration: none;
+            color: var(--green-dim);
+            font-family: var(--pixel);
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            transition: color 0.2s;
+        }
+        .back-btn:hover { color: var(--green); }
+
+        /* ── METADATA STRIP — subtle "true story" hint ── */
+        .meta-strip {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            z-index: 300;
+            background: rgba(5,8,5,0.92);
+            border-top: 1px solid var(--green-ghost);
+            padding: 6px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            color: var(--green-ghost);
+        }
+        .meta-strip .meta-left { opacity: 0.5; }
+        .meta-strip .meta-right {
+            opacity: 0;
+            animation: metaFadeIn 1s ease 12s forwards;
+            text-align: right;
+            font-style: italic;
+            color: var(--green-dim);
+            max-width: 60%;
+        }
+        @keyframes metaFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 0.6; }
+        }
+        .meta-strip .meta-right span {
+            color: var(--amber-dim);
+        }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.hidden { display: none; }
+
+        .modal-screen {
+            width: 100%;
+            max-width: 360px;
+            border: 2px solid var(--green-dim);
+            background: var(--screen);
+            box-shadow: 0 0 40px rgba(74,255,106,0.08), inset 0 0 60px rgba(0,0,0,0.5);
+            padding: 0;
+            overflow: hidden;
+            animation: screenOn 0.4s ease;
+        }
+
+        @keyframes screenOn {
+            0%   { opacity: 0; transform: scaleY(0.02); }
+            30%  { opacity: 1; transform: scaleY(0.02); }
+            100% { transform: scaleY(1); }
+        }
+
+        .modal-topbar {
+            background: var(--green-dim);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-topbar-title {
+            font-family: var(--pixel);
+            font-size: 1.1rem;
+            color: #000;
+            letter-spacing: 2px;
+        }
+
+        .modal-topbar-time {
+            font-family: var(--pixel);
+            font-size: 1rem;
+            color: #000;
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 24px 20px;
+        }
+
+        .modal-question {
+            font-family: var(--pixel);
+            font-size: 1.3rem;
+            color: var(--green);
+            line-height: 1.6;
+            margin-bottom: 28px;
+            letter-spacing: 1px;
+        }
+
+        .modal-question span {
+            color: var(--amber);
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        .recipient-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .recipient-btn {
+            background: transparent;
+            border: 1px solid var(--green-ghost);
+            padding: 12px 16px;
+            text-align: left;
+            cursor: pointer;
+            font-family: var(--pixel);
+            font-size: 1.2rem;
+            color: var(--green-dim);
+            letter-spacing: 2px;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .recipient-btn:hover,
+        .recipient-btn:focus {
+            background: var(--green-ghost);
+            color: var(--green);
+            border-color: var(--green-dim);
+            outline: none;
+        }
+
+        .recipient-btn .icon { font-size: 1rem; opacity: 0.6; }
+
+        .modal-note {
+            margin-top: 20px;
+            font-family: var(--pixel);
+            font-size: 0.9rem;
+            color: var(--green-ghost);
+            letter-spacing: 1px;
+            line-height: 1.8;
+            border-top: 1px solid var(--green-ghost);
+            padding-top: 16px;
+        }
+
+        /* ── PHONE WRAPPER ── */
+        .phone-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 60px 20px 100px;
+        }
+
+        .phone {
+            width: 100%;
+            max-width: 380px;
+            border: 2px solid var(--green-dim);
+            background: var(--screen);
+            box-shadow:
+                0 0 60px rgba(74,255,106,0.06),
+                0 0 120px rgba(74,255,106,0.03),
+                inset 0 0 40px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            min-height: 80vh;
+        }
+
+        .phone-topbar {
+            background: var(--green-dim);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .topbar-left {
+            font-family: var(--pixel);
+            font-size: 1.05rem;
+            color: #000;
+            letter-spacing: 2px;
+        }
+
+        .topbar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .signal-bars {
+            display: flex;
+            gap: 2px;
+            align-items: flex-end;
+        }
+        .bar {
+            width: 4px;
+            background: #000;
+            opacity: 0.7;
+        }
+        .bar:nth-child(1) { height: 4px; }
+        .bar:nth-child(2) { height: 7px; }
+        .bar:nth-child(3) { height: 10px; }
+        .bar:nth-child(4) { height: 13px; }
+
+        .battery {
+            font-family: var(--pixel);
+            font-size: 0.85rem;
+            color: #000;
+            opacity: 0.7;
+        }
+
+        .recipient-bar {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recipient-avatar {
+            width: 28px; height: 28px;
+            border: 1px solid var(--green-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--pixel);
+            font-size: 0.9rem;
+            color: var(--green-dim);
+            flex-shrink: 0;
+        }
+
+        .recipient-name {
+            font-family: var(--pixel);
+            font-size: 1.15rem;
+            color: var(--green);
+            letter-spacing: 2px;
+        }
+
+        .recipient-status {
+            font-family: var(--pixel);
+            font-size: 0.85rem;
+            color: var(--green-dim);
+            letter-spacing: 1px;
+            margin-left: auto;
+        }
+
+        .messages {
+            flex: 1;
+            padding: 16px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+            min-height: 400px;
+        }
+
+        .date-divider {
+            text-align: center;
+            font-family: var(--pixel);
+            font-size: 0.85rem;
+            color: var(--green-ghost);
+            letter-spacing: 2px;
+            margin: 8px 0;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .date-divider.visible { opacity: 1; }
+
+        .msg {
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            max-width: 82%;
+        }
+        .msg.visible { opacity: 1; }
+
+        .msg.sent {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+
+        .msg.received {
+            align-self: flex-start;
+            align-items: flex-start;
+        }
+
+        .bubble {
+            border: 1px solid;
+            padding: 10px 14px;
+            font-family: var(--pixel);
+            font-size: 1.15rem;
+            line-height: 1.7;
+            letter-spacing: 1px;
+            position: relative;
+            word-break: break-word;
+        }
+
+        .msg.sent .bubble {
+            border-color: var(--green-dim);
+            color: var(--green);
+            background: rgba(74,255,106,0.04);
+        }
+
+        .bubble .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1.1em;
+            background: var(--green);
+            vertical-align: middle;
+            margin-left: 2px;
+            animation: blink 0.7s infinite;
+        }
+        .bubble .cursor.hidden { display: none; }
+
+        .msg-meta {
+            font-family: var(--pixel);
+            font-size: 0.8rem;
+            color: var(--green-ghost);
+            letter-spacing: 1px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .msg.sent .msg-meta { justify-content: flex-end; }
+
+        .read-tick {
+            color: var(--green-dim);
+            letter-spacing: -3px;
+        }
+        .read-tick.read { color: var(--green); }
+
+        .typing-indicator {
+            align-self: flex-start;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            max-width: 100px;
+        }
+        .typing-indicator.visible { opacity: 1; }
+        .typing-indicator.hidden  { opacity: 0; }
+
+        .typing-dot {
+            width: 6px; height: 6px;
+            background: var(--green-dim);
+            border-radius: 0;
+            animation: typingBounce 1.2s infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce {
+            0%,80%,100% { opacity: 0.3; transform: translateY(0); }
+            40%          { opacity: 1;   transform: translateY(-4px); }
+        }
+
+        .phone-inputbar {
+            border-top: 1px solid var(--border);
+            padding: 12px 14px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .input-field {
+            flex: 1;
+            border: 1px solid var(--green-dim);
+            background: transparent;
+            padding: 8px 12px;
+            font-family: var(--pixel);
+            font-size: 1rem;
+            color: var(--green);
+            letter-spacing: 1px;
+            outline: none;
+            cursor: text;
+        }
+
+        .input-field::placeholder { color: var(--green-ghost); }
+        .input-field:focus { border-color: var(--green); }
+
+        .send-btn {
+            border: 1px solid var(--green-dim);
+            background: transparent;
+            padding: 8px 14px;
+            font-family: var(--pixel);
+            font-size: 1rem;
+            color: var(--green-dim);
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+        .send-btn:hover {
+            background: var(--green-ghost);
+            color: var(--green);
+            border-color: var(--green);
+        }
+
+        /* ── DRAFT SCREEN ── */
+        .draft-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+        .draft-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .draft-screen {
+            width: 100%;
+            max-width: 380px;
+            max-height: 85vh;
+            border: 2px solid var(--amber-dim);
+            background: var(--screen);
+            box-shadow: 0 0 60px rgba(255,184,50,0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .draft-topbar {
+            background: var(--amber-dim);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .draft-topbar span {
+            font-family: var(--pixel);
+            font-size: 1rem;
+            color: #000;
+            letter-spacing: 2px;
+        }
+
+        .draft-body {
+            padding: 24px 20px 28px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .draft-label {
+            font-family: var(--pixel);
+            font-size: 0.9rem;
+            color: var(--amber-dim);
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            display: block;
+            animation: blink 2s infinite;
+        }
+
+        .draft-text {
+            font-family: var(--pixel);
+            font-size: 1.2rem;
+            color: var(--amber);
+            line-height: 1.9;
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: opacity 1s ease;
+            white-space: pre-wrap;
+        }
+        .draft-text.visible { opacity: 1; }
+
+        .draft-text .cursor-amber {
+            display: inline-block;
+            width: 10px; height: 1em;
+            background: var(--amber);
+            vertical-align: middle;
+            animation: blink 0.8s infinite;
+            margin-left: 3px;
+        }
+
+        .draft-footer {
+            margin-top: 24px;
+            padding-top: 14px;
+            border-top: 1px solid var(--amber-dim);
+            font-family: var(--pixel);
+            font-size: 0.85rem;
+            color: var(--amber-dim);
+            letter-spacing: 2px;
+            line-height: 2;
+        }
+
+        .draft-close {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-family: var(--pixel);
+            font-size: 1rem;
+            color: var(--amber-dim);
+            letter-spacing: 3px;
+            cursor: pointer;
+            border: 1px solid var(--amber-dim);
+            padding: 10px;
+            transition: all 0.2s;
+            background: transparent;
+            width: 100%;
+            flex-shrink: 0;
+        }
+        .draft-close:hover {
+            color: var(--amber);
+            border-color: var(--amber);
+        }
+
+        .msg.user-sent {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+        .msg.user-sent .bubble {
+            border-color: var(--amber-dim);
+            color: var(--amber);
+            background: rgba(255,184,50,0.04);
+        }
+        .msg.user-sent .msg-meta { 
+            justify-content: flex-end;
+            color: var(--amber);
+            border-color: var(--amber);
+        }
+
+        @media (max-width: 420px) {
+            .phone { max-width: 100%; }
+            .bubble { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="noiseCanvas"></canvas>
+<a href="../index.html" class="back-btn">← KEMBALI</a>
+
+<!-- ── METADATA STRIP — samar, muncul belakangan ── -->
+<div class="meta-strip" id="metaStrip">
+    <span class="meta-left">session_id: 7f3a · enc: off · log: none</span>
+    <span class="meta-right" id="metaNote">
+        <span>※</span> nama-nama dalam percakapan ini telah diubah. atau mungkin tidak. <span>※</span>
+    </span>
+</div>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="modal">
+    <div class="modal-screen">
+        <div class="modal-topbar">
+            <span class="modal-topbar-title">PESAN BARU</span>
+            <span class="modal-topbar-time" id="modalTime">--:--</span>
+        </div>
+        <div class="modal-body">
+            <p class="modal-question">
+                Kamu ingin mengirim pesan ke siapa?<span>_</span>
+            </p>
+            <div class="recipient-list">
+                <button class="recipient-btn" onclick="startChat('mantan')">
+                    <span class="icon">&gt;</span> MANTAN
+                </button>
+                <button class="recipient-btn" onclick="startChat('teman')">
+                    <span class="icon">&gt;</span> TEMAN LAMA
+                </button>
+                <button class="recipient-btn" onclick="startChat('diri')">
+                    <span class="icon">&gt;</span> DIRI SENDIRI
+                </button>
+                <button class="recipient-btn" onclick="startChat('nomor')">
+                    <span class="icon">&gt;</span> +62 *** *** ***
+                </button>
+            </div>
+            <p class="modal-note">
+                * tidak ada yang akan membaca ini.<br>
+                * tapi kamu tetap ingin mengirimnya.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ── DRAFT OVERLAY ── -->
+<div class="draft-overlay" id="draftOverlay">
+    <div class="draft-screen">
+        <div class="draft-topbar">
+            <span>DRAFT</span>
+            <span>TIDAK TERKIRIM</span>
+        </div>
+        <div class="draft-body">
+            <span class="draft-label">[ TERSIMPAN — TIDAK PERNAH DIKIRIM ]</span>
+            <p class="draft-text" id="draftText"></p>
+            <div class="draft-footer" id="draftFooter"></div>
+            <button class="draft-close" onclick="closeDraft()">[ TUTUP ]</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── PHONE UI ── -->
+<div class="phone-wrapper" id="phoneWrapper" style="display:none;">
+    <div class="phone">
+        <div class="phone-topbar">
+            <span class="topbar-left" id="topbarTitle">PESAN</span>
+            <div class="topbar-right">
+                <div class="signal-bars">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+                <span class="battery" id="batteryLevel">84%</span>
+            </div>
+        </div>
+
+        <div class="recipient-bar">
+            <div class="recipient-avatar" id="recipientAvatar">?</div>
+            <span class="recipient-name" id="recipientName">---</span>
+            <span class="recipient-status" id="recipientStatus">online</span>
+        </div>
+
+        <div class="messages" id="messages">
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+
+        <div class="phone-inputbar">
+            <input class="input-field" id="msgInput" placeholder="Ketik sesuatu..." maxlength="120">
+            <button class="send-btn" id="sendBtn" onclick="sendUserMessage()">KIRIM</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── NOISE CANVAS ──
+    const nc  = document.getElementById('noiseCanvas');
+    const nct = nc.getContext('2d');
+    function resizeNoise() { nc.width = window.innerWidth; nc.height = window.innerHeight; }
+    resizeNoise();
+    window.addEventListener('resize', resizeNoise);
+    function drawNoise() {
+        const W = nc.width, H = nc.height;
+        const img = nct.createImageData(W, H);
+        for (let i = 0; i < img.data.length; i += 4) {
+            const v = Math.random() > 0.5 ? 255 : 0;
+            img.data[i]   = 0;
+            img.data[i+1] = v;
+            img.data[i+2] = 0;
+            img.data[i+3] = Math.random() * 25;
+        }
+        nct.putImageData(img, 0, 0);
+        setTimeout(drawNoise, 80);
+    }
+    drawNoise();
+
+    // ── CLOCK ──
+    function updateClock() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2,'0');
+        const m = String(now.getMinutes()).padStart(2,'0');
+        document.getElementById('modalTime').textContent = `${h}:${m}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ── BATTERY drain ──
+    let battery = 84;
+    setInterval(() => {
+        battery = Math.max(1, battery - 1);
+        const el = document.getElementById('batteryLevel');
+        if (el) el.textContent = battery + '%';
+    }, 8000);
+
+    // ══════════════════════════════════════════
+    // CHAT DATA
+    // ══════════════════════════════════════════
+    const recipients = {
+        mantan: {
+            name: 'MANTAN',
+            avatar: 'M',
+            status: 'terakhir dilihat lama sekali',
+            messages: [
+                { time: '14:02', text: 'hei.' },
+                { time: '14:02', text: 'tadi aku nemu kunci yang nggak tau kunci apa.' },
+                { time: '14:03', text: 'mungkin kunci gudang di tempat lama.' },
+                { time: '14:03', text: 'atau bukan. kunci ini bahkan nggak punya lubang yang cocok.' },
+                { time: '14:04', text: 'tapi bentuknya familiar banget.' },
+                { time: '15:44', text: 'aku coba masukkan ke semua pintu yang ada di rumah.' },
+                { time: '15:44', text: 'nggak ada yang cocok.' },
+                { time: '15:45', text: 'termasuk pintu yang sudah aku semen tiga bulan lalu.' },
+                { time: '18:11', text: 'kamu pernah nggak ngerasa ada sesuatu yang salah posisinya.' },
+                { time: '18:11', text: 'tapi nggak tau harus dipindah ke mana.' },
+                { time: '18:12', text: 'jadi dibiarkan. jadi dinding. jadi bagian dari denah rumah.' },
+                { time: '21:30', text: 'itu bukan pertanyaan buat kamu sebenernya.' },
+                { time: '21:30', text: 'maaf. aku ngirim ini ke nomor yang salah juga waktu itu.' },
+                { time: '23:47', text: 'selamat malam.' },
+                { time: '23:47', text: 'kunci itu masih di laci. laci yang tarik pegangannya sudah copot.' },
+            ]
+        },
+        teman: {
+            name: 'TEMAN LAMA',
+            avatar: 'T',
+            status: 'terakhir aktif 847 hari lalu',
+            messages: [
+                { time: '10:05', text: 'eh.' },
+                { time: '10:05', text: 'nama kamu masih muncul di rekomendasiku.' },
+                { time: '10:06', text: 'di bawah iklan obat tidur dan tutorial origami.' },
+                { time: '10:06', text: 'algoritmanya masih ingat. meskipun aku sudah lupa caranya.' },
+                { time: '13:22', text: 'aku tadi lewat warung yang dulu kita sering ke sana.' },
+                { time: '13:22', text: 'tutup. udah jadi minimarket yang jual es krim rasa kesepian.' },
+                { time: '13:23', text: 'aku beli satu.' },
+                { time: '13:23', text: 'rasanya seperti plastik yang ingat pernah jadi susu.' },
+                { time: '17:09', text: 'gimana kabar.' },
+                { time: '17:09', text: 'nggak usah dijawab.' },
+                { time: '17:10', text: 'pertanyaan ini sudah kedaluwarsa sejak dikirim.' },
+                { time: '20:58', text: 'waktu itu kita pernah ngomongin soal seseorang yang pergi.' },
+                { time: '20:58', text: 'aku lupa siapa. tapi aku inget cara kamu pegang gelasnya.' },
+                { time: '20:59', text: 'dua tangan. pelan-pelan. kayak takut isinya tumpah.' },
+                { time: '23:01', text: 'gelas itu juga udah nggak ada.' },
+                { time: '23:01', text: 'atau masih ada tapi sudah jadi sesuatu yang lain.' },
+            ]
+        },
+        diri: {
+            name: 'KAMU (DULU)',
+            avatar: '?',
+            status: 'tidak dapat dihubungi',
+            messages: [
+                { time: '00:01', text: 'hei.' },
+                { time: '00:01', text: 'ini kamu.' },
+                { time: '00:01', text: 'yang nanti. yang sudah lupa cara masak nasi yang bener.' },
+                { time: '00:14', text: 'jangan terlalu banyak menyimpan hal.' },
+                { time: '00:14', text: 'laci kamu cuma muat segitu.' },
+                { time: '00:15', text: 'sisanya sudah diisi oleh suara-suara yang nggak kamu undang.' },
+                { time: '01:03', text: 'orang yang sekarang kamu khawatirkan.' },
+                { time: '01:03', text: 'nggak usah dikhawatirkan.' },
+                { time: '01:04', text: 'tapi juga nggak usah berhenti.' },
+                { time: '01:04', text: 'kekhawatiran itu yang bikin kamu masih di sini.' },
+                { time: '02:37', text: 'nanti kamu akan berdiri di depan cermin.' },
+                { time: '02:37', text: 'dan nggak kenal yang di dalamnya.' },
+                { time: '02:38', text: 'cerminnya masih sama. kamu yang bergeser.' },
+                { time: '02:38', text: 'dua milimeter ke kiri. tepat di luar frame.' },
+                { time: '03:11', text: 'aku cuma mau bilang itu.' },
+                { time: '03:11', text: 'sisanya kamu yang tahu. kamu selalu tahu tapi pura-pura tidak.' },
+            ]
+        },
+        nomor: {
+            name: '+62 *** *** ***',
+            avatar: '#',
+            status: 'nomor tidak terdaftar',
+            messages: [
+                { time: '19:44', text: 'maaf.' },
+                { time: '19:44', text: 'ini salah kirim.' },
+                { time: '19:45', text: 'atau mungkin nggak. aku sudah salah kirim berkali-kali ke tempat yang tepat.' },
+                { time: '20:12', text: 'ada hal yang lebih gampang diceritain ke yang nggak kenal.' },
+                { time: '20:12', text: 'yang kenal sudah punya versi ceritanya sendiri.' },
+                { time: '20:13', text: 'versi yang lebih rapi. yang sudah dipotong di bagian yang jelek.' },
+                { time: '20:13', text: 'bagian yang jelek itu satu-satunya yang terasa nyata.' },
+                { time: '21:30', text: 'hal yang hilang itu bukan orangnya.' },
+                { time: '21:30', text: 'tapi selasa malam di bulan ketujuh.' },
+                { time: '21:31', text: 'yang waktu itu lampu kamar mati dan kita diam saja.' },
+                { time: '21:31', text: 'diam yang beratnya seperti furnitur yang tidak ada di katalog mana pun.' },
+                { time: '22:58', text: 'kamu pasti nggak baca ini.' },
+                { time: '22:58', text: 'itu yang bikin aku berani nulis.' },
+                { time: '23:59', text: 'selamat malam.' },
+                { time: '23:59', text: 'siapapun kamu. terima kasih sudah tidak ada.' },
+            ]
+        }
+    };
+
+    // Draft
+    const draftMessage = {
+        text: `aku nggak tau ini buat siapa.\n\ntapi ada satu hal\nyang tiap mau aku kirim\naku hapus duluan.\n\nbukan karena salah.\n\nkarena terlalu benar.\n\ndan karena beberapa hal\nhanya boleh benar\ndi dalam draft.\n\n_`,
+        footer: `[ draft: 03:17 ]\n[ tidak terkirim ]\n[ ukuran file: 1 kenangan, 0 byte ]`
+    };
+
+    // ══════════════════════════════════════════
+    // CHAT ENGINE
+    // ══════════════════════════════════════════
+    let currentMsgIdx  = 0;
+    let chatData       = null;
+
+    function startChat(type) {
+        document.getElementById('modal').classList.add('hidden');
+        chatData = recipients[type];
+
+        document.getElementById('topbarTitle').textContent = 'PESAN';
+        document.getElementById('recipientAvatar').textContent = chatData.avatar;
+        document.getElementById('recipientName').textContent   = chatData.name;
+        document.getElementById('recipientStatus').textContent = chatData.status;
+
+        document.getElementById('phoneWrapper').style.display = 'flex';
+        currentMsgIdx = 0;
+
+        addDateDivider();
+        setTimeout(sendNextMessage, 800);
+    }
+
+    function addDateDivider() {
+        const msgs = document.getElementById('messages');
+        const divider = document.createElement('div');
+        divider.className = 'date-divider';
+        divider.textContent = getTodayLabel();
+        msgs.insertBefore(divider, document.getElementById('typingIndicator'));
+        setTimeout(() => divider.classList.add('visible'), 50);
+    }
+
+    function getTodayLabel() {
+        const days = ['MINGGU','SENIN','SELASA','RABU','KAMIS','JUMAT','SABTU'];
+        const now  = new Date();
+        return `— ${days[now.getDay()]}, HARI INI —`;
+    }
+
+    function sendNextMessage() {
+        if (!chatData || currentMsgIdx >= chatData.messages.length) {
+            setTimeout(showDraft, 3000);
+            return;
+        }
+
+        const msgData = chatData.messages[currentMsgIdx];
+        const typingDuration = Math.min(800 + msgData.text.length * 35, 3200);
+
+        addMessageWithTypewriter(msgData, typingDuration, () => {
+            currentMsgIdx++;
+            const nextMsg = chatData.messages[currentMsgIdx];
+            const gap = nextMsg && nextMsg.time === msgData.time
+                ? 400 + Math.random() * 300
+                : 900 + Math.random() * 800;
+            setTimeout(sendNextMessage, gap);
+        });
+    }
+
+    function addMessageWithTypewriter(msgData, typingDuration, onDone) {
+        const msgs = document.getElementById('messages');
+        const typingEl = document.getElementById('typingIndicator');
+
+        const msgEl = document.createElement('div');
+        msgEl.className = 'msg sent';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+
+        const textSpan = document.createElement('span');
+        const cursorSpan = document.createElement('span');
+        cursorSpan.className = 'cursor';
+
+        bubble.appendChild(textSpan);
+        bubble.appendChild(cursorSpan);
+
+        const meta = document.createElement('div');
+        meta.className = 'msg-meta';
+        meta.innerHTML = `<span>${msgData.time}</span><span class="read-tick">✓✓</span>`;
+
+        msgEl.appendChild(bubble);
+        msgEl.appendChild(meta);
+
+        msgs.insertBefore(msgEl, typingEl);
+        setTimeout(() => msgEl.classList.add('visible'), 50);
+
+        const fullText = msgData.text;
+        let charIdx = 0;
+        const charDelay = Math.min(typingDuration / fullText.length, 60);
+
+        function typeChar() {
+            if (charIdx < fullText.length) {
+                textSpan.textContent = fullText.slice(0, charIdx + 1);
+                charIdx++;
+                scrollToBottom();
+                setTimeout(typeChar, charDelay + Math.random() * 20);
+            } else {
+                cursorSpan.classList.add('hidden');
+                setTimeout(() => {
+                    const tick = meta.querySelector('.read-tick');
+                    if (tick) tick.classList.add('read');
+                }, 800 + Math.random() * 1200);
+                if (onDone) onDone();
+            }
+        }
+
+        setTimeout(typeChar, 80);
+    }
+
+    function scrollToBottom() {
+        const msgs = document.getElementById('messages');
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    // ══════════════════════════════════════════
+    // DRAFT
+    // ══════════════════════════════════════════
+    function showDraft() {
+        const overlay = document.getElementById('draftOverlay');
+        const textEl  = document.getElementById('draftText');
+        const footerEl = document.getElementById('draftFooter');
+
+        footerEl.innerHTML = draftMessage.footer.replace(/\n/g, '<br>');
+
+        overlay.classList.add('visible');
+
+        const fullText = draftMessage.text;
+        let charIdx = 0;
+
+        textEl.innerHTML = '<span class="cursor-amber"></span>';
+        const cursorEl = textEl.querySelector('.cursor-amber');
+
+        setTimeout(() => {
+            textEl.classList.add('visible');
+
+            function typeNext() {
+                if (charIdx < fullText.length) {
+                    const char = fullText[charIdx];
+
+                    if (char === '\n') {
+                        textEl.insertBefore(document.createElement('br'), cursorEl);
+                    } else {
+                        textEl.insertBefore(document.createTextNode(char), cursorEl);
+                    }
+
+                    charIdx++;
+                    const delay = char === '\n' ? 180 : 28 + Math.random() * 25;
+                    setTimeout(typeNext, delay);
+                }
+            }
+
+            typeNext();
+        }, 400);
+    }
+
+    function closeDraft() {
+        document.getElementById('draftOverlay').classList.remove('visible');
+    }
+
+    // ── USER MESSAGES ──
+    function sendUserMessage() {
+        const input = document.getElementById('msgInput');
+        const text  = input.value.trim();
+        if (!text) return;
+        input.value = '';
+
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2,'0');
+        const m = String(now.getMinutes()).padStart(2,'0');
+
+        const msgs = document.getElementById('messages');
+        const typingEl = document.getElementById('typingIndicator');
+
+        const msgEl = document.createElement('div');
+        msgEl.className = 'msg user-sent';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.textContent = text;
+
+        const meta = document.createElement('div');
+        meta.className = 'msg-meta';
+        meta.innerHTML = `<span>${h}:${m}</span><span class="read-tick">✓✓</span>`;
+
+        msgEl.appendChild(bubble);
+        msgEl.appendChild(meta);
+        msgs.insertBefore(msgEl, typingEl);
+
+        setTimeout(() => {
+            msgEl.classList.add('visible');
+            setTimeout(() => {
+                meta.querySelector('.read-tick').classList.add('read');
+            }, 1200 + Math.random() * 1000);
+            scrollToBottom();
+        }, 50);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        const input = document.getElementById('msgInput');
+        if (input && e.key === 'Enter' && document.activeElement === input) {
+            sendUserMessage();
+        }
+    });
+</script>
+</body>
+</html>

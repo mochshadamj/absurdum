@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../images/icon.png">
+    <title>KAMUS TIDAK RESMI | ABSURDUM</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --paper: #f5f0e8;
+            --paper2: #ede8de;
+            --paper3: #e4ddd0;
+            --ink: #1c1710;
+            --ink-dim: #4a4030;
+            --ink-mid: #6a5a48;
+            --ink-light: #9a8a78;
+            --ink-ghost: #c4b8a8;
+            --red: #7a1a10;
+            --red-dim: #a83020;
+            --blue: #1a3058;
+            --border: #c8bfaa;
+            --serif: 'Playfair Display', 'Georgia', serif;
+            --body: 'EB Garamond', 'Garamond', Georgia, serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--paper);
+            color: var(--ink);
+            font-family: var(--body);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Paper texture */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Page edge shadows */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(to right, rgba(0, 0, 0, 0.06) 0%, transparent 40px),
+                linear-gradient(to left, rgba(0, 0, 0, 0.04) 0%, transparent 40px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── LAYOUT ── */
+        .page {
+            max-width: 780px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            padding: 0 0 80px;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            background: var(--paper);
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.08), 0 0 120px rgba(0, 0, 0, 0.04);
+            min-height: 100vh;
+        }
+
+        /* ── BACK ── */
+        .back-btn {
+            position: fixed;
+            top: 16px;
+            left: calc(50% - 390px - 80px);
+            text-decoration: none;
+            color: var(--ink-light);
+            font-family: var(--body);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            transition: color 0.2s;
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            color: var(--ink);
+        }
+
+        @media(max-width:900px) {
+            .back-btn {
+                position: sticky;
+                top: 0;
+                left: 0;
+                display: block;
+                background: var(--paper2);
+                padding: 10px 20px;
+                border-bottom: 1px solid var(--border);
+                width: 100%;
+                z-index: 50;
+            }
+        }
+
+        /* ── HEADER / TITLE PAGE ── */
+        .title-page {
+            padding: 60px 60px 48px;
+            border-bottom: 3px double var(--border);
+            text-align: center;
+            position: relative;
+        }
+
+        .title-series {
+            font-family: var(--body);
+            font-size: 0.65rem;
+            letter-spacing: 5px;
+            color: var(--ink-light);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .title-main {
+            font-family: var(--serif);
+            font-size: clamp(2.2rem, 8vw, 3.8rem);
+            font-weight: 900;
+            color: var(--ink);
+            line-height: 1.05;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+        }
+
+        .title-sub {
+            font-family: var(--serif);
+            font-size: clamp(0.9rem, 3vw, 1.2rem);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--ink-dim);
+            margin-bottom: 32px;
+        }
+
+        .title-rule {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .title-rule::before,
+        .title-rule::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .title-rule-center {
+            font-family: var(--body);
+            font-size: 0.7rem;
+            color: var(--ink-ghost);
+            letter-spacing: 3px;
+            white-space: nowrap;
+        }
+
+        .title-meta {
+            font-family: var(--body);
+            font-size: 0.72rem;
+            color: var(--ink-light);
+            letter-spacing: 1px;
+            line-height: 2.2;
+            font-style: italic;
+        }
+
+        .edition-stamp {
+            position: absolute;
+            top: 24px;
+            right: 40px;
+            font-family: var(--body);
+            font-size: 0.55rem;
+            letter-spacing: 3px;
+            color: var(--red);
+            border: 1px solid var(--red);
+            padding: 4px 10px;
+            transform: rotate(8deg);
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        /* ── ALPHABET TABS ── */
+        .alpha-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 12px 60px;
+            gap: 2px;
+            border-bottom: 1px solid var(--border);
+            background: var(--paper2);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+
+        .alpha-tab {
+            font-family: var(--body);
+            font-size: 0.62rem;
+            letter-spacing: 1px;
+            color: var(--ink-light);
+            padding: 3px 7px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s;
+            border: 1px solid transparent;
+        }
+
+        .alpha-tab:hover {
+            color: var(--ink);
+            border-color: var(--border);
+            background: var(--paper);
+        }
+
+        .alpha-tab.has-entry {
+            color: var(--ink-dim);
+            font-weight: 500;
+        }
+
+        .alpha-tab.active {
+            color: var(--ink);
+            border-color: var(--ink-dim);
+            background: var(--paper);
+        }
+
+        /* ── SECTION LETTER ── */
+        .letter-section {
+            padding: 0 60px;
+        }
+
+        .section-letter {
+            font-family: var(--serif);
+            font-size: clamp(3rem, 10vw, 5.5rem);
+            font-weight: 900;
+            color: var(--paper3);
+            line-height: 1;
+            margin: 32px 0 0;
+            padding: 24px 0 8px;
+            border-top: 2px solid var(--border);
+            position: relative;
+            -webkit-text-stroke: 1px var(--border);
+            letter-spacing: -2px;
+            float: left;
+            margin-right: 20px;
+            margin-bottom: 8px;
+        }
+
+        .section-divider {
+            clear: both;
+            border-top: 1px solid var(--border);
+            margin: 32px 0 0;
+        }
+
+        /* ── ENTRY ── */
+        .entry {
+            padding: 28px 0;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            transition: background 0.2s;
+            cursor: default;
+        }
+
+        .entry:last-child {
+            border-bottom: none;
+        }
+
+        .entry:hover {
+            background: rgba(0, 0, 0, 0.015);
+            margin: 0 -16px;
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+
+        .entry-head {
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .entry-word {
+            font-family: var(--serif);
+            font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.3px;
+        }
+
+        /* Invented words get different styling */
+        .entry-word.invented {
+            color: var(--blue);
+            font-style: italic;
+        }
+
+        .entry-pron {
+            font-family: var(--body);
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            letter-spacing: 1px;
+        }
+
+        .entry-pos {
+            font-family: var(--body);
+            font-size: 0.72rem;
+            font-style: italic;
+            color: var(--red-dim);
+            letter-spacing: 0.5px;
+        }
+
+        .entry-num {
+            font-family: var(--body);
+            font-size: 0.6rem;
+            color: var(--ink-ghost);
+            letter-spacing: 2px;
+            margin-left: auto;
+        }
+
+        /* Definition(s) */
+        .entry-defs {
+            padding-left: 20px;
+        }
+
+        .entry-def {
+            font-family: var(--body);
+            font-size: clamp(0.88rem, 2.2vw, 1.02rem);
+            color: var(--ink-dim);
+            line-height: 1.95;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .entry-def::before {
+            content: attr(data-n);
+            font-family: var(--body);
+            font-size: 0.65rem;
+            color: var(--ink-ghost);
+            position: absolute;
+            left: -18px;
+            top: 3px;
+        }
+
+        .entry-def em {
+            font-style: italic;
+            color: var(--ink-mid);
+        }
+
+        .entry-example {
+            font-family: var(--body);
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--ink-light);
+            margin-left: 8px;
+            margin-top: 4px;
+            line-height: 1.8;
+            border-left: 2px solid var(--border);
+            padding-left: 12px;
+        }
+
+        .entry-also {
+            font-family: var(--body);
+            font-size: 0.72rem;
+            color: var(--ink-ghost);
+            letter-spacing: 1px;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .entry-also span {
+            color: var(--ink-light);
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+        }
+
+        /* Warning/note entries */
+        .entry-note {
+            background: rgba(122, 26, 16, 0.03);
+            border-left: 2px solid var(--red);
+            padding: 8px 14px;
+            margin-top: 10px;
+            font-family: var(--body);
+            font-size: 0.75rem;
+            color: var(--red-dim);
+            font-style: italic;
+            line-height: 1.7;
+        }
+
+        /* Invented badge */
+        .badge-invented {
+            font-family: var(--body);
+            font-size: 0.5rem;
+            letter-spacing: 2px;
+            color: var(--blue);
+            border: 1px solid currentColor;
+            padding: 1px 5px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            vertical-align: middle;
+            margin-left: 4px;
+        }
+
+        /* ── SEARCH ── */
+        .search-bar {
+            padding: 16px 60px;
+            border-bottom: 1px solid var(--border);
+            background: var(--paper2);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            padding: 6px 4px;
+            font-family: var(--body);
+            font-size: 0.88rem;
+            color: var(--ink);
+            outline: none;
+            letter-spacing: 0.5px;
+        }
+
+        .search-input::placeholder {
+            color: var(--ink-ghost);
+            font-style: italic;
+        }
+
+        .search-input:focus {
+            border-bottom-color: var(--ink-dim);
+        }
+
+        .search-label {
+            font-family: var(--body);
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            color: var(--ink-ghost);
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        /* Search results count */
+        .search-count {
+            font-family: var(--body);
+            font-size: 0.65rem;
+            color: var(--ink-ghost);
+            font-style: italic;
+            padding: 6px 60px;
+            border-bottom: 1px solid var(--border);
+            background: var(--paper2);
+            display: none;
+        }
+
+        .search-count.visible {
+            display: block;
+        }
+
+        /* ── COLOPHON ── */
+        .colophon {
+            padding: 48px 60px;
+            border-top: 3px double var(--border);
+            text-align: center;
+            font-family: var(--body);
+            font-size: 0.7rem;
+            color: var(--ink-ghost);
+            letter-spacing: 1px;
+            line-height: 2.5;
+            font-style: italic;
+        }
+
+        /* ── HEADER per halaman ── */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 60px;
+            border-bottom: 1px solid var(--border);
+            background: var(--paper2);
+        }
+
+        .ph-left,
+        .ph-right {
+            font-family: var(--body);
+            font-size: 0.62rem;
+            letter-spacing: 2px;
+            color: var(--ink-ghost);
+            text-transform: uppercase;
+        }
+
+        .ph-center {
+            font-family: var(--body);
+            font-size: 0.65rem;
+            color: var(--ink-ghost);
+            font-style: italic;
+        }
+
+        @media(max-width:640px) {
+            .title-page {
+                padding: 40px 24px 36px;
+            }
+
+            .edition-stamp {
+                top: 12px;
+                right: 16px;
+                font-size: 0.48rem;
+            }
+
+            .alpha-tabs {
+                padding: 10px 16px;
+            }
+
+            .letter-section {
+                padding: 0 24px;
+            }
+
+            .search-bar {
+                padding: 12px 24px;
+            }
+
+            .search-count {
+                padding: 6px 24px;
+            }
+
+            .page-header {
+                padding: 10px 24px;
+            }
+
+            .colophon {
+                padding: 36px 24px;
+            }
+
+            .entry:hover {
+                margin: 0 -8px;
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="../index.html" class="back-btn">← kembali</a>
+
+    <div class="page">
+
+        <!-- Title Page -->
+        <div class="title-page">
+            <div class="edition-stamp">Edisi Tidak Resmi</div>
+            <div class="title-series">ABSURDUM · SERI REFERENSI</div>
+            <h1 class="title-main">Kamus<br>Tidak Resmi</h1>
+            <p class="title-sub">Definisi untuk hal-hal yang ada<br>tapi tidak pernah diberi nama yang benar</p>
+            <div class="title-rule">
+                <span class="title-rule-center">❧</span>
+            </div>
+            <p class="title-meta">
+                Memuat <span id="totalEntries">—</span> entri &nbsp;·&nbsp;
+                <span id="inventedCount">—</span> kata tidak ada &nbsp;·&nbsp;
+                <span id="realCount">—</span> kata yang ada tapi salah definisi<br>
+                Disusun tanpa urutan yang jelas &nbsp;·&nbsp;
+                Diterbitkan kapan saja &nbsp;·&nbsp;
+                Tidak ada ISBN<br><br>
+                <em>Catatan penyusun: Semua definisi dalam kamus ini dibuat dengan sangat serius.<br>
+                    Keseriusannya adalah bagian dari masalah.</em>
+            </p>
+        </div>
+
+        <!-- Page header -->
+        <div class="page-header">
+            <span class="ph-left">KAMUS TIDAK RESMI</span>
+            <span class="ph-center">∴ ABSURDUM</span>
+            <span class="ph-right" id="pageNum">hal. 1</span>
+        </div>
+
+        <!-- Search -->
+        <div class="search-bar">
+            <span class="search-label">Cari</span>
+            <input class="search-input" id="searchInput" type="text" placeholder="ketik kata yang ingin dicari...">
+        </div>
+        <div class="search-count" id="searchCount"></div>
+
+        <!-- Alphabet tabs -->
+        <div class="alpha-tabs" id="alphaTabs"></div>
+
+        <!-- Dictionary entries -->
+        <div id="dictBody"></div>
+
+        <!-- Colophon -->
+        <div class="colophon">
+            Kamus ini tidak memiliki edisi berikutnya yang direncanakan.<br>
+            Bukan karena tidak ada kata-kata lagi yang perlu didefinisikan.<br>
+            Justru sebaliknya.<br><br>
+            ∴ ABSURDUM / KAMUS TIDAK RESMI / Cetakan Pertama dan Terakhir
+        </div>
+
+    </div>
+
+    <script>
+        // ══════════════════════════════════════════
+        // ENTRIES DATA
+        // ══════════════════════════════════════════
+        const entries = [
+
+            // ── A ──
+            {
+                word: 'absen',
+                invented: false,
+                pron: '/ab·sen/',
+                pos: 'adj., v.',
+                num: 'A.001',
+                defs: [
+                    { n: '1', text: 'Tidak hadir secara fisik di suatu tempat.' },
+                    { n: '2', text: 'Hadir secara fisik di suatu tempat tetapi pikirannya sedang berada di tempat lain yang tidak bisa ditunjuk di peta.' },
+                    {
+                        n: '3',
+                        text: '(tidak resmi) Kondisi saat seseorang berada di dalam percakapan tetapi seluruh kesadarannya sedang mengerjakan sesuatu yang berbeda di layer yang tidak terlihat.',
+                        example: '"Dia ada di sana tapi absen dengan sangat meyakinkan."'
+                    }
+                ],
+                also: 'lihat: hadir (definisi 3), mendengarkan (catatan kaki)',
+                note: null
+            },
+
+            {
+                word: 'ANTARBATAS',
+                invented: true,
+                pron: '/an·tar·ba·tas/',
+                pos: 'n.',
+                num: 'A.002',
+                defs: [
+                    {
+                        n: '1',
+                        text: 'Kondisi berada di antara dua keputusan yang sudah final — keduanya sudah dibuat, tapi tubuh belum selesai berpindah dari satu ke yang lain.',
+                        example: '"Ia sudah pergi. Tapi ia masih dalam antarbatas selama tiga bulan setelahnya."'
+                    },
+                    { n: '2', text: '(teknis) Interval waktu antara saat seseorang tahu sesuatu dan saat mereka mulai bertingkah seolah tahu. Durasi rata-rata: tidak tercatat.' }
+                ],
+                also: null,
+                note: 'Kata ini tidak ada dalam kamus manapun. Kemungkinan karena tidak ada yang mau mengakui bahwa kondisi ini punya nama.'
+            },
+
+            // ── B ──
+            {
+                word: 'baik',
+                invented: false,
+                pron: '/ba·ik/',
+                pos: 'adj.',
+                num: 'B.001',
+                defs: [
+                    { n: '1', text: 'Berada dalam kondisi yang memuaskan secara objektif.' },
+                    {
+                        n: '2',
+                        text: 'Jawaban yang diberikan ketika seseorang ditanya "bagaimana kabar" dan mereka tidak ingin menjelaskan jawaban yang sebenarnya.',
+                        example: '"Kabarku baik," katanya. Tidak ada yang menindaklanjuti.'
+                    },
+                    { n: '3', text: '(paling sering digunakan) Kata yang maknanya paling besar bergantung pada intonasi, dan paling sering disalahbaca oleh penerimanya.' }
+                ],
+                also: 'lihat: tidak apa-apa (sinonim fungsional), baik-baik saja (lebih panjang, tidak lebih akurat)',
+                note: null
+            },
+
+            {
+                word: 'BARANG BUKTI',
+                invented: false,
+                pron: '/ba·rang buk·ti/',
+                pos: 'n.',
+                num: 'B.002',
+                defs: [
+                    { n: '1', text: 'Objek yang digunakan sebagai bukti dalam suatu perkara hukum.' },
+                    {
+                        n: '2',
+                        text: 'Benda-benda kecil yang tidak sengaja bertahan setelah sesuatu berakhir: charger yang tertinggal, nomor yang tidak dihapus, screenshot percakapan yang tidak ada alasan untuk disimpan tapi tetap ada di folder tersembunyi.',
+                        example: '"Laci mejanya penuh barang bukti."'
+                    }
+                ],
+                also: null,
+                note: 'Berbeda dari kenangan karena barang bukti punya bentuk fisik yang bisa dipegang dan membuat tanganmu tidak tahu harus diletakkan di mana.'
+            },
+
+            {
+                word: 'BERLANJUT',
+                invented: false,
+                pron: '/ber·lan·jut/',
+                pos: 'v.',
+                num: 'B.003',
+                defs: [
+                    { n: '1', text: 'Terus berjalan setelah titik tertentu.' },
+                    {
+                        n: '2',
+                        text: 'Melakukan aktivitas sehari-hari secara teknis fungsional meski ada sesuatu yang besar yang sedang tidak berfungsi di latar belakang.',
+                        example: '"Hidupnya berlanjut. Tapi dengan semacam lag yang tidak bisa dijelaskan ke orang yang tidak pernah merasakannya."'
+                    }
+                ],
+                also: 'lihat: TERUSAN (entri tidak ditemukan), LANJUT (lihat definisi 2-4)',
+                note: null
+            },
+
+            // ── D ──
+            {
+                word: 'diam',
+                invented: false,
+                pron: '/di·am/',
+                pos: 'adj., n., v.',
+                num: 'D.001',
+                defs: [
+                    { n: '1', text: 'Tidak mengeluarkan suara.' },
+                    { n: '2', text: 'Tidak mengeluarkan suara meski ada banyak yang ingin dikeluarkan. Berbeda dari definisi 1 secara signifikan meski secara akustik identik.' },
+                    {
+                        n: '3',
+                        text: '(sebagai keputusan) Memilih untuk tidak menyampaikan sesuatu bukan karena tidak ada yang perlu disampaikan, melainkan karena terlalu banyak dan tidak tahu dari mana mulainya.',
+                        example: '"Ia memilih diam. Bukan karena tidak ada kata-kata. Tapi karena kata-katanya antre terlalu panjang dan pintu keluarnya terlalu sempit."'
+                    }
+                ],
+                also: 'lihat: SUNYI (berbeda), MEMBISU (lebih aktif), PERISAPAN (entri terkait)',
+                note: null
+            },
+
+            {
+                word: 'DIAPIT',
+                invented: true,
+                pron: '/di·a·pit/',
+                pos: 'adj.',
+                num: 'D.002',
+                defs: [
+                    {
+                        n: '1',
+                        text: 'Kondisi berada di antara dua versi diri sendiri — yang lama sudah tidak sepenuhnya berlaku, yang baru belum sepenuhnya terbentuk.',
+                        example: '"Ia sedang diapit. Kamu bisa tahu dari caranya menjawab pertanyaan tentang dirinya sendiri — selalu ada jeda setengah detik sebelum kata "aku"."'
+                    }
+                ],
+                also: null,
+                note: 'Tidak identik dengan bingung. Lebih presisi dari itu.'
+            },
+
+            // ── G ──
+            {
+                word: 'GARIS BATAS',
+                invented: false,
+                pron: '/ga·ris ba·tas/',
+                pos: 'n.',
+                num: 'G.001',
+                defs: [
+                    { n: '1', text: 'Batas pemisah antara dua wilayah atau konsep.' },
+                    {
+                        n: '2',
+                        text: 'Titik dalam sebuah percakapan di mana salah satu pihak sudah tahu ke mana arahnya tapi tetap melanjutkan karena berhenti terasa lebih aneh dari terus berjalan.',
+                        example: '"Mereka sudah melewati garis batas itu dua topik yang lalu. Tidak ada yang berkomentar."'
+                    },
+                    { n: '3', text: 'Jarak minimum antara dua orang yang sebelumnya tidak berjarak. Tidak terukur dalam sentimeter.' }
+                ],
+                also: null,
+                note: null
+            },
+
+            {
+                word: 'GEGAP',
+                invented: true,
+                pron: '/ge·gap/',
+                pos: 'n.',
+                num: 'G.002',
+                defs: [
+                    {
+                        n: '1',
+                        text: 'Bunyi yang dihasilkan oleh percakapan yang ingin dimulai tapi tidak jadi — bukan keheningan, bukan kata, tapi sesuatu di antara keduanya yang hanya bisa didengar oleh yang ada di dalam ruangan.',
+                        example: '"Ada gegap di antara mereka yang berlangsung selama tiga menit sambil menunggu pesanan datang."'
+                    }
+                ],
+                also: 'lihat: HENING AKTIF (sinonim yang lebih panjang)',
+                note: null
+            },
+
+            // ── H ──
+            {
+                word: 'hadir',
+                invented: false,
+                pron: '/ha·dir/',
+                pos: 'adj., v.',
+                num: 'H.001',
+                defs: [
+                    { n: '1', text: 'Berada di suatu tempat secara fisik.' },
+                    { n: '2', text: 'Berada di suatu tempat secara fisik dan mental secara bersamaan. Lebih jarang dari definisi 1.' },
+                    {
+                        n: '3',
+                        text: '(paling sulit dicapai) Berada di suatu tempat secara fisik, mental, dan tanpa satu bagian pun dari pikiranmu yang sedang mengerjakan sesuatu yang lain.',
+                        example: '"Terakhir kali ia benar-benar hadir: tidak bisa diingat."'
+                    }
+                ],
+                also: 'antonim: absen (semua definisi)',
+                note: null
+            },
+
+            {
+                word: 'HENING AKTIF',
+                invented: true,
+                pron: '/he·ning ak·tif/',
+                pos: 'n.',
+                num: 'H.002',
+                defs: [
+                    {
+                        n: '1',
+                        text: 'Keheningan yang terasa sedang mengerjakan sesuatu. Berbeda dari keheningan biasa karena ada tekanan di udara yang mengindikasikan proses sedang berjalan, hanya tidak ada output yang dihasilkan.',
+                        example: '"Perjalanan pulang itu penuh hening aktif. Keduanya sedang memproses hal yang sama dari sudut yang berlawanan."'
+                    },
+                    { n: '2', text: 'Kondisi saat seseorang tidak berbicara bukan karena tidak ada yang ingin dikatakan, melainkan karena terlalu banyak yang sedang diformulasikan secara bersamaan dan sistem memilih untuk menunggu.' }
+                ],
+                also: 'lihat: GEGAP (bentuk yang lebih pendek)',
+                note: null
+            },
+
+            // ── I ──
+            {
+                word: 'ingat',
+                invented: false,
+                pron: '/i·ngat/',
+                pos: 'v.',
+                num: 'I.001',
+                defs: [
+                    { n: '1', text: 'Menyimpan sesuatu dalam memori dan bisa mengaksesnya kembali.' },
+                    {
+                        n: '2',
+                        text: 'Menyimpan sesuatu dalam memori tanpa meminta izin, dan mengaksesnya kembali di waktu yang tidak dipilih — terutama saat sedang mengerjakan hal lain yang tidak ada hubungannya.',
+                        example: '"Ia sedang memotong bawang ketika ingat. Bawangnya tidak ada hubungannya."'
+                    },
+                    { n: '3', text: '(sebagai beban) Kondisi di mana memori berfungsi lebih baik dari yang kamu inginkan di situasi tertentu.' }
+                ],
+                also: 'lihat: LUPA (antonim yang lebih rumit dari yang dikira)',
+                note: null
+            },
+
+            {
+                word: 'ISAP JEMPOL',
+                invented: false,
+                pron: '/i·sap jem·pol/',
+                pos: 'frasa n.',
+                num: 'I.002',
+                defs: [
+                    { n: '1', text: 'Sesuatu yang dibuat-buat, tidak berdasarkan fakta.' },
+                    {
+                        n: '2',
+                        text: '(didefinisikan ulang) Penjelasan yang diberikan seseorang kepada dirinya sendiri untuk membenarkan keputusan yang sudah diambil sebelum penjelasan itu dibuat.',
+                        example: '"Alasannya masuk akal. Tapi itu alasan yang datang belakangan. Sebelumnya hanya ada perasaan yang kemudian dicari pembenarannya."'
+                    }
+                ],
+                also: null,
+                note: 'Tidak digunakan secara negatif dalam kamus ini. Kadang isap jempol adalah satu-satunya cara untuk terus berjalan.'
+            },
+
+            // ── K ──
+            {
+                word: 'kehabisan',
+                invented: false,
+                pron: '/ke·ha·bis·an/',
+                pos: 'v.',
+                num: 'K.001',
+                defs: [
+                    { n: '1', text: 'Tidak memiliki lagi sesuatu yang sebelumnya ada.' },
+                    {
+                        n: '2',
+                        text: 'Kondisi saat seseorang menyadari bahwa kata-kata yang biasa digunakan untuk menggambarkan kondisinya sudah tidak muat lagi — bukan karena tidak ada kata, tapi karena kata yang ada terasa terlalu kecil atau terlalu besar dari apa yang perlu dijelaskan.',
+                        example: '"Ia kehabisan cara untuk menjawab "gimana kabar" dengan jujur."'
+                    }
+                ],
+                also: 'lihat: TUMPUL (kondisi yang berkorelasi)',
+                note: null
+            },
+
+            {
+                word: 'KESIAPAN PALSU',
+                invented: true,
+                pron: '/ke·si·ap·an pal·su/',
+                pos: 'n.',
+                num: 'K.002',
+                defs: [
+                    {
+                        n: '1',
+                        text: 'Perasaan siap yang muncul di momen yang salah — saat tidak ada yang membutuhkan kesiapan itu — dan menghilang tepat ketika kesiapan itu dibutuhkan.',
+                        example: '"Ia sudah siap berbulan-bulan untuk percakapan itu. Ketika percakapan itu akhirnya terjadi, kesiapan palsunya tidak hadir."'
+                    },
+                    { n: '2', text: 'Kondisi di mana seseorang telah berlatih suatu situasi berkali-kali di dalam kepala, dan situasi itu akhirnya terjadi dengan cara yang tidak ada dalam latihan manapun.' }
+                ],
+                also: null,
+                note: null
+            },
+
+            {
+                word: 'kosong',
+                invented: false,
+                pron: '/ko·song/',
+                pos: 'adj.',
+                num: 'K.003',
+                defs: [
+                    { n: '1', text: 'Tidak berisi apa-apa.' },
+                    { n: '2', text: 'Berisi udara dan kenangan tapi tidak ada yang dihitung sebagai isi.' },
+                    {
+                        n: '3',
+                        text: '(paling tidak produktif untuk dipertahankan) Kondisi yang terasa seperti tidak ada yang kurang, tapi juga tidak ada yang cukup. Berbeda dari sedih karena tidak ada perasaan yang dominan — hanya tidak ada.',
+                        example: '"Kosong bukan kebalikan dari penuh. Kosong adalah kondisi tersendiri yang tidak punya lawan kata yang tepat."'
+                    }
+                ],
+                also: 'lihat: HAMPA (berbeda secara tekstur), penuh (bukan antonim yang akurat)',
+                note: null
+            },
+
+            // ── L ──
+            {
+                word: 'lupa',
+                invented: false,
+                pron: '/lu·pa/',
+                pos: 'v.',
+                num: 'L.001',
+                defs: [
+                    { n: '1', text: 'Tidak bisa mengakses kembali sesuatu yang tersimpan dalam memori.' },
+                    {
+                        n: '2',
+                        text: 'Mengakses sesuatu dalam memori tapi memutuskan untuk tidak mengakuinya kepada orang lain — atau kepada diri sendiri.',
+                        example: '"Ia lupa, katanya. Tapi cara dia berhenti sebentar sebelum menjawab mengatakan hal yang berbeda."'
+                    },
+                    { n: '3', text: '(sebagai proses aktif) Kegiatan yang jauh lebih disengaja dari yang diakui secara umum.' }
+                ],
+                also: 'lihat: ingat (definisi 2-3)',
+                note: 'Lupa dan ingat bukan antonim. Keduanya adalah dua cara berbeda untuk menyimpan sesuatu yang sama.'
+            },
+
+            // ── M ──
+            {
+                word: 'masuk akal',
+                invented: false,
+                pron: '/ma·suk a·kal/',
+                pos: 'frasa adj.',
+                num: 'M.001',
+                defs: [
+                    { n: '1', text: 'Dapat dipahami melalui logika.' },
+                    {
+                        n: '2',
+                        text: 'Penjelasan yang diterima bukan karena benar-benar masuk akal, melainkan karena semua pihak yang terlibat terlalu lelah untuk menggali lebih jauh.',
+                        example: '"Penjelasannya masuk akal. Pertanyaannya adalah: masuk akal bagi siapa, dalam kondisi seperti apa, dengan informasi yang mana."'
+                    }
+                ],
+                also: null,
+                note: null
+            },
+
+            {
+                word: 'MEMBEKU SEBENTAR',
+                invented: true,
+                pron: '/mem·be·ku se·ben·tar/',
+                pos: 'v.',
+                num: 'M.002',
+                defs: [
+                    {
+                        n: '1',
+                        text: 'Kondisi saat sistem berhenti merespons input baru untuk durasi singkat karena sedang memproses sesuatu yang terlalu besar untuk diproses sambil berjalan.',
+                        example: '"Ia membeku sebentar di tengah percakapan. Bukan karena tidak mendengar. Karena terlalu mendengar."'
+                    },
+                    { n: '2', text: 'Jeda involunter yang terjadi saat seseorang bertemu situasi yang sudah pernah dilatih di kepala tapi tidak dalam urutan ini, tidak dengan kata-kata ini, tidak dengan ekspresi wajah itu.' }
+                ],
+                also: 'lihat: KESIAPAN PALSU (kondisi yang sering mendahului)',
+                note: null
+            },
+
+            // ── N ──
+            {
+                word: 'NOMBOR',
+                invented: true,
+                pron: '/nom·bor/',
+                pos: 'n.',
+                num: 'N.001',
+                defs: [
+                    {
+                        n: '1',
+                        text: 'Kontak di ponsel yang tidak dihapus bukan karena masih akan dihubungi, melainkan karena menghapus terasa seperti membuat keputusan yang tidak siap untuk dibuat.',
+                        example: '"Ada tiga nombor di ponselnya. Semuanya masih di sana. Tidak satu pun yang akan dihubungi."'
+                    }
+                ],
+                also: null,
+                note: 'Berbeda dari kontak aktif maupun kontak yang dihapus — nombor adalah kategori ketiga yang tidak ada tombolnya di UI manapun.'
+            },
+
+            // ── P ──
+            {
+                word: 'PERISAPAN',
+                invented: true,
+                pron: '/pe·ri·sap·an/',
+                pos: 'n.',
+                num: 'P.001',
+                defs: [
+                    {
+                        n: '1',
+                        text: 'Perasaan yang muncul saat seseorang sudah sangat siap menjelaskan sesuatu kepada orang tertentu — yang tidak pernah bertanya.',
+                        example: '"Ia membawa perisapan itu ke mana-mana selama berminggu-minggu. Tidak ada yang memintanya untuk dikeluarkan."'
+                    },
+                    { n: '2', text: 'Kondisi memiliki penjelasan yang sangat lengkap tentang diri sendiri untuk audiens yang tidak ada.' }
+                ],
+                also: 'lihat: HENING AKTIF (kondisi yang berkaitan)',
+                note: 'Kata ini tidak ada. Tapi kondisi yang digambarkannya ada pada hampir semua orang yang membaca definisi ini.'
+            },
+
+            {
+                word: 'pura-pura',
+                invented: false,
+                pron: '/pu·ra-pu·ra/',
+                pos: 'adj., v.',
+                num: 'P.002',
+                defs: [
+                    { n: '1', text: 'Berpura-pura; melakukan sesuatu yang tidak sesuai dengan kondisi sebenarnya.' },
+                    {
+                        n: '2',
+                        text: 'Strategi bertahan yang sangat umum yang, jika dilakukan cukup lama, tidak bisa lagi dibedakan dari kondisi aslinya.',
+                        example: '"Ia pura-pura baik-baik saja selama cukup lama sehingga tidak tahu lagi mana bagian yang pura-pura."'
+                    },
+                    { n: '3', text: '(secara kontroversial) Salah satu metode yang paling sering berhasil, meski tidak pernah diakui dalam literatur psikologi resmi yang sopan.' }
+                ],
+                also: null,
+                note: null
+            },
+
+            // ── S ──
+            {
+                word: 'SELA',
+                invented: false,
+                pron: '/se·la/',
+                pos: 'n.',
+                num: 'S.001',
+                defs: [
+                    { n: '1', text: 'Celah di antara dua hal; ruang kosong di antara sesuatu.' },
+                    {
+                        n: '2',
+                        text: 'Jarak antara apa yang dimaksud seseorang dan apa yang akhirnya dikatakan. Biasanya lebih besar dari yang terlihat dari luar.',
+                        example: '"Ada sela yang cukup besar antara pertanyaan yang ingin ia ajukan dan pertanyaan yang benar-benar keluar dari mulutnya."'
+                    }
+                ],
+                also: null,
+                note: null
+            },
+
+            {
+                word: 'SILAM',
+                invented: false,
+                pron: '/si·lam/',
+                pos: 'adj., n.',
+                num: 'S.002',
+                defs: [
+                    { n: '1', text: 'Sudah lampau; masa lalu.' },
+                    {
+                        n: '2',
+                        text: 'Masa lalu yang masih terasa lebih nyata dari sekarang karena sekarang belum cukup jauh untuk dinilai.',
+                        example: '"Sembilan tahun yang silam terasa kemarin. Kemarin terasa seperti tidak terjadi."'
+                    }
+                ],
+                also: null,
+                note: null
+            },
+
+            {
+                word: 'STATIS',
+                invented: false,
+                pron: '/sta·tis/',
+                pos: 'adj.',
+                num: 'S.003',
+                defs: [
+                    { n: '1', text: 'Tidak bergerak; tidak berubah.' },
+                    {
+                        n: '2',
+                        text: 'Terlihat tidak bergerak dari luar sementara di dalam ada sangat banyak yang sedang bergerak ke segala arah dan belum ada yang tahu harus ke mana.',
+                        example: '"Selama setahun ia tampak statis. Yang bergerak hanya yang tidak terlihat."'
+                    }
+                ],
+                also: 'lihat: DIAM (berbeda), BEKU (berkorelasi, lihat MEMBEKU SEBENTAR)',
+                note: null
+            },
+
+            // ── T ──
+            {
+                word: 'tidak apa-apa',
+                invented: false,
+                pron: '/ti·dak a·pa-a·pa/',
+                pos: 'frasa adj.',
+                num: 'T.001',
+                defs: [
+                    { n: '1', text: 'Dalam kondisi yang memuaskan; tidak ada masalah.' },
+                    {
+                        n: '2',
+                        text: 'Jawaban yang digunakan saat kondisi sebenarnya terlalu rumit untuk dijelaskan dalam konteks pertanyaan yang baru saja diajukan.',
+                        example: '"Tidak apa-apa," katanya. Ini bukan kebohongan. Ini adalah penyederhanaan yang dipilih secara sadar.'
+                    },
+                    { n: '3', text: '(juga digunakan sebagai izin) "Tidak apa-apa" yang diberikan kepada orang lain untuk melakukan sesuatu, padahal ada apa-apanya.' }
+                ],
+                also: 'sinonim fungsional: baik, oke, fine — semuanya dengan presisi yang sama',
+                note: 'Frasa ini adalah salah satu yang paling sering digunakan dan paling jarang akurat. Bukan karena berbohong. Tapi karena akurat membutuhkan waktu yang lebih panjang dari durasi rata-rata pertanyaan tersebut diajukan.'
+            },
+
+            {
+                word: 'TUMPUL',
+                invented: false,
+                pron: '/tum·pul/',
+                pos: 'adj.',
+                num: 'T.002',
+                defs: [
+                    { n: '1', text: 'Tidak tajam; tidak runcing.' },
+                    {
+                        n: '2',
+                        text: 'Kondisi emosional di mana respons terhadap stimulus terasa lebih lambat dan lebih kecil dari biasanya — bukan karena tidak merasakan, melainkan karena sistem sedang berjalan dalam mode hemat daya.',
+                        example: '"Ia tidak sedih. Tidak senang. Hanya tumpul — yang, menurutnya, lebih melelahkan dari keduanya."'
+                    }
+                ],
+                also: 'lihat: KOSONG (berbeda secara tekstur), kehabisan (kondisi yang berkaitan)',
+                note: null
+            },
+
+            // ── U ──
+            {
+                word: 'UJUNG PERCAKAPAN',
+                invented: true,
+                pron: '/u·jung per·ca·kap·an/',
+                pos: 'n.',
+                num: 'U.001',
+                defs: [
+                    {
+                        n: '1',
+                        text: 'Titik dalam sebuah percakapan di mana semua orang yang terlibat sudah tahu percakapan itu selesai, tapi belum ada yang mengucapkan kalimat penutupnya.',
+                        example: '"Mereka sudah berada di ujung percakapan itu selama sepuluh menit. Tidak ada yang bergerak duluan."'
+                    },
+                    { n: '2', text: '(jarang terjadi) Versi yang menyenangkan dari kondisi di atas: ujung percakapan yang tidak ingin ditutup oleh siapapun karena keduanya tahu apa yang terjadi setelah percakapan itu selesai.' }
+                ],
+                also: null,
+                note: null
+            },
+
+            // ── V ──
+            {
+                word: 'VAKUM SOSIAL',
+                invented: true,
+                pron: '/va·kum so·si·al/',
+                pos: 'n.',
+                num: 'V.001',
+                defs: [
+                    {
+                        n: '1',
+                        text: 'Kondisi di mana seseorang dikelilingi orang banyak tapi tidak ada satu pun yang bisa menerima versi lengkap dari situasinya saat ini — bukan karena mereka tidak peduli, tapi karena konteksnya terlalu panjang untuk situasi sosial yang ada.',
+                        example: '"Di acara itu ia mengalami vakum sosial yang sempurna. Semua orang ada, tapi tidak ada yang bisa menerima semua informasi yang relevan."'
+                    }
+                ],
+                also: 'lihat: HENING AKTIF, PERISAPAN',
+                note: null
+            },
+
+            // ── W ──
+            {
+                word: 'wajar',
+                invented: false,
+                pron: '/wa·jar/',
+                pos: 'adj.',
+                num: 'W.001',
+                defs: [
+                    { n: '1', text: 'Sesuai dengan norma; normal; pantas.' },
+                    {
+                        n: '2',
+                        text: 'Kata yang paling sering digunakan untuk memberikan izin kepada seseorang untuk merasakan sesuatu yang sudah mereka rasakan tanpa perlu izin siapapun.',
+                        example: '"Wajar kok," kata temannya. Ini tidak mengubah apa yang sedang dirasakan, tapi entah bagaimana terasa perlu untuk didengar.'
+                    },
+                    { n: '3', text: '(juga digunakan sebagai penutup) Cara untuk mengakhiri diskusi tentang sesuatu dengan menyatakan bahwa tidak ada yang perlu didiskusikan lebih lanjut.' }
+                ],
+                also: null,
+                note: null
+            },
+
+            // ── Z ──
+            {
+                word: 'ZONA TIDAK BERTANDA',
+                invented: true,
+                pron: '/zo·na ti·dak ber·tan·da/',
+                pos: 'n.',
+                num: 'Z.001',
+                defs: [
+                    {
+                        n: '1',
+                        text: 'Periode waktu dalam kehidupan seseorang yang tidak bisa dikategorikan sebagai baik atau buruk karena terlalu campuran dan terlalu spesifik untuk masuk ke label yang ada.',
+                        example: '"Sembilan tahun itu adalah zona tidak bertanda yang tidak tahu harus diletakkan di mana dalam narasi hidupnya."'
+                    },
+                    { n: '2', text: 'Bagian dari peta yang tidak memiliki nama karena belum ada yang membuat petanya, bukan karena tempat itu tidak ada.' }
+                ],
+                also: 'lihat: ANTARBATAS, DIAPIT',
+                note: 'Ini adalah entri terakhir dalam kamus ini. Bukan karena alfabet sudah habis. Tapi karena setelah zona tidak bertanda, yang ada biasanya adalah halaman kosong.'
+            },
+        ];
+
+        // ══════════════════════════════════════════
+        // GROUP BY LETTER
+        // ══════════════════════════════════════════
+        const byLetter = {};
+        entries.forEach(e => {
+            const l = e.word[0].toUpperCase();
+            if (!byLetter[l]) byLetter[l] = [];
+            byLetter[l].push(e);
+        });
+
+        const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+        // Update counts
+        const invented = entries.filter(e => e.invented).length;
+        document.getElementById('totalEntries').textContent = entries.length;
+        document.getElementById('inventedCount').textContent = invented;
+        document.getElementById('realCount').textContent = entries.length - invented;
+
+        // ── Build alpha tabs ──
+        const tabsEl = document.getElementById('alphaTabs');
+        allLetters.forEach(l => {
+            const a = document.createElement('a');
+            a.className = 'alpha-tab' + (byLetter[l] ? ' has-entry' : '');
+            a.textContent = l;
+            a.href = byLetter[l] ? `#letter-${l}` : '#';
+            if (!byLetter[l]) a.style.opacity = '0.3';
+            tabsEl.appendChild(a);
+        });
+
+        // ── Build entries ──
+        const dictBody = document.getElementById('dictBody');
+        let entryIndex = 0;
+
+        Object.keys(byLetter).sort().forEach(letter => {
+            const sec = document.createElement('div');
+            sec.className = 'letter-section';
+            sec.id = `letter-${letter}`;
+
+            // Big letter drop cap
+            const bigL = document.createElement('div');
+            bigL.className = 'section-letter';
+            bigL.textContent = letter;
+            sec.appendChild(bigL);
+
+            byLetter[letter].forEach(e => {
+                const div = document.createElement('div');
+                div.className = 'entry';
+                div.dataset.search = (e.word + ' ' + e.defs.map(d => d.text).join(' ')).toLowerCase();
+
+                let defsHtml = e.defs.map(d => `
+      <div class="entry-def" data-n="${d.n}">
+        ${d.text}
+        ${d.example ? `<div class="entry-example">${d.example}</div>` : ''}
+      </div>`).join('');
+
+                div.innerHTML = `
+      <div class="entry-head">
+        <span class="entry-word ${e.invented ? 'invented' : ''}">${e.word}${e.invented ? '<span class="badge-invented">kata baru</span>' : ''}</span>
+        <span class="entry-pron">${e.pron}</span>
+        <span class="entry-pos">${e.pos}</span>
+        <span class="entry-num">${e.num}</span>
+      </div>
+      <div class="entry-defs">${defsHtml}</div>
+      ${e.also ? `<div class="entry-also">${e.also.replace(/(lihat|sinonim|antonim)/gi, '<em>$1</em>')}</div>` : ''}
+      ${e.note ? `<div class="entry-note">${e.note}</div>` : ''}
+    `;
+
+                sec.appendChild(div);
+                entryIndex++;
+            });
+
+            // Clear float
+            const clr = document.createElement('div');
+            clr.style.clear = 'both';
+            sec.appendChild(clr);
+
+            dictBody.appendChild(sec);
+        });
+
+        // ── Search ──
+        const searchInput = document.getElementById('searchInput');
+        const searchCount = document.getElementById('searchCount');
+
+        searchInput.addEventListener('input', () => {
+            const q = searchInput.value.trim().toLowerCase();
+            const allEntries = document.querySelectorAll('.entry');
+            const allSections = document.querySelectorAll('.letter-section');
+
+            if (!q) {
+                allEntries.forEach(e => e.style.display = '');
+                allSections.forEach(s => s.style.display = '');
+                searchCount.classList.remove('visible');
+                return;
+            }
+
+            let count = 0;
+            allEntries.forEach(e => {
+                const match = e.dataset.search.includes(q);
+                e.style.display = match ? '' : 'none';
+                if (match) count++;
+            });
+
+            // Hide empty sections
+            allSections.forEach(s => {
+                const visible = [...s.querySelectorAll('.entry')].some(e => e.style.display !== 'none');
+                s.style.display = visible ? '' : 'none';
+            });
+
+            searchCount.textContent = count === 0
+                ? `Tidak ada entri yang ditemukan untuk "${q}".`
+                : `${count} entri ditemukan untuk "${q}".`;
+            searchCount.classList.add('visible');
+        });
+
+        // ── Active tab on scroll ──
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    const letter = id.replace('letter-', '');
+                    document.querySelectorAll('.alpha-tab').forEach(t => {
+                        t.classList.toggle('active', t.textContent === letter);
+                    });
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '-40px 0px -70% 0px' });
+
+        document.querySelectorAll('.letter-section').forEach(s => observer.observe(s));
+
+        // Page number updates with scroll
+        window.addEventListener('scroll', () => {
+            const total = document.body.scrollHeight - window.innerHeight;
+            const pct = window.scrollY / total;
+            const page = Math.max(1, Math.ceil(pct * 24));
+            document.getElementById('pageNum').textContent = `hal. ${page}`;
+        });
+    </script>
+</body>
+
+</html>

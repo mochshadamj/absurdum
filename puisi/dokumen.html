@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../images/icon.png">
+    <title>AUTOPSI SEBUAH JALAN | ABSURDUM</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=DM+Mono:wght@300;400&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --bg: #0c0c0a;
+            --surface: #111110;
+            --card: #161614;
+            --border: #242420;
+            --dim: #363630;
+            --muted: #5a5a52;
+            --body: #8a8a7e;
+            --bright: #c4c4b4;
+            --white: #e8e8d8;
+            --accent: #d4c89a;
+            --red: #8a3020;
+            --serif: 'Playfair Display', Georgia, serif;
+            --body-f: 'EB Garamond', Georgia, serif;
+            --mono: 'DM Mono', monospace;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--body);
+            font-family: var(--body-f);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── MODAL ── */
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            transition: opacity 0.7s ease;
+        }
+
+        .modal.hiding {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-inner {
+            max-width: 460px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-issue {
+            font-family: var(--mono);
+            font-size: 0.52rem;
+            letter-spacing: 5px;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .modal-issue::before,
+        .modal-issue::after {
+            content: '';
+            width: 32px;
+            height: 1px;
+            background: var(--dim);
+        }
+
+        .modal-title {
+            font-family: var(--serif);
+            font-size: clamp(1.8rem, 6vw, 2.8rem);
+            font-weight: 900;
+            color: var(--white);
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            font-family: var(--serif);
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            font-style: italic;
+            color: var(--muted);
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+
+        .modal-rule {
+            width: 40px;
+            height: 1px;
+            background: var(--dim);
+            margin: 0 auto 28px;
+        }
+
+        .modal-note {
+            font-family: var(--body-f);
+            font-size: 0.88rem;
+            color: var(--muted);
+            line-height: 2;
+            font-style: italic;
+            margin-bottom: 40px;
+            max-width: 340px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn {
+            font-family: var(--mono);
+            font-size: 0.56rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 12px 28px;
+            border: 1px solid var(--dim);
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .modal-btn:hover {
+            border-color: var(--muted);
+            color: var(--bright);
+        }
+
+        .modal-btn.primary {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .modal-btn.primary:hover {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        /* ── PAGE ── */
+        .page {
+            max-width: 780px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: 0.54rem;
+            letter-spacing: 3px;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover {
+            color: var(--white);
+        }
+
+        .mag-name {
+            font-family: var(--serif);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--bright);
+            letter-spacing: 1px;
+        }
+
+        .mag-issue {
+            font-family: var(--mono);
+            font-size: 0.52rem;
+            color: var(--muted);
+            letter-spacing: 2px;
+            text-align: right;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            padding: 64px 40px 48px;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background quote decoration */
+        .hero::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-family: var(--serif);
+            font-size: 18rem;
+            color: rgba(255, 255, 255, 0.018);
+            line-height: 1;
+            pointer-events: none;
+            font-style: italic;
+        }
+
+        .hero-category {
+            font-family: var(--mono);
+            font-size: 0.52rem;
+            letter-spacing: 5px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hero-category::before {
+            content: '';
+            width: 24px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .hero-title {
+            font-family: var(--serif);
+            font-size: clamp(2.2rem, 7vw, 3.8rem);
+            font-weight: 900;
+            color: var(--white);
+            line-height: 1.08;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-family: var(--serif);
+            font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+            font-style: italic;
+            color: var(--muted);
+            line-height: 1.7;
+            max-width: 480px;
+            margin-bottom: 32px;
+        }
+
+        .hero-byline {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .byline-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--dim);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--serif);
+            font-size: 0.85rem;
+            color: var(--muted);
+            font-style: italic;
+            flex-shrink: 0;
+        }
+
+        .byline-info {
+            font-family: var(--mono);
+            font-size: 0.54rem;
+            letter-spacing: 2px;
+            color: var(--muted);
+            line-height: 2;
+        }
+
+        .byline-info strong {
+            color: var(--bright);
+            font-weight: 400;
+            display: block;
+            font-size: 0.6rem;
+        }
+
+        /* ── LAYOUT ── */
+        .content-layout {
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            gap: 0;
+        }
+
+        @media(max-width:620px) {
+            .content-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-left: none;
+                border-top: 1px solid var(--border);
+            }
+        }
+
+        /* ── POEM COLUMN ── */
+        .poem-col {
+            padding: 48px 40px 64px;
+            border-right: 1px solid var(--border);
+        }
+
+        /* Drop cap first stanza */
+        .stanza:first-child .poem-line:first-child::first-letter {
+            font-family: var(--serif);
+            font-size: 3.8em;
+            font-weight: 900;
+            float: left;
+            line-height: 0.8;
+            margin-right: 6px;
+            margin-top: 6px;
+            color: var(--white);
+        }
+
+        .stanza {
+            margin-bottom: 36px;
+            position: relative;
+        }
+
+        .stanza:last-child {
+            margin-bottom: 0;
+        }
+
+        .poem-line {
+            font-family: var(--serif);
+            font-size: clamp(1rem, 2.8vw, 1.18rem);
+            color: var(--bright);
+            line-height: 1.95;
+            letter-spacing: 0.1px;
+            display: block;
+        }
+
+        /* Italicize key imagery lines */
+        .poem-line.italic {
+            font-style: italic;
+            color: var(--white);
+        }
+
+        /* Indented lines */
+        .poem-line.indent {
+            padding-left: 2em;
+        }
+
+        /* Emphasized final lines */
+        .poem-line.closing {
+            color: var(--white);
+            font-size: clamp(1rem, 2.8vw, 1.2rem);
+        }
+
+        /* Stanza separator */
+        .stanza-gap {
+            display: block;
+            height: 36px;
+        }
+
+        /* Pull quote */
+        .pull-quote {
+            margin: 36px 0;
+            padding: 20px 0 20px 20px;
+            border-left: 2px solid var(--accent);
+        }
+
+        .pull-quote p {
+            font-family: var(--serif);
+            font-size: clamp(1.05rem, 3vw, 1.3rem);
+            font-style: italic;
+            color: var(--accent);
+            line-height: 1.75;
+            letter-spacing: 0.2px;
+        }
+
+        /* End mark */
+        .end-mark {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .end-mark::before {
+            content: '∎';
+            color: var(--accent);
+            font-size: 0.8rem;
+        }
+
+        .end-mark-text {
+            font-family: var(--mono);
+            font-size: 0.52rem;
+            letter-spacing: 3px;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            padding: 36px 24px;
+            border-left: 1px solid var(--border);
+        }
+
+        .sidebar-block {
+            margin-bottom: 36px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-block:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .sidebar-label {
+            font-family: var(--mono);
+            font-size: 0.5rem;
+            letter-spacing: 3px;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .sidebar-note {
+            font-family: var(--body-f);
+            font-size: 0.82rem;
+            color: var(--muted);
+            line-height: 1.9;
+            font-style: italic;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            font-family: var(--mono);
+            font-size: 0.5rem;
+            letter-spacing: 2px;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-meta-row {
+            font-family: var(--mono);
+            font-size: 0.54rem;
+            letter-spacing: 1px;
+            color: var(--muted);
+            line-height: 2.2;
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .sidebar-meta-row span {
+            color: var(--dim);
+            font-size: 0.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* ── FOOTER ── */
+        .mag-footer {
+            border-top: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer-text {
+            font-family: var(--mono);
+            font-size: 0.5rem;
+            letter-spacing: 2px;
+            color: var(--dim);
+            text-transform: uppercase;
+            line-height: 2;
+        }
+
+        @media(max-width:600px) {
+            .hero {
+                padding: 40px 20px 36px;
+            }
+
+            .poem-col {
+                padding: 36px 20px 48px;
+            }
+
+            .sidebar {
+                padding: 28px 20px;
+            }
+
+            .topbar {
+                padding: 14px 16px;
+            }
+
+            .mag-footer {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── MODAL ── -->
+    <div class="modal" id="modal">
+        <div class="modal-inner">
+            <div class="modal-issue">ABSURDUM &nbsp;·&nbsp; EDISI PUISI</div>
+            <h1 class="modal-title">Autopsi<br>Sebuah Jalan</h1>
+            <p class="modal-subtitle">sebuah puisi tentang operasi sunyi</p>
+            <div class="modal-rule"></div>
+            <p class="modal-note">
+                Beberapa hal tidak mati karena luka.<br>
+                Mereka mati karena jantungnya tidak pernah belajar<br>
+                berdetak dengan ritme yang sama.
+            </p>
+            <div class="modal-btns">
+                <button class="modal-btn" onclick="goBack()">← Pergi</button>
+                <button class="modal-btn primary" onclick="closeModal()">Baca Puisi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── PAGE ── -->
+    <div class="page" id="mainPage" style="opacity:0;transition:opacity 0.6s ease;">
+
+        <div class="topbar">
+            <a href="../index.html" class="back-btn">← kembali</a>
+            <span class="mag-name">ABSURDUM</span>
+            <span class="mag-issue">PUISI &nbsp;·&nbsp; <span id="issueDate">—</span></span>
+        </div>
+
+        <!-- Hero -->
+        <div class="hero">
+            <div class="hero-category">Puisi</div>
+            <h1 class="hero-title">Autopsi<br>Sebuah Jalan</h1>
+            <p class="hero-subtitle">
+                sebuah pemeriksaan atas sesuatu yang tidak memiliki<br>
+                sertifikat kelahiran maupun sertifikat kematian
+            </p>
+            <div class="hero-byline">
+                <div class="byline-avatar">∴</div>
+                <div class="byline-info">
+                    <strong>ABSURDUM</strong>
+                    Koleksi Puisi &nbsp;·&nbsp; <span id="pubDate">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content-layout">
+
+            <!-- Poem -->
+            <div class="poem-col">
+
+                <div class="stanza">
+                    <span class="poem-line">Malam ini kota membuka dadanya sendiri.</span>
+                    <span class="poem-line italic">Lampu jalan menggantung seperti jarum operasi</span>
+                    <span class="poem-line italic indent">yang lupa apa yang sedang diperbaiki.</span>
+                    <span class="poem-line">Di ruang yang tidak memiliki jendela,</span>
+                    <span class="poem-line">dua kursi saling berhadapan</span>
+                    <span class="poem-line italic indent">seperti saksi yang menolak berbicara.</span>
+                </div>
+
+                <div class="stanza">
+                    <span class="poem-line">Ada sesuatu yang dulu hidup di antara mereka —</span>
+                    <span class="poem-line">sesuatu yang sekarang</span>
+                    <span class="poem-line italic indent">hanya tersisa sebagai suhu.</span>
+                </div>
+
+                <div class="pull-quote">
+                    <p>Jam dinding berdetak seperti alat monitor<br>yang perlahan kehilangan garisnya.</p>
+                </div>
+
+                <div class="stanza">
+                    <span class="poem-line">Aku mencoba menjahit langit</span>
+                    <span class="poem-line">dengan benang dari kata-kata yang tidak pernah selesai,</span>
+                    <span class="poem-line italic">tapi setiap simpul berubah menjadi lubang</span>
+                    <span class="poem-line italic indent">yang menelan cahaya.</span>
+                </div>
+
+                <div class="stanza">
+                    <span class="poem-line">Mungkin beberapa hubungan</span>
+                    <span class="poem-line italic indent">tidak mati karena luka.</span>
+                    <span class="poem-line">Mereka mati</span>
+                    <span class="poem-line">karena jantungnya tidak pernah belajar</span>
+                    <span class="poem-line italic indent">berdetak dengan ritme yang sama.</span>
+                </div>
+
+                <div class="stanza">
+                    <span class="poem-line">Di luar, hujan turun</span>
+                    <span class="poem-line italic indent">seperti arsip yang dihancurkan.</span>
+                    <span class="poem-line">Nama-nama larut di selokan malam</span>
+                    <span class="poem-line">dan hanyut menuju tempat</span>
+                    <span class="poem-line italic indent">di mana kenangan tidak lagi membutuhkan tubuh.</span>
+                </div>
+
+                <div class="stanza">
+                    <span class="poem-line">Aku berdiri cukup lama</span>
+                    <span class="poem-line">untuk menyadari satu hal yang aneh:</span>
+                </div>
+
+                <div class="stanza">
+                    <span class="poem-line italic">Kadang cara paling lembut</span>
+                    <span class="poem-line italic">untuk menyelamatkan seseorang</span>
+                    <span class="poem-line italic">adalah berhenti</span>
+                    <span class="poem-line italic closing indent">menjadi tempat mereka tinggal.</span>
+                </div>
+
+                <div class="stanza">
+                    <span class="poem-line">Jadi aku mematikan lampu terakhir di ruangan itu</span>
+                    <span class="poem-line">dan membiarkan pintu menutup sendiri —</span>
+                    <span class="poem-line">bukan sebagai kekalahan,</span>
+                    <span class="poem-line italic">melainkan sebagai operasi sunyi</span>
+                    <span class="poem-line italic">agar seseorang</span>
+                    <span class="poem-line italic">bisa hidup lebih lama</span>
+                    <span class="poem-line italic closing indent">di dunia yang tidak lagi memerlukan bayanganku.</span>
+                </div>
+
+                <div class="end-mark">
+                    <span class="end-mark-text">∴ selesai</span>
+                </div>
+
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+
+                <div class="sidebar-block">
+                    <div class="sidebar-label">Tentang</div>
+                    <p class="sidebar-note">
+                        Sebuah puisi tentang kepergian yang bukan kekalahan —
+                        melainkan tindakan paling sunyi dari seseorang
+                        yang memilih untuk tidak lagi menempati ruang
+                        yang tidak lagi membutuhkannya.
+                    </p>
+                </div>
+
+                <div class="sidebar-block">
+                    <div class="sidebar-label">Tema</div>
+                    <div class="tag-list">
+                        <span class="tag">Perpisahan</span>
+                        <span class="tag">Operasi Sunyi</span>
+                        <span class="tag">Kota Malam</span>
+                        <span class="tag">Irama</span>
+                        <span class="tag">Arsip</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-block">
+                    <div class="sidebar-label">Detail</div>
+                    <div class="sidebar-meta-row">
+                        <span>Diterbitkan</span>
+                        <span id="sideDate">—</span>
+                    </div>
+                    <div class="sidebar-meta-row">
+                        <span>Jumlah baris</span>
+                        <span>34</span>
+                    </div>
+                    <div class="sidebar-meta-row">
+                        <span>Jumlah bait</span>
+                        <span>9</span>
+                    </div>
+                    <div class="sidebar-meta-row">
+                        <span>Koleksi</span>
+                        <span>ABSURDUM</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-block">
+                    <div class="sidebar-label">Catatan Editor</div>
+                    <p class="sidebar-note">
+                        "Beberapa teks tidak perlu dijelaskan.<br>
+                        Mereka cukup dibaca dalam keheningan
+                        yang tepat."
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="mag-footer">
+            <div class="footer-text">
+                ∴ ABSURDUM &nbsp;·&nbsp; KOLEKSI PUISI<br>
+                SEMUA HAK TIDAK DICADANGKAN
+            </div>
+            <div class="footer-text" style="text-align:right;">
+                EDISI <span id="footerYear">—</span><br>
+                TIDAK ADA EDISI BERIKUTNYA YANG DIJADWALKAN
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Dates
+        const now = new Date();
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const shortM = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+            'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const full = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+        const short = `${shortM[now.getMonth()]} ${now.getFullYear()}`;
+
+        document.getElementById('issueDate').textContent = short;
+        document.getElementById('pubDate').textContent = full;
+        document.getElementById('sideDate').textContent = short;
+        document.getElementById('footerYear').textContent = now.getFullYear();
+
+        // Modal
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            const page = document.getElementById('mainPage');
+            modal.classList.add('hiding');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                page.style.opacity = '1';
+            }, 700);
+        }
+
+        function goBack() {
+            window.location.href = '../index.html';
+        }
+    </script>
+</body>
+
+</html>

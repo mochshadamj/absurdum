@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="icon" type="image/png" href="../images/icon.png">
+    <title>GALERI | ABSURDUM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Caveat:wght@400;500;600&family=DM+Mono:wght@300;400&family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0e0b08;
+            --paper: #f2ede3;
+            --ink: #1a1410;
+            --ink-mid: #2e2318;
+            --ink-faded: #4a3828;
+            --tape: rgba(215, 205, 175, 0.55);
+            --tape-dark: rgba(175, 160, 125, 0.55);
+            --dim-text: #8a7858;
+            --warm-gold: #c8a855;
+            --warm-mid: #a88840;
+            --warm-dim: #7a6030;
+            --warm-deep: #4a3820;
+            --mono: 'DM Mono', monospace;
+            --serif: 'Playfair Display', Georgia, serif;
+            --hand: 'Caveat', cursive;
+            --body-s: 'Cormorant Garamond', serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: var(--serif);
+            cursor: crosshair;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='0.08'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 500;
+            opacity: 0.65;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 40%, transparent 35%, rgba(10, 8, 5, 0.55) 72%, rgba(5, 3, 1, 0.93) 100%);
+            pointer-events: none;
+            z-index: 499;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            background: rgba(14, 11, 8, 0.97);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(120, 95, 50, 0.18);
+            padding: 0 24px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: var(--warm-dim);
+            font-family: var(--mono);
+            font-size: 0.56rem;
+            letter-spacing: 3px;
+            transition: color 0.3s;
+        }
+
+        .back-btn:hover {
+            color: var(--warm-gold);
+        }
+
+        .topbar-title {
+            font-family: var(--hand);
+            font-size: 1.15rem;
+            color: rgba(210, 190, 150, 0.75);
+            letter-spacing: 1px;
+        }
+
+        .topbar-meta {
+            font-family: var(--mono);
+            font-size: 0.52rem;
+            color: var(--warm-deep);
+            letter-spacing: 2px;
+        }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 48px 32px 20px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .header-eyebrow {
+            font-family: var(--mono);
+            font-size: 0.5rem;
+            letter-spacing: 4px;
+            color: var(--warm-dim);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .header-title {
+            font-family: var(--hand);
+            font-size: clamp(1.7rem, 4.5vw, 2.6rem);
+            color: rgba(215, 195, 158, 0.95);
+            line-height: 1.15;
+            font-weight: 500;
+        }
+
+        .header-title em {
+            font-style: italic;
+            color: rgba(175, 150, 105, 0.78);
+            font-size: 0.72em;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .header-date {
+            font-family: var(--hand);
+            font-size: 0.88rem;
+            color: var(--warm-mid);
+            text-align: right;
+            line-height: 2;
+            flex-shrink: 0;
+        }
+
+        /* ── FILTER ── */
+        .filter-row {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 32px 34px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            font-family: var(--mono);
+            font-size: 0.5rem;
+            letter-spacing: 2px;
+            color: var(--warm-mid);
+            border: 1px solid rgba(120, 90, 45, 0.28);
+            padding: 5px 14px;
+            cursor: pointer;
+            transition: all 0.25s;
+            background: transparent;
+            text-transform: uppercase;
+        }
+
+        .filter-chip:hover,
+        .filter-chip.active {
+            color: var(--warm-gold);
+            border-color: rgba(200, 168, 85, 0.55);
+            background: rgba(120, 90, 45, 0.13);
+        }
+
+        /* ── BOARD WRAPPER ── */
+        .board-wrapper {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 20px 72px;
+        }
+
+        .section-tag {
+            font-family: var(--mono);
+            font-size: 0.5rem;
+            letter-spacing: 3px;
+            color: var(--warm-dim);
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(120, 90, 45, 0.18);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .count-badge {
+            font-family: var(--mono);
+            font-size: 0.44rem;
+            color: var(--warm-dim);
+            letter-spacing: 2px;
+            border: 1px solid rgba(120, 90, 45, 0.2);
+            padding: 3px 8px;
+        }
+
+        /* ── CORK BOARD ── */
+        .cork-board {
+            columns: 3 260px;
+            column-gap: 18px;
+        }
+
+        @media (max-width: 580px) {
+            .cork-board {
+                columns: 1;
+            }
+        }
+
+        @media (max-width: 820px) {
+            .cork-board {
+                columns: 2 220px;
+            }
+        }
+
+        /* ── PHOTO CARD ── */
+        .photo-card {
+            break-inside: avoid;
+            margin-bottom: 18px;
+            display: inline-block;
+            width: 100%;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.38s cubic-bezier(0.2, 0, 0.2, 1), filter 0.3s ease;
+            will-change: transform;
+        }
+
+        .photo-card:hover {
+            transform: rotate(0deg) scale(1.025) translateY(-5px) !important;
+            z-index: 10;
+        }
+
+        .card-paper {
+            background: var(--paper);
+            padding: 10px 10px 36px;
+            box-shadow: 0 6px 28px rgba(0, 0, 0, 0.72), 0 1px 4px rgba(0, 0, 0, 0.45),
+                inset 0 0 0 1px rgba(0, 0, 0, 0.07);
+            position: relative;
+        }
+
+        .card-paper::before {
+            content: '';
+            position: absolute;
+            width: 46px;
+            height: 16px;
+            background: var(--tape);
+            top: -7px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-1deg);
+            z-index: 2;
+        }
+
+        .card-paper.tape-corner::before {
+            left: 20%;
+            top: -7px;
+            transform: rotate(-9deg);
+            width: 38px;
+        }
+
+        .card-paper.tape-corner::after {
+            content: '';
+            position: absolute;
+            width: 32px;
+            height: 14px;
+            background: var(--tape-dark);
+            top: -5px;
+            right: 16%;
+            transform: rotate(7deg);
+            z-index: 2;
+        }
+
+        .card-photo {
+            width: 100%;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            background: #1a1510;
+            position: relative;
+        }
+
+        .card-photo.portrait {
+            aspect-ratio: 3/4;
+        }
+
+        .card-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            filter: sepia(0.18) contrast(1.06) brightness(0.9);
+            transition: transform 0.5s ease, filter 0.4s ease;
+        }
+
+        .photo-card:hover .card-photo img {
+            transform: scale(1.05);
+            filter: sepia(0.08) contrast(1.08) brightness(0.96);
+        }
+
+        .card-caption {
+            padding: 11px 5px 0;
+            font-family: var(--hand);
+            font-size: clamp(0.9rem, 2vw, 1.02rem);
+            color: var(--ink-mid);
+            line-height: 1.65;
+        }
+
+        .card-date {
+            font-family: var(--hand);
+            font-size: 0.72rem;
+            color: var(--dim-text);
+            margin-top: 5px;
+            display: block;
+        }
+
+        .pin {
+            position: absolute;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            top: -5px;
+            z-index: 5;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+        }
+
+        .pin-red {
+            background: radial-gradient(circle at 35% 35%, #cc3333, #6a1010);
+            right: 26%;
+        }
+
+        .pin-cream {
+            background: radial-gradient(circle at 35% 35%, #e8d89a, #a89040);
+            left: 30%;
+        }
+
+        .pin-dark {
+            background: radial-gradient(circle at 35% 35%, #666, #252525);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* ── STICKY NOTE ── */
+        .sticky-note {
+            break-inside: avoid;
+            margin-bottom: 18px;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .sticky-inner {
+            background: #d4c97a;
+            padding: 18px 16px 22px;
+            box-shadow: 0 4px 22px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .sticky-inner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .sticky-inner.blue {
+            background: #8ab4c8;
+        }
+
+        .sticky-inner.pink {
+            background: #c89aaa;
+        }
+
+        .sticky-inner.white {
+            background: #f0ead8;
+        }
+
+        .sticky-text {
+            font-family: var(--hand);
+            font-size: 1.08rem;
+            color: rgba(15, 10, 5, 0.85);
+            line-height: 1.78;
+            font-weight: 500;
+        }
+
+        .sticky-meta {
+            font-family: var(--mono);
+            font-size: 0.45rem;
+            color: rgba(15, 10, 5, 0.4);
+            letter-spacing: 2px;
+            margin-top: 14px;
+            text-transform: uppercase;
+        }
+
+        /* ── DIVIDER ── */
+        .divider-strip {
+            max-width: 900px;
+            margin: 8px auto 28px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(120, 90, 45, 0.18);
+        }
+
+        .divider-label {
+            font-family: var(--mono);
+            font-size: 0.48rem;
+            color: var(--warm-dim);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* ── ALBUM FOLDERS ── */
+        .album-section {
+            max-width: 900px;
+            margin: 0 auto 56px;
+            padding: 0 20px;
+        }
+
+        .folder-item {
+            background: rgba(20, 15, 8, 0.92);
+            border: 1px solid rgba(120, 90, 45, 0.2);
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.25s;
+            margin-bottom: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .folder-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: transparent;
+            transition: background 0.3s;
+        }
+
+        .folder-item:hover::before {
+            background: rgba(200, 168, 85, 0.55);
+        }
+
+        .folder-item:hover {
+            border-color: rgba(180, 145, 75, 0.42);
+            background: rgba(28, 20, 10, 0.95);
+        }
+
+        .folder-glyph {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            opacity: 0.75;
+        }
+
+        .folder-name {
+            font-family: var(--body-s);
+            font-size: 1rem;
+            color: rgba(205, 185, 150, 0.88);
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .folder-item.locked .folder-name {
+            color: rgba(130, 108, 75, 0.6);
+        }
+
+        .folder-count {
+            font-family: var(--mono);
+            font-size: 0.5rem;
+            color: var(--warm-dim);
+            letter-spacing: 2px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        /* ── LOCK MODAL ── */
+        .lock-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 800;
+            background: rgba(5, 3, 1, 0.97);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .lock-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .lock-box {
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .lock-symbol {
+            font-family: var(--hand);
+            font-size: 2.5rem;
+            color: rgba(180, 148, 80, 0.32);
+            display: block;
+            margin-bottom: 28px;
+        }
+
+        .lock-title {
+            font-family: var(--body-s);
+            font-size: clamp(1.1rem, 3vw, 1.38rem);
+            color: rgba(215, 195, 155, 0.9);
+            line-height: 1.85;
+            font-style: italic;
+            margin-bottom: 16px;
+        }
+
+        .lock-body {
+            font-family: var(--hand);
+            font-size: 1.05rem;
+            color: var(--warm-mid);
+            line-height: 2.1;
+            margin-bottom: 36px;
+            font-style: italic;
+        }
+
+        .lock-btns {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .lock-btn {
+            font-family: var(--mono);
+            font-size: 0.54rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 12px 24px;
+            border: 1px solid rgba(120, 90, 45, 0.3);
+            background: transparent;
+            color: var(--warm-mid);
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .lock-btn:hover {
+            color: var(--warm-gold);
+            border-color: rgba(200, 168, 85, 0.5);
+        }
+
+        .lock-btn.primary {
+            border-color: rgba(180, 148, 80, 0.5);
+            color: rgba(210, 190, 150, 0.88);
+        }
+
+        .lock-btn.primary:hover {
+            background: rgba(180, 148, 80, 0.1);
+        }
+
+        /* ── HIDDEN SECTION ── */
+        .hidden-section {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 20px 72px;
+            display: none;
+        }
+
+        .hidden-section.visible {
+            display: block;
+        }
+
+        .hidden-header {
+            padding: 40px 0 26px;
+            border-top: 1px solid rgba(120, 90, 45, 0.18);
+            margin-bottom: 28px;
+        }
+
+        .hidden-eyebrow {
+            font-family: var(--mono);
+            font-size: 0.48rem;
+            letter-spacing: 4px;
+            color: var(--warm-dim);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: block;
+            animation: dimBlink 3s infinite;
+        }
+
+        @keyframes dimBlink {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            55% {
+                opacity: 0.3
+            }
+        }
+
+        .hidden-title {
+            font-family: var(--body-s);
+            font-size: clamp(1.05rem, 3vw, 1.45rem);
+            color: rgba(210, 190, 152, 0.85);
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .hidden-note {
+            font-family: var(--hand);
+            font-size: 0.95rem;
+            color: var(--warm-mid);
+            line-height: 2;
+        }
+
+        /* ── LIGHTBOX ── */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 900;
+            background: rgba(4, 3, 1, 0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            overflow-y: auto;
+        }
+
+        .lightbox.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .lb-inner {
+            max-width: 540px;
+            width: 100%;
+            margin: auto;
+            position: relative;
+        }
+
+        .lb-close {
+            position: absolute;
+            top: -38px;
+            right: 0;
+            background: transparent;
+            border: none;
+            color: var(--warm-dim);
+            font-family: var(--mono);
+            font-size: 0.54rem;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: color 0.2s;
+            text-transform: uppercase;
+            padding: 6px 0;
+        }
+
+        .lb-close:hover {
+            color: var(--warm-gold);
+        }
+
+        .lb-paper {
+            background: var(--paper);
+            padding: 13px 13px 46px;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.88);
+            position: relative;
+        }
+
+        .lb-paper::before {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 20px;
+            background: var(--tape);
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-0.5deg);
+            z-index: 2;
+        }
+
+        .lb-photo {
+            width: 100%;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            background: #1a1510;
+        }
+
+        .lb-photo.portrait {
+            aspect-ratio: 3/4;
+        }
+
+        .lb-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            filter: sepia(0.15) contrast(1.06) brightness(0.88);
+        }
+
+        .lb-caption-area {
+            padding: 18px 8px 0;
+        }
+
+        .lb-caption {
+            font-family: var(--hand);
+            font-size: clamp(1rem, 2.5vw, 1.15rem);
+            color: var(--ink-mid);
+            line-height: 1.88;
+            margin-bottom: 18px;
+        }
+
+        .lb-metadata {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-top: 13px;
+            border-top: 1px solid rgba(60, 45, 25, 0.18);
+        }
+
+        .lb-meta-item {
+            font-family: var(--mono);
+            font-size: 0.48rem;
+            color: var(--dim-text);
+            letter-spacing: 1px;
+            line-height: 2;
+        }
+
+        .lb-meta-item span {
+            display: block;
+            color: rgba(90, 70, 40, 0.55);
+            font-size: 0.42rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        /* ── FINAL NOTE ── */
+        .final-note {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 32px 80px;
+            border-top: 1px solid rgba(120, 90, 45, 0.14);
+            display: none;
+        }
+
+        .final-note.visible {
+            display: block;
+        }
+
+        .final-text {
+            font-family: var(--hand);
+            font-size: 1rem;
+            color: var(--warm-dim);
+            line-height: 2.8;
+            font-style: italic;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <a href="../index.html" class="back-btn">← kembali</a>
+        <span class="topbar-title">galeri</span>
+        <span class="topbar-meta" id="topMeta">— foto</span>
+    </div>
+
+    <div class="page-header">
+        <div class="header-left">
+            <span class="header-eyebrow">koleksi pribadi · tidak terurut</span>
+            <div class="header-title">
+                hal-hal yang pernah<br>terasa perlu diabadikan
+                <em>sekarang hanya file di suatu tempat</em>
+            </div>
+        </div>
+        <div class="header-date" id="headerDate"></div>
+    </div>
+
+    <div class="filter-row">
+        <button class="filter-chip active" onclick="filterCards('all',this)">Semua</button>
+        <button class="filter-chip" onclick="filterCards('tempat',this)">Tempat</button>
+        <button class="filter-chip" onclick="filterCards('benda',this)">Benda</button>
+        <button class="filter-chip" onclick="filterCards('lainnya',this)">Lainnya</button>
+    </div>
+
+    <div class="board-wrapper">
+        <div class="section-tag">
+            <span>Terbaru — tidak terurut dengan benar</span>
+            <span class="count-badge" id="gridCount">—</span>
+        </div>
+        <div class="cork-board" id="mainBoard"></div>
+    </div>
+
+    <div class="divider-strip">
+        <div class="divider-line"></div>
+        <div class="divider-label">Album</div>
+        <div class="divider-line"></div>
+    </div>
+
+    <div class="album-section">
+        <div class="folder-item">
+            <span class="folder-glyph">🗂</span>
+            <div>
+                <div class="folder-name">Tempat yang Sudah Berbeda</div>
+            </div>
+            <span class="folder-count">8 foto</span>
+        </div>
+        <div class="folder-item">
+            <span class="folder-glyph">🗂</span>
+            <div>
+                <div class="folder-name">Benda Tanpa Pemilik</div>
+            </div>
+            <span class="folder-count">5 foto</span>
+        </div>
+        <div class="folder-item locked" id="lockedFolder" onclick="openLock()">
+            <span class="folder-glyph">🔒</span>
+            <div>
+                <div class="folder-name">Tidak Berlabel</div>
+            </div>
+            <span class="folder-count" id="lockedCount">dikunci</span>
+        </div>
+    </div>
+
+    <div class="lock-overlay" id="lockOverlay">
+        <div class="lock-box">
+            <span class="lock-symbol">⊘</span>
+            <p class="lock-title">Folder ini terkunci<br>sejak cukup lama.</p>
+            <p class="lock-body">
+                tidak ada kata sandi.<br>
+                hanya perlu tahu<br>
+                apakah kamu sudah siap<br>
+                melihat foto-foto yang<br>
+                dulu terlalu berat untuk dibuka.
+            </p>
+            <div class="lock-btns">
+                <button class="lock-btn" onclick="closeLock()">Belum sekarang</button>
+                <button class="lock-btn primary" onclick="unlockFolder()">Buka</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="hidden-section" id="hiddenSection">
+        <div class="hidden-header">
+            <span class="hidden-eyebrow">// folder tidak berlabel — dibuka hari ini</span>
+            <div class="hidden-title">Foto-foto yang lama tidak dilihat.</div>
+            <div class="hidden-note">
+                bukan karena dihindari.<br>
+                hanya belum ada alasan yang cukup kuat untuk membukanya.
+            </div>
+        </div>
+        <div class="cork-board" id="hiddenBoard"></div>
+    </div>
+
+    <div class="final-note" id="finalNote">
+        <p class="final-text">
+            // semua foto sudah dibuka.<br>
+            // tidak ada yang terhapus.<br>
+            // tidak ada yang perlu dihapus.<br>
+            // galeri dimuat sepenuhnya.
+        </p>
+    </div>
+
+    <div class="lightbox" id="lightbox" onclick="closeLightboxBg(event)">
+        <div class="lb-inner">
+            <button class="lb-close" onclick="closeLightbox()">✕ tutup</button>
+            <div class="lb-paper" id="lbPaper">
+                <div class="lb-photo" id="lbPhoto"></div>
+                <div class="lb-caption-area">
+                    <p class="lb-caption" id="lbCaption"></p>
+                    <div class="lb-metadata" id="lbMeta"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ══════════════════════════════════════════════════════
+        // DATA
+        // Ganti src dengan path foto kamu: ../images/nama.jpg
+        // Foto utama: 1.jpg s/d 9.jpg
+        // Foto tersembunyi: h1.jpg s/d h9.jpg
+        // ══════════════════════════════════════════════════════
+        const mainPhotos = [
+            {
+                id: 'm1', tag: 'tempat', portrait: false,
+                src: '../images/jendela.jpg',
+                pin: 'pin-cream', tape: 'tape-corner',
+                shortCaption: 'jendela yang tidak berubah.',
+                caption: 'Jendela yang menghadap ke arah yang tidak pernah berubah.\n\nCahayanya masuk dari sudut yang sama setiap hari.\n\nAku hanya yang berbeda.',
+                date: '3 tahun lalu', loc: 'tidak dicatat', size: '2.1 MB', device: 'kamera belakang'
+            },
+            {
+                id: 'm2', tag: 'benda', portrait: false,
+                src: '../images/cangkir.jpg',
+                pin: 'pin-dark', tape: '',
+                shortCaption: 'cangkir yang tidak dibuang.',
+                caption: 'Cangkir yang sudah tidak digunakan tapi tidak dibuang.\n\nBukan sentimental.\n\nHanya tidak ada alasan yang cukup kuat untuk membuangnya.',
+                date: '2 tahun 8 bulan lalu', loc: 'dapur', size: '1.8 MB', device: 'kamera belakang'
+            },
+            {
+                id: 'm3', tag: 'lainnya', portrait: false,
+                src: '../images/langit.jpg',
+                pin: 'pin-red', tape: '',
+                shortCaption: 'langit pukul 05.47.',
+                caption: 'Langit pukul 05.47.\n\nTidak ada yang memintaku memotretnya.\n\nTapi ada sesuatu yang terasa perlu dibuktikan — bahwa aku di sini, sendirian, dan baik-baik saja.',
+                date: '2 tahun 5 bulan lalu', loc: 'tidak diketahui', size: '3.2 MB', device: 'kamera belakang'
+            },
+            {
+                id: 'm4', tag: 'tempat', portrait: false,
+                src: '../images/parkiran.jpg',
+                pin: 'pin-cream', tape: 'tape-corner',
+                shortCaption: 'parkiran yang dulu terasa lebih kecil.',
+                caption: 'Parkiran yang dulu terasa lebih kecil.\n\nSekarang terlihat hanya seperti parkiran.',
+                date: '1 tahun 11 bulan lalu', loc: 'tidak perlu dicatat', size: '4.1 MB', device: 'kamera belakang'
+            },
+            {
+                id: 'm5', tag: 'benda', portrait: false,
+                src: '../images/buku.jpg',
+                pin: 'pin-dark', tape: '',
+                shortCaption: 'buku yang berhenti di halaman 47.',
+                caption: 'Buku yang dibelikan tapi tidak pernah selesai.\n\nBukan karena tidak bagus.\n\nKarena di halaman 47 ada sesuatu yang membuatku harus berhenti.',
+                date: '1 tahun 7 bulan lalu', loc: 'rak buku', size: '1.4 MB', device: 'kamera belakang'
+            },
+            {
+                id: 'm6', tag: 'lainnya', portrait: false,
+                src: '../images/foto.jpg',
+                pin: 'pin-red', tape: '',
+                shortCaption: 'foto yang tidak jelas motifnya.',
+                caption: 'Foto yang tidak jelas motifnya.\n\nKemungkinan aku sedang mencoba membuktikan sesuatu kepada diri sendiri di waktu yang salah.',
+                date: '1 tahun 4 bulan lalu', loc: '—', size: '2.7 MB', device: 'kamera depan'
+            },
+            {
+                id: 'm7', tag: 'tempat', portrait: false,
+                src: '../images/sudut.jpg',
+                pin: 'pin-cream', tape: 'tape-corner',
+                shortCaption: 'sudut yang sering diabaikan.',
+                caption: 'Sudut ruangan yang sering diabaikan.\n\nAda debu di sana yang sudah berumur sama dengan keputusan yang belum selesai.',
+                date: '1 tahun lalu', loc: 'ruangan yang sama', size: '1.9 MB', device: 'kamera belakang'
+            },
+            {
+                id:'m8', tag:'benda', portrait:false,
+                src:'../images/cermin.jpg',
+                pin:'pin-dark', tape:'',
+                shortCaption:'cermin yang retaknya tidak ingat kapan mulainya.',
+                caption:'Cermin dengan satu retakan panjang di sudut kiri.\n\nTidak ingat kapan mulainya.\n\nMungkin sudah lama, mungkin baru.\n\nDua kemungkinan itu sama-sama tidak menenangkan.',
+                date:'9 bulan lalu', loc:'kamar', size:'1.2 MB', device:'kamera belakang'
+            },
+            {
+                id: 'm9', tag: 'lainnya', portrait: false,
+                src: '../images/bayangan.jpg',
+                pin: 'pin-red', tape: '',
+                shortCaption: 'bayangan yang berbentuk tidak biasa.',
+                caption: 'Bayangan di lantai yang berbentuk tidak biasa.\n\nAku berdiri di sana selama beberapa menit sebelum sadar aku berdiri di sana.',
+                date: '7 bulan lalu', loc: '—', size: '2.3 MB', device: 'kamera belakang'
+            },
+        ];
+
+        const hiddenPhotos = [
+            {
+                id: 'h1', tag: 'lainnya', portrait: false,
+                src: '../images/pertama.jpg',
+                pin: 'pin-cream', tape: 'tape-corner',
+                shortCaption: 'foto pertama.',
+                caption: 'Foto pertama.\n\nSekarang hanya foto.',
+                date: '4 tahun lalu', loc: '—', size: '3.1 MB', device: 'kamera belakang'
+            },
+            {
+                id: 'h2', tag: 'lainnya', portrait: true,
+                src: '../images/senyum.jpg',
+                pin: 'pin-red', tape: '',
+                shortCaption: 'senyum yang dulu menyimpan banyak arti.',
+                caption: 'Senyum yang dulu menyimpan banyak arti.\n\nSekarang hanya ekspresi wajah seseorang.',
+                date: '3 tahun 9 bulan lalu', loc: '—', size: '2.8 MB', device: 'kamera depan'
+            },
+            {
+                id: 'h3', tag: 'tempat', portrait: false,
+                src: '../images/tempat.jpg',
+                pin: 'pin-dark', tape: 'tape-corner',
+                shortCaption: 'tempat yang dulu tidak bisa dilihat fotonya.',
+                caption: 'Tempat yang dulu tidak bisa dilihat fotonya.\n\nSekarang terlihat hanya seperti tempat.\n\nBeton, tanaman, langit.',
+                date: '3 tahun 6 bulan lalu', loc: 'suatu tempat', size: '4.4 MB', device: 'kamera belakang'
+            },
+            {
+                id: 'h4', tag: 'lainnya', portrait: false,
+                src: '../images/notme.jpg',
+                pin: 'pin-cream', tape: '',
+                shortCaption: 'foto yang diambil bukan olehku.',
+                caption: 'Foto yang diambil bukan olehku.\n\nSekarang ada di galeri ini.\n\nTidak ada yang perlu dijelaskan.',
+                date: '3 tahun 2 bulan lalu', loc: '—', size: '2.2 MB', device: 'tidak diketahui'
+            },
+            {
+                id: 'h5', tag: 'lainnya', portrait: false,
+                src: '../images/berat.jpg',
+                pin: 'pin-red', tape: 'tape-corner',
+                shortCaption: 'yang dulu paling berat untuk dilihat.',
+                caption: 'Ini yang dulu paling berat untuk dilihat.\n\nSekarang aku bisa melihatnya.\n\nHanya itu.',
+                date: '3 tahun lalu', loc: '—', size: '1.9 MB', device: 'kamera belakang'
+            },
+            {
+                id: 'h6', tag: 'benda', portrait: false,
+                src: '../images/benda.jpg',
+                pin: 'pin-dark', tape: '',
+                shortCaption: 'benda milik seseorang.',
+                caption: 'Benda milik seseorang yang tidak tahu fotonya masih ada.\n\nTidak apa-apa.',
+                date: '2 tahun 11 bulan lalu', loc: '—', size: '1.6 MB', device: 'kamera belakang'
+            },
+            {
+                id: 'h7', tag: 'tempat', portrait: false,
+                src: '../images/last.jpg',
+                pin: 'pin-cream', tape: 'tape-corner',
+                shortCaption: 'tempat terakhir yang difoto bersama.',
+                caption: 'Tempat terakhir yang difoto bersama.\n\nSekarang hanya koordinat.',
+                date: '2 tahun 8 bulan lalu', loc: 'sudah lupa tepatnya', size: '3.3 MB', device: 'kamera belakang'
+            },
+            {
+                id: 'h8', tag: 'lainnya', portrait: false,
+                src: '../images/sering.jpg',
+                pin: 'pin-red', tape: '',
+                shortCaption: 'foto yang dulu sering dibuka.',
+                caption: 'Foto ini dulu sering dibuka.\n\nSekarang sudah lama tidak.\n\nBukan karena dihindari.\n\nKarena tidak perlu.',
+                date: '2 tahun 5 bulan lalu', loc: '—', size: '2.1 MB', device: 'kamera depan'
+            },
+            {
+                id: 'h9', tag: 'lainnya', portrait: false,
+                src: '../images/perpisahan.jpg',
+                pin: 'pin-dark', tape: 'tape-corner',
+                shortCaption: 'foto terakhir.',
+                caption: 'Foto terakhir di folder ini.\n\nTidak istimewa.\n\nItu yang membuatnya akhirnya terasa biasa.',
+                date: '2 tahun 1 bulan lalu', loc: '—', size: '1.7 MB', device: 'kamera belakang'
+            },
+        ];
+
+        const stickyNotes = [
+            {
+                after: 2, color: 'white',
+                text: 'kenapa kita menyimpan foto\ndari hal-hal yang ingin kita lupakan?',
+                meta: 'pertanyaan · tanpa jawaban'
+            },
+            {
+                after: 5, color: 'blue',
+                text: 'setiap gambar adalah\nbukti bahwa kita pernah\n\ndi suatu tempat,\ndengan sesuatu,\nuntuk alasan yang waktu itu\nterasa cukup.',
+                meta: 'catatan · tidak terdokumentasi'
+            },
+            {
+                after: 8, color: 'pink',
+                text: 'memori yang difoto\ntidak lebih nyata\ndari yang tidak.',
+                meta: 'observasi · tidak berguna'
+            },
+        ];
+
+        // ── Rotasi ──
+        const rotations = [-3.5, -2.2, -1.4, -0.7, 0.4, 1.1, 1.9, 2.6, 3.1, -1.2, 2.0, -2.8, 0.8, -0.5, 1.6];
+        let rotIdx = 0;
+        function nextRot() { return rotations[(rotIdx++) % rotations.length]; }
+
+        function buildCard(p) {
+            const rot = nextRot();
+            const card = document.createElement('div');
+            card.className = 'photo-card';
+            card.dataset.tag = p.tag;
+            card.style.transform = `rotate(${rot}deg)`;
+
+            const paper = document.createElement('div');
+            paper.className = 'card-paper' + (p.tape ? ' ' + p.tape : '');
+
+            const pin = document.createElement('div');
+            pin.className = 'pin ' + p.pin;
+            paper.appendChild(pin);
+
+            const photoDiv = document.createElement('div');
+            photoDiv.className = 'card-photo' + (p.portrait ? ' portrait' : '');
+            const img = document.createElement('img');
+            img.src = p.src;
+            img.alt = '';
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            photoDiv.appendChild(img);
+            paper.appendChild(photoDiv);
+
+            const caption = document.createElement('div');
+            caption.className = 'card-caption';
+            caption.textContent = p.shortCaption;
+            const dateEl = document.createElement('span');
+            dateEl.className = 'card-date';
+            dateEl.textContent = p.date;
+            caption.appendChild(dateEl);
+            paper.appendChild(caption);
+
+            card.appendChild(paper);
+            card.addEventListener('click', () => openLightbox(p, rot));
+            return card;
+        }
+
+        function buildSticky(s) {
+            const wrap = document.createElement('div');
+            wrap.className = 'sticky-note';
+            wrap.style.transform = `rotate(${nextRot() * 0.55}deg)`;
+            const inner = document.createElement('div');
+            inner.className = 'sticky-inner ' + s.color;
+            const text = document.createElement('div');
+            text.className = 'sticky-text';
+            text.innerHTML = s.text.replace(/\n/g, '<br>');
+            const meta = document.createElement('div');
+            meta.className = 'sticky-meta';
+            meta.textContent = s.meta;
+            inner.appendChild(text);
+            inner.appendChild(meta);
+            wrap.appendChild(inner);
+            return wrap;
+        }
+
+        let currentFilter = 'all';
+
+        function renderBoard(photos, containerId) {
+            const board = document.getElementById(containerId);
+            board.innerHTML = '';
+            const list = (currentFilter === 'all' || containerId === 'hiddenBoard')
+                ? photos
+                : photos.filter(p => p.tag === currentFilter);
+            list.forEach((p, i) => {
+                board.appendChild(buildCard(p));
+                if (containerId === 'mainBoard') {
+                    const s = stickyNotes.find(n => n.after === i);
+                    if (s) board.appendChild(buildSticky(s));
+                }
+            });
+        }
+
+        function filterCards(tag, btn) {
+            currentFilter = tag;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            rotIdx = 0;
+            renderBoard(mainPhotos, 'mainBoard');
+            updateCount();
+        }
+
+        function updateCount() {
+            const n = currentFilter === 'all'
+                ? mainPhotos.length
+                : mainPhotos.filter(p => p.tag === currentFilter).length;
+            document.getElementById('gridCount').textContent = n + ' foto';
+            document.getElementById('topMeta').textContent = mainPhotos.length + ' foto';
+        }
+
+        function openLightbox(p, rot) {
+            const paper = document.getElementById('lbPaper');
+            paper.style.transform = `rotate(${(rot || 0) * 0.25}deg)`;
+
+            const lbPhoto = document.getElementById('lbPhoto');
+            lbPhoto.innerHTML = '';
+            lbPhoto.className = 'lb-photo' + (p.portrait ? ' portrait' : '');
+            const img = document.createElement('img');
+            img.src = p.src;
+            img.alt = '';
+            lbPhoto.appendChild(img);
+
+            document.getElementById('lbCaption').innerHTML = p.caption.replace(/\n/g, '<br>');
+            document.getElementById('lbMeta').innerHTML = `
+    <div class="lb-meta-item"><span>Tanggal</span>${p.date}</div>
+    <div class="lb-meta-item"><span>Lokasi</span>${p.loc}</div>
+    <div class="lb-meta-item"><span>Ukuran</span>${p.size}</div>
+    <div class="lb-meta-item"><span>Perangkat</span>${p.device}</div>`;
+
+            document.getElementById('lightbox').classList.add('visible');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+        function closeLightboxBg(e) {
+            if (e.target === document.getElementById('lightbox')) closeLightbox();
+        }
+
+        function openLock() {
+            document.getElementById('lockOverlay').classList.add('visible');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeLock() {
+            document.getElementById('lockOverlay').classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+        function unlockFolder() {
+            const f = document.getElementById('lockedFolder');
+            f.querySelector('.folder-glyph').textContent = '🗂';
+            f.querySelector('.folder-name').style.color = 'rgba(210,190,152,0.88)';
+            f.querySelector('#lockedCount').textContent = '9 foto';
+            f.classList.remove('locked');
+            f.onclick = null;
+            closeLock();
+
+            const hs = document.getElementById('hiddenSection');
+            hs.classList.add('visible');
+            rotIdx = 0;
+            renderBoard(hiddenPhotos, 'hiddenBoard');
+            setTimeout(() => document.getElementById('finalNote').classList.add('visible'), 900);
+            setTimeout(() => hs.scrollIntoView({ behavior: 'smooth', block: 'start' }), 250);
+        }
+
+        // Init
+        const now = new Date();
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        document.getElementById('headerDate').innerHTML =
+            `<span style="font-family:var(--mono);font-size:0.5rem;letter-spacing:2px;color:var(--warm-dim);">${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}</span><br>` +
+            `<span style="font-size:0.9rem;color:var(--warm-mid);">${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}</span>`;
+
+        renderBoard(mainPhotos, 'mainBoard');
+        updateCount();
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') { closeLightbox(); closeLock(); }
+        });
+    </script>
+</body>
+
+</html>
